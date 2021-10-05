@@ -353,7 +353,11 @@ MigrationBackup/
 .ionide/
 
 #.idea
+<<<<<<< HEAD
 .idea/
 
 # MACOS
 .DS_Store
+=======
+.idea/
+>>>>>>> WIP database connection
