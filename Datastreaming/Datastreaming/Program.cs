@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
@@ -7,7 +8,7 @@ namespace Datastreaming
     {
         static void Main(string[] args)
         {
-            string connectionString = "Server=DESKTOP-91DJ17V\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=aes; Password=aes;Trusted_Connection=False";
+            string connectionString = ReadSetupFile(); //"Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False";
             try
             {
                 string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'";
@@ -44,6 +45,19 @@ namespace Datastreaming
         private static void PrintReader(SqlDataReader reader)
         {
             Console.WriteLine("{0}, {1}", reader[0], reader[1]);
+        }
+
+        private static string ReadSetupFile()
+        {
+            const string fileName = "setup.txt";
+            string connectionString;
+            using (StreamReader sr = new StreamReader(fileName))
+            {
+                connectionString = sr.ReadLine();
+            }
+
+            Console.WriteLine(connectionString);
+            return connectionString;
         }
     }
 }
