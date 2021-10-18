@@ -1,0 +1,16 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datastreaming", "Datastreaming\Datastreaming.csproj", "{385B52F6-FBFD-46BA-9ED2-555F1033A1B9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{385B52F6-FBFD-46BA-9ED2-555F1033A1B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{385B52F6-FBFD-46BA-9ED2-555F1033A1B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{385B52F6-FBFD-46BA-9ED2-555F1033A1B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{385B52F6-FBFD-46BA-9ED2-555F1033A1B9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
