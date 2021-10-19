@@ -137,6 +137,9 @@ _TeamCity*
 .axoCover/*
 !.axoCover/settings.json
 
+#MacOS Stuff
+*.DS_Store
+
 # Visual Studio code coverage results
 *.coverage
 *.coveragexml
