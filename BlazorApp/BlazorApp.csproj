@@ -8,4 +8,12 @@
     <None Include="wwwroot\Icons\error-icon.svg" />
   </ItemGroup>
 
+  <ItemGroup>
+    <PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <_ContentIncludedByDefault Remove="Charts\Linechart.cshtml" />
+  </ItemGroup>
+
 </Project>

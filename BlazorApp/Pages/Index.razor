@@ -1,4 +1,95 @@
 @page "/"
+@using ChartJs.Blazor.LineChart
+@using ChartJs.Blazor.PieChart
+@using System.Reflection.Emit
 
-<h1>P3 Landing page</h1>
 
+<div class="summary">
+    <h1><div class="summary_caption" style="text-align: center;">Summary</div></h1>
+    <Chart Config="_pieconfig"></Chart>
+    
+</div>
+
+<div class="cpu_usage" style="text-align: center ">CPU Usage
+    <Chart Config="_lineconfig" ></Chart>
+    <h1></h1>
+</div>
+
+
+
+@code{
+    private LineConfig _lineconfig;
+    private PieConfig _pieconfig;
+
+    protected override void OnInitialized()
+    {
+        ConfigureLineConfig();
+        ConfigurePieConfig();
+    }
+
+    private void ConfigureLineConfig()
+    {
+        _lineconfig = new LineConfig();
+
+        _lineconfig.Options = new LineOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = "Cpu usage",
+                FontColor = "#FFFFFF"
+            }
+
+        };
+        
+        var lineconfigdataset = new LineDataset<int>(new[] {35, 50, 15, 45, 37});
+        {
+        }
+        
+     
+
+        _lineconfig.Data.Datasets.Add(lineconfigdataset);
+
+    }
+    
+    private void ConfigurePieConfig()
+    {
+
+        
+        
+        _pieconfig = new PieConfig();
+
+
+        _pieconfig.Options = new PieOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = true,
+                Text = "Total Errors",
+                FontColor = "#FFFFFF",
+
+            },
+            
+        };
+        
+
+        foreach (var party in new[]{"Fatal error","Error","Test"})
+        {
+            _pieconfig.Data.Labels.Add(party);
+        }
+
+        var pieconfigdataset = new PieDataset<int>(new[] {35, 50, 15}) //Datapoints
+        {
+            BackgroundColor = new[]   // Color for the pies
+            {
+                ColorUtil.ColorHexString(255, 0, 0),
+                ColorUtil.ColorHexString(0, 255, 0),
+                ColorUtil.ColorHexString(0, 0, 255)
+            }
+        };
+        _pieconfig.Data.Datasets.Add(pieconfigdataset);
+
+    }
+}
