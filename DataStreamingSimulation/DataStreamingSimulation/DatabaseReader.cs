@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using Microsoft.Data.SqlClient;
 
 namespace DataStreamingSimulation
@@ -6,7 +7,7 @@ namespace DataStreamingSimulation
     public class DatabaseReader
     {
         
-        public void SqlReader(SqlCommand command, Action<SqlDataReader> readerHandler)
+        protected void SqlReader(SqlCommand command, Action<SqlDataReader> readerHandler)
         {
             using(SqlDataReader reader = command.ExecuteReader())
             {
@@ -17,15 +18,14 @@ namespace DataStreamingSimulation
             }
         }
         
-        public void PrintConnection(SqlConnection connection)
+        protected void PrintConnection(SqlConnection connection)
         {
             Console.WriteLine("State: {0}", connection.State);
-            Console.WriteLine("ConnectionString: {0}",
-                connection.ConnectionString);
+            Console.WriteLine("ConnectionString: {0}", connection.ConnectionString);
         }
         
         /* Print matching queryString columns */
-        public void PrintReader(SqlDataReader reader)
+        protected void PrintReader(SqlDataReader reader)
         {
             string printString = String.Empty;
 
@@ -40,6 +40,5 @@ namespace DataStreamingSimulation
             
             Console.WriteLine(printString);
         }
-        
     }
 }

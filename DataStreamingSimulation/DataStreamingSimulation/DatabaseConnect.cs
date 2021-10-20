@@ -17,38 +17,28 @@ namespace DataStreamingSimulation
                 connection.Open();
                 PrintConnection(connection);
                 
-                // SqlCommand cmd = new SqlCommand("SELECT COUNT(*) FROM AFSTEMNING",connection);
-                //
-                // Int32 count = (Int32)cmd.ExecuteScalar();
-                // Console.WriteLine("--------------------" + count);
-                
                 SqlCommand command = new SqlCommand(queryString, connection);
                 
                 if (print) SqlReader(command, PrintReader);
-                else Console.WriteLine("FALSE");
-                
-                // using(SqlDataReader reader = command.ExecuteReader())
-                // {
-                //     while (reader.Read())
-                //     {
-                //         PrintReader(reader);
-                //     }
-                // }
+                else Console.WriteLine("SEND TO FAKE STATE DATABASE!");
             }
         }
+        
+        /* Edit 'bin/Debug/net5.0/setup.txt' to change DBO */
+        /* Format: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False' */
+        public string ReadSetupFile()
+        {
+            const string fileName = "setup.txt";
+            string connectionString;
+            using (StreamReader sr = new StreamReader(fileName))
+            {
+                connectionString = sr.ReadLine();
+            }
 
-        // public void SqlReader(SqlCommand command, Action<SqlDataReader> readerHandler)
-        // {
-        //     using(SqlDataReader reader = command.ExecuteReader())
-        //     {
-        //         while (reader.Read())
-        //         {
-        //             readerHandler(reader);
-        //             //PrintReader(reader);
-        //         }
-        //     }
-        // }
-
+            Console.WriteLine(connectionString);
+            return connectionString;
+        }
+        
         public Int32 GetMaxRowsInDB(string[] tables, string connectionString)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
@@ -67,46 +57,6 @@ namespace DataStreamingSimulation
                 connection.Close();
                 return tableRowNum.Max();
             }
-        }
-        
-        
-        
-        // private static void PrintConnection(SqlConnection connection)
-        // {
-        //     Console.WriteLine("State: {0}", connection.State);
-        //     Console.WriteLine("ConnectionString: {0}",
-        //         connection.ConnectionString);
-        // }
-        //
-        // /* Print matching queryString columns */
-        // private static void PrintReader(SqlDataReader reader)
-        // {
-        //     string printString = String.Empty;
-        //
-        //     for (int i = 0; reader.FieldCount > i ; i++)
-        //     {
-        //         if (reader.IsDBNull(i))
-        //         {
-        //             printString += "NULL,";
-        //         } else
-        //             printString += $"{reader[i]},";
-        //     }
-        //     
-        //     Console.WriteLine(printString);
-        // }
-
-        // "Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False";
-        public string ReadSetupFile()
-        {
-            const string fileName = "setup.txt";
-            string connectionString;
-            using (StreamReader sr = new StreamReader(fileName))
-            {
-                connectionString = sr.ReadLine();
-            }
-
-            Console.WriteLine(connectionString);
-            return connectionString;
         }
     }
 }
