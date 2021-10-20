@@ -11,9 +11,14 @@ namespace DataStreamingSimulation
     {
         static void Main(string[] args)
         {
+            string[] tablesToStream = {"AFSTEMNING", "AUDIT_LOGERROR", "ENGINE_PROPERTIES", "HEALTH_REPORT", "MANAGER_TRACKING"};
+            
+            // Console.WriteLine(tablesToStream[0]);
             
             const int increaseInSec = 5;
             DatabaseConnect sqlConnection = new DatabaseConnect();
+            
+            
             
             try
             {
@@ -22,10 +27,15 @@ namespace DataStreamingSimulation
                 DateTime startTime = DateTime.Parse("2021-05-18 14:28:14.060");
                 DateTime nextTime = startTime.AddSeconds(increaseInSec);
 
-                for (int tableCount = 0; tableCount < 20; tableCount++)
+                Int32 maxTableCount = sqlConnection.GetMaxRowsInDB(tablesToStream, sqlConnection.ReadSetupFile());
+
+                Console.WriteLine("*****************" + maxTableCount);
+                
+                for (int i = 0; maxTableCount > i; i++)
                 {
                     string queryString = makeQueryString(startTime, nextTime);
-                    sqlConnection.SqlConnect(queryString,sqlConnection.ReadSetupFile());
+                    sqlConnection.SqlConnect(queryString,sqlConnection.ReadSetupFile(), true);
+                    
                     
                     System.Threading.Thread.Sleep(increaseInSec * 1000);
                     
@@ -46,10 +56,11 @@ namespace DataStreamingSimulation
             
             string healthReport = $@"SELECT * FROM HEALTH_REPORT
                                      WHERE LOG_TIME BETWEEN '{startTime}' and '{nextTime}';";
-            
-            
+
+            string test = "ANS_CUSTOM_MVP.Rows.Count";
             
             return healthReport;
         }
+        
     }
 }
