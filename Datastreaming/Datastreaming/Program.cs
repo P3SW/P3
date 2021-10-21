@@ -8,7 +8,7 @@ namespace Datastreaming
     {
         static void Main(string[] args)
         {
-            string connectionString = ReadSetupFile(); //"Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False";
+            string connectionString = new ConfigReader().ReadSetupFile(); 
             try
             {
                 string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'";
@@ -17,15 +17,19 @@ namespace Datastreaming
                     connection.Open();
                     PrintConnection(connection);
 
-                    SqlCommand command = new SqlCommand(queryString, connection);
+                    DbStreamer streamer = new DbStreamer(connection, connectionString);
+                    streamer.StartListening();
 
-                    using(SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            PrintReader(reader);
-                        }
-                    }
+                    Console.ReadLine();
+                    // SqlCommand command = new SqlCommand(queryString, connection);
+                    //
+                    // using(SqlDataReader reader = command.ExecuteReader())
+                    // {
+                    //     while (reader.Read())
+                    //     {
+                    //         PrintReader(reader);
+                    //     }
+                    // }
                 }
             }
             catch (Exception e)
@@ -45,19 +49,6 @@ namespace Datastreaming
         private static void PrintReader(SqlDataReader reader)
         {
             Console.WriteLine("{0}, {1}", reader[0], reader[1]);
-        }
-
-        private static string ReadSetupFile()
-        {
-            const string fileName = "setup.txt";
-            string connectionString;
-            using (StreamReader sr = new StreamReader(fileName))
-            {
-                connectionString = sr.ReadLine();
-            }
-
-            Console.WriteLine(connectionString);
-            return connectionString;
         }
     }
 }
