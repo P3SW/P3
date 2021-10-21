@@ -4,7 +4,7 @@ using Microsoft.Data.SqlClient;
 
 namespace DataStreamingSimulation
 {
-    public class DatabaseReader
+    public class DatabaseRead
     {
         
         protected void SqlReader(SqlCommand command, Action<SqlDataReader> readerHandler)
@@ -40,5 +40,29 @@ namespace DataStreamingSimulation
             
             Console.WriteLine(printString);
         }
+
+        protected void TransferData(SqlDataReader reader)
+        {
+            DatabaseConnect sqlConnection = new DatabaseConnect();
+            
+            using (SqlConnection connection = new SqlConnection(sqlConnection.ReadSetupFile(true)))
+            {
+                connection.Open();
+                PrintConnection(connection);
+
+                string queryString = "Bla";
+                
+                using (SqlCommand command = new SqlCommand(queryString, connection))
+                {
+                    //command.Parameters.Add()
+                }
+                
+            }
+            
+            
+            Console.WriteLine(reader[0]);
+            Console.WriteLine("Sent to DBO");
+        }
+        
     }
 }

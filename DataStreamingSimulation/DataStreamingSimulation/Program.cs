@@ -27,7 +27,7 @@ namespace DataStreamingSimulation
                 {
                     string queryString = makeQueryString(startTime, nextTime);
                     
-                    sqlConnection.SqlConnect(queryString,sqlConnection.ReadSetupFile(), true);
+                    sqlConnection.SqlConnect(queryString,sqlConnection.ReadSetupFile());
                     
                     System.Threading.Thread.Sleep(increaseInSec * 1000);
                     
