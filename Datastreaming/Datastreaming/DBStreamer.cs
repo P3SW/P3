@@ -19,7 +19,7 @@ namespace Datastreaming
             _connection = connection;
             _connectionString = connectionString;
             //_queryString = "SELECT name, age FROM dbo.people";
-            _queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8 /*AND LOG_TIME >= '2021-10-20 09:30:10.770'*/";
+            _queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8";
             _printer = new StreamPrinter(_connection, _queryString);
             SqlDependency.Stop(_connectionString);
             SqlDependency.Start(_connectionString);
@@ -58,21 +58,6 @@ namespace Datastreaming
                 _printer.PrintChanges();
             }
             StartListening();
-        }
-        public void PrintChanges()
-        {
-            SqlCommand command = new SqlCommand(_queryString, _connection);
-
-            _printer.PrintReader(command);
-        }
-        public void PrintReader(SqlDataReader reader)
-        {
-            for (int i = 0; i < reader.VisibleFieldCount; i++)
-            {
-                Console.Write("{0} ", reader[i]);
-            }
-            Console.Write("\n");
-            //Console.WriteLine("{0},{1}", reader[0], reader[1]);
         }
     }
 }

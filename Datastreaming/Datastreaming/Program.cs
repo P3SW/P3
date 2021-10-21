@@ -21,15 +21,6 @@ namespace Datastreaming
                     streamer.StartListening();
 
                     Console.ReadLine();
-                    // SqlCommand command = new SqlCommand(queryString, connection);
-                    //
-                    // using(SqlDataReader reader = command.ExecuteReader())
-                    // {
-                    //     while (reader.Read())
-                    //     {
-                    //         PrintReader(reader);
-                    //     }
-                    // }
                 }
             }
             catch (Exception e)
