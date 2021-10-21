@@ -6,43 +6,38 @@ using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
 {
-    public class DBStreamer
+    public class DbStreamer
     {
         private SqlDependency _dependency;
 
-        public string ConnectionString { get; private set; }
+        private string _connectionString;
         private string _queryString;
-        public SqlConnection Connection { get; private set; }
-
-        public DBStreamer(SqlConnection connection, string connectionString)
+        private SqlConnection _connection;
+        private StreamPrinter _printer;
+        public DbStreamer(SqlConnection connection, string connectionString)
         {
-            Connection = connection;
-            ConnectionString = connectionString;
+            _connection = connection;
+            _connectionString = connectionString;
             //_queryString = "SELECT name, age FROM dbo.people";
             _queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8 /*AND LOG_TIME >= '2021-10-20 09:30:10.770'*/";
-            SqlDependency.Stop(ConnectionString);
-            SqlDependency.Start(ConnectionString);
+            _printer = new StreamPrinter(_connection, _queryString);
+            SqlDependency.Stop(_connectionString);
+            SqlDependency.Start(_connectionString);
         }
 
         public void StartListening()
         {   
             try
             {
-                using (SqlCommand command = new SqlCommand(_queryString, Connection))
+                using (SqlCommand command = new SqlCommand(_queryString, _connection))
                 {
                     command.CommandType = CommandType.Text;
                     command.CommandText = _queryString;
                 
                     _dependency = new SqlDependency(command);
                     _dependency.OnChange += SqlDependencyChange;
-                
-                    using (SqlDataReader reader = command.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            PrintReader(reader);
-                        }
-                    }
+                    
+                    _printer.PrintReader(command);
                 }
             }
             catch (Exception e)
@@ -60,21 +55,15 @@ namespace Datastreaming
             else
             {
                 //Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source, eventArgs.Type);
-                PrintChanges();
+                _printer.PrintChanges();
             }
             StartListening();
         }
         public void PrintChanges()
         {
-            SqlCommand command = new SqlCommand(_queryString, Connection);
+            SqlCommand command = new SqlCommand(_queryString, _connection);
 
-            using(SqlDataReader reader = command.ExecuteReader())
-            {
-                while (reader.Read())
-                {
-                    PrintReader(reader);
-                }
-            }
+            _printer.PrintReader(command);
         }
         public void PrintReader(SqlDataReader reader)
         {
