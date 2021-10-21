@@ -14,7 +14,6 @@ namespace Datastreaming
         }
         public void PrintChanges()
         {
-            //string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM HEALTH_REPORT WHERE MONITOR_NO = 8/*REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'*/";
             SqlCommand command = new SqlCommand(_queryString, _connection);
             PrintReader(command);
         }
@@ -22,16 +21,12 @@ namespace Datastreaming
         {
             using (SqlDataReader reader = command.ExecuteReader())
             {
-                while (reader.Read())
+                for (int i = 0; i < reader.VisibleFieldCount; i++)
                 {
-                    foreach (var value in reader){}
-                    {
-                        Console.Write("{0}, ", reader);
-                    }
+                    Console.Write("{0} ", reader[i]);
                 }
+                Console.Write("\n");
             }
-            
-            //Console.WriteLine("{0},{1}", reader[0], reader[1]);
         }
     }
 }
