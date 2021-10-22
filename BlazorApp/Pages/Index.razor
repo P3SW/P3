@@ -39,17 +39,56 @@
                 Display = true,
                 Text = "Cpu usage",
                 FontColor = "#FFFFFF"
+            },
+            Hover = new Hover
+            {
+                Mode = InteractionMode.Nearest,
+                Intersect = true
+            },
+            Scales = new Scales
+            {
+                XAxes = new List<CartesianAxis> //data for the x axes
+                {
+                    new CategoryAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            LabelString = "Time"
+                        }
+                    }
+                },
+                YAxes = new List<CartesianAxis>  // data for the y axes
+                {
+                    new LinearCartesianAxis
+                    {
+                        ScaleLabel = new ScaleLabel   
+                        {
+                            LabelString = "%" 
+                        }
+                   }
+                }
             }
-
         };
         
-        var lineconfigdataset = new LineDataset<int>(new[] {35, 50, 15, 45, 37});
+        var lineconfigdataset1 = new LineDataset<int>(new[] {35, 50, 15, 45, 37})
         {
-        }
-        
-     
+            Label = "Cpu usage",
+            //BackgroundColor = ColorUtil.ColorHexString
+            BorderColor = ColorUtil.ColorHexString(227,95,82),
+            
+        };
 
-        _lineconfig.Data.Datasets.Add(lineconfigdataset);
+        var lineconfigdataset2 = new LineDataset<int>(new[] {10, 30, 1, 10, 20})
+        {
+            Label = "Ram usage",
+    //BackgroundColor = ColorUtil.ColorHexString
+            BorderColor = ColorUtil.ColorHexString(92, 188, 169),
+            BackgroundColor = ColorUtil.ColorHexString(92,188,169), // ADD GRADIANT HERE!!!
+        };
+        
+        _lineconfig.Data.Datasets.Add(lineconfigdataset1);
+        _lineconfig.Data.Datasets.Add(lineconfigdataset2);
+        
 
     }
     
@@ -69,25 +108,28 @@
                 Display = true,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
-
             },
-            
         };
         
 
-        foreach (var party in new[]{"Fatal error","Error","Test"})
+        foreach (var party in new[]{"Fatal error","Error","Warning","Info"})
         {
+            
             _pieconfig.Data.Labels.Add(party);
         }
 
-        var pieconfigdataset = new PieDataset<int>(new[] {35, 50, 15}) //Datapoints
+        var pieconfigdataset = new PieDataset<int>(new[] {20,10,10,60 }) //Datapoints
         {
             BackgroundColor = new[]   // Color for the pies
             {
-                ColorUtil.ColorHexString(255, 0, 0),
-                ColorUtil.ColorHexString(0, 255, 0),
-                ColorUtil.ColorHexString(0, 0, 255)
-            }
+                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
+                ColorUtil.ColorHexString(227, 95, 82), //Error
+                ColorUtil.ColorHexString(221, 155, 43), //Warning
+                ColorUtil.ColorHexString(92, 188, 169)  //Info
+                    
+            },
+
+
         };
         _pieconfig.Data.Datasets.Add(pieconfigdataset);
 
