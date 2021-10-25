@@ -15,17 +15,19 @@ namespace DataStreamingSimulation
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-                PrintConnection(connection);
+                //PrintConnection(connection);
                 
                 SqlCommand command = new SqlCommand(queryString, connection);
 
                 if (print)
                 {
                     SqlReader(command, PrintReader);
+                    connection.Close(); //BUG?
                 }
                 else
                 {
                     SqlReader(command, TransferData);
+                    connection.Close(); //BUG?
                     // Console.WriteLine("SEND TO FAKE STATE DATABASE!");
                     // DatabaseTransfer transfer = new DatabaseTransfer();
                     // transfer.TransferToDatabase(queryString);
@@ -34,8 +36,8 @@ namespace DataStreamingSimulation
             }
         }
         
-        /* Edit 'bin/Debug/net5.0/setup.txt' to change DBO */
-        /* Format: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False' */
+        // Edit 'bin/Debug/net5.0/setup.txt' to change DBO */
+        // Format: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False'
         public string ReadSetupFile(bool transferData = false)
         {
             const string fileName = "setup.txt";
