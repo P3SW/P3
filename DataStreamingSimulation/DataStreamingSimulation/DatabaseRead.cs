@@ -3,6 +3,7 @@ using System.Collections.Concurrent;
 using System.Data;
 using System.Diagnostics;
 using System.Globalization;
+using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Channels;
 using Microsoft.Data.SqlClient;
@@ -44,6 +45,11 @@ namespace DataStreamingSimulation
                 {
                     printString += $"{reader.GetName(i)}: NULL\n";
                 }
+                else if (reader[i].GetType() == typeof(Byte[]))
+                {
+                    string byteString = reader.GetString(0).ToString();
+                    printString += $"{reader.GetName(i)}: {byteString}\n";
+                }
                 else
                 {
                     printString += $"{reader.GetName(i)}: {reader[i]}\n";
@@ -76,7 +82,8 @@ namespace DataStreamingSimulation
 
                 Regex rgx = new Regex(@"(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}).(\d{3})");
                 
-                //TODO - System.Byte[]
+                //string test = (@"select distinct Discriminator from ANS_Destination_2.dbo.Actor where Discriminator not in ('OrganisationalUnit', 'User', 'ItSystem')");
+                //TODO - FIX STRING INTERPOLATION
                 
                 for (int i = 0; reader.FieldCount > i ; i++)
                 {
@@ -90,13 +97,19 @@ namespace DataStreamingSimulation
                     {
                         valuesQueryTail += (i == lastValue ? $"(CONVERT(datetime,'{reader[i]}'))" : $"(CONVERT(datetime,'{reader[i]}')), ");
                     }
+                    else if (reader[i].GetType() == typeof(Byte[]))
+                    {
+                        
+                        string byteString = reader.GetString(0).ToString();
+                        valuesQueryTail += (i == lastValue ? $"(CONVERT(VARBINARY(MAX),'{byteString}'))" : $"(CONVERT(VARBINARY(MAX),'{byteString}')), ");                                                  //BUG? - DOES IT WORK?
+                    }
                     else if (rgx.IsMatch($"({reader[i]})"))
                     {
                         valuesQueryTail += (i == lastValue ? $"('{reader[i]}')" : $"('{reader[i]}'), ");
                     }
                     else
                     { 
-                        valuesQueryTail += (i == lastValue ? $"('{reader[i]}')" : $"('{reader[i]}'), ");
+                        valuesQueryTail += (i == lastValue ? @$"('{reader[i]}')" : $"('{reader[i]}'), ");
                     }
                     
                 }
