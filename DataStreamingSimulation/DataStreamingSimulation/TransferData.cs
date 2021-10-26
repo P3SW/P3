@@ -40,7 +40,6 @@ namespace DataStreamingSimulation
                             command.Parameters.AddWithValue($"@param{i}", reader[i]);
                         }
                     }
-                    
                     try
                     {
                         connection.Open();

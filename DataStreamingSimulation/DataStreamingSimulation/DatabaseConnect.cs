@@ -35,8 +35,11 @@ namespace DataStreamingSimulation
             }
         }
         
-        // Edit 'bin/Debug/net5.0/setup.txt' to change DBO 
-        // Format: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False'
+        /// <remarks>
+        ///   <para> Edit 'bin/Debug/net5.0/setup.txt' to change DBO. </para>
+        ///   <para> Format example: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP;
+        ///     User ID=sa; Password=Password123;Trusted_Connection=False' </para>
+        /// </remarks>
         public string ReadSetupFile(bool transferData = false)
         {
             const string fileName = "setup.txt";
@@ -47,10 +50,7 @@ namespace DataStreamingSimulation
                 int i = 0;
                 while (!sr.EndOfStream) connectionString[i++] = sr.ReadLine();
             }
-
-            //Console.WriteLine("Read: " + connectionString[0]);
-            //Console.WriteLine("Write: " + connectionString[1]);
-            
+          
             if (transferData) return connectionString[1];
             return connectionString[0];
         }
@@ -59,25 +59,6 @@ namespace DataStreamingSimulation
         {
             Console.WriteLine("State: {0}", connection.State);
             Console.WriteLine("ConnectionString: {0}", connection.ConnectionString);
-        }
-        
-        public Int32 GetMaxRowsInDB(string[] tables, string connectionString)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                List<int> tableRowNum = new List<int>();
-
-                foreach (var table in tables)
-                {
-                    SqlCommand cmd = new SqlCommand($"SELECT COUNT(*) FROM {table}", connection);
-                    Int32 count = (Int32)cmd.ExecuteScalar();
-                    tableRowNum.Add(count);
-                }
-                
-                connection.Close();
-                return tableRowNum.Max();
-            }
         }
     }
 }
