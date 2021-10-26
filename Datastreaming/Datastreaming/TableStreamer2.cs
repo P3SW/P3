@@ -1,12 +1,11 @@
 using System;
+using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Threading;
 using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
 {
-    public class DbStreamer
+    public class TableStreamer2
     {
         private SqlDependency _dependency;
 
@@ -14,15 +13,32 @@ namespace Datastreaming
         private string _queryString;
         private SqlConnection _connection;
         private StreamPrinter _printer;
-        public DbStreamer(SqlConnection connection, string connectionString)
+        private List<LogData> dataList;
+        public TableStreamer2(SqlConnection connection, string connectionString, string queryString)
         {
             _connection = connection;
             _connectionString = connectionString;
-            //_queryString = "SELECT name, age FROM dbo.people";
-            _queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8";
+            _queryString = queryString;
             _printer = new StreamPrinter(_connection, _queryString);
-            SqlDependency.Stop(_connectionString);
-            SqlDependency.Start(_connectionString);
+            
+            dataList = new List<LogData>();
+            
+            
+            using (SqlCommand command = new SqlCommand(_queryString, _connection))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        dataList.Add(new LogData((DateTime) reader[0], (string) reader[1], (string) reader[2], (long) reader[3], (long) reader[4]));
+                        for (int i = 0; i < reader.VisibleFieldCount; i++)
+                        {
+                            Console.Write("{0} ", reader[i]);
+                        }
+                        Console.Write("\n");
+                    }
+                }
+            }
         }
 
         public void StartListening()
@@ -37,7 +53,9 @@ namespace Datastreaming
                     _dependency = new SqlDependency(command);
                     _dependency.OnChange += SqlDependencyChange;
                     
-                    _printer.PrintReader(command);
+                    CloseReader(command);
+                    
+                    //_printer.PrintReader(command);
                 }
             }
             catch (Exception e)
@@ -54,10 +72,15 @@ namespace Datastreaming
             }
             else
             {
-                //Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source, eventArgs.Type);
-                _printer.PrintChanges();
+                _printer.PrintChanges(LogData.GetChangesQueryString());
             }
             StartListening();
+        }
+
+        private static void CloseReader(SqlCommand command)
+        {
+            SqlDataReader reader = command.ExecuteReader();
+            reader.Close();
         }
     }
 }

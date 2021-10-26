@@ -11,15 +11,19 @@ namespace Datastreaming
             string connectionString = new ConfigReader().ReadSetupFile(); 
             try
             {
-                string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'";
+                //string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'";
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     PrintConnection(connection);
-
-                    DbStreamer streamer = new DbStreamer(connection, connectionString);
+                    SqlDependency.Stop(connectionString);
+                    SqlDependency.Start(connectionString);
+                    
+                    TableStreamer streamer = new TableStreamer(connection, connectionString, "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8");
                     streamer.StartListening();
-
+                    TableStreamer2 s2 = new TableStreamer2(connection, connectionString, "SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging");
+                    s2.StartListening();
+                    
                     Console.ReadLine();
                 }
             }
