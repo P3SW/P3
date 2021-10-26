@@ -78,42 +78,16 @@ namespace DataStreamingSimulation
                 string valuesQueryHead = "VALUES (";
                 string closingQuery = ");";
 
-                int lastValue = reader.FieldCount - 1;
 
                 Regex rgx = new Regex(@"(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}).(\d{3})");
                 
-                //string test = (@"select distinct Discriminator from ANS_Destination_2.dbo.Actor where Discriminator not in ('OrganisationalUnit', 'User', 'ItSystem')");
-                //TODO - FIX STRING INTERPOLATION
+                int lastValue = reader.FieldCount - 1;
                 
                 for (int i = 0; reader.FieldCount > i ; i++)
                 {
-                    Console.WriteLine(reader[i].GetType());
-                    
-                    if (reader.IsDBNull(i))
-                    {
-                        valuesQueryTail += (i == lastValue ? "NULL" : "NULL, ");
-                    } 
-                    else if (reader[i].GetType() == typeof(DateTime))
-                    {
-                        valuesQueryTail += (i == lastValue ? $"(CONVERT(datetime,'{reader[i]}'))" : $"(CONVERT(datetime,'{reader[i]}')), ");
-                    }
-                    else if (reader[i].GetType() == typeof(Byte[]))
-                    {
-                        
-                        string byteString = reader.GetString(0).ToString();
-                        valuesQueryTail += (i == lastValue ? $"(CONVERT(VARBINARY(MAX),'{byteString}'))" : $"(CONVERT(VARBINARY(MAX),'{byteString}')), ");                                                  //BUG? - DOES IT WORK?
-                    }
-                    else if (rgx.IsMatch($"({reader[i]})"))
-                    {
-                        valuesQueryTail += (i == lastValue ? $"('{reader[i]}')" : $"('{reader[i]}'), ");
-                    }
-                    else
-                    { 
-                        valuesQueryTail += (i == lastValue ? @$"('{reader[i]}')" : $"('{reader[i]}'), ");
-                    }
-                    
+                    valuesQueryTail += (i == lastValue ? @$"@param{i}" : $"@param{i}, ");
                 }
-                
+
                 queryString = openingQuery + valuesQueryHead + valuesQueryTail + closingQuery;
 
                 Console.WriteLine("---- queryString: ---- ");
@@ -121,13 +95,29 @@ namespace DataStreamingSimulation
                 
                 using (SqlCommand command = new SqlCommand(queryString, connection))
                 {
-                    connection.Open();
-
-                    int numOfRowsAffected = command.ExecuteNonQuery();
-                    Console.WriteLine(numOfRowsAffected);
+                    for (int i = 0; reader.FieldCount > i; i++)
+                    {
+                        if (reader[i] is DBNull)
+                        {
+                            command.Parameters.Add($"@param{i}",SqlDbType.VarBinary, -1).Value = reader[i];
+                        }
+                        else
+                        {
+                            command.Parameters.AddWithValue($"@param{i}", reader[i]);
+                        }
+                    }
+                    
+                    try
+                    {
+                        connection.Open();
+                        command.ExecuteNonQuery();
+                    }
+                    catch (SqlException e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
             }
         }
-        
     }
 }
