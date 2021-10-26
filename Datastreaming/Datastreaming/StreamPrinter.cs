@@ -12,20 +12,25 @@ namespace Datastreaming
             _connection = connection;
             _queryString = queryString;
         }
-        public void PrintChanges()
+        public void PrintChanges(string queryString)
         {
-            SqlCommand command = new SqlCommand(_queryString, _connection);
-            PrintReader(command);
+            using (SqlCommand command = new SqlCommand(queryString, _connection))
+            {
+                PrintReader(command);
+            }
         }
         public void PrintReader(SqlCommand command)
         {
             using (SqlDataReader reader = command.ExecuteReader())
             {
-                for (int i = 0; i < reader.VisibleFieldCount; i++)
+                while (reader.Read())
                 {
-                    Console.Write("{0} ", reader[i]);
+                    for (int i = 0; i < reader.VisibleFieldCount; i++)
+                    {
+                        Console.Write("{0} ", reader[i]);
+                    }
+                    Console.Write("\n");
                 }
-                Console.Write("\n");
             }
         }
     }
