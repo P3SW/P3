@@ -7,32 +7,34 @@ using System.Linq;
 
 namespace DataStreamingSimulation
 {
-    public class DatabaseConnect : DatabaseRead
+    public class DatabaseConnect
     {
+        private readonly DatabaseRead _databaseRead = new DatabaseRead();
+        private readonly PrintData _printData = new PrintData();
+        private readonly TransferData _transferData = new TransferData();
         
         public void SqlConnect(string queryString, string connectionString, bool print = false)
         {
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
-                connection.Open();
-                //PrintConnection(connection);
-                
-                SqlCommand command = new SqlCommand(queryString, connection);
-
-                if (print)
+                try
                 {
-                    SqlReader(command, PrintReader);
-                    connection.Close(); //BUG?
+                    //PrintConnection(connection);
+                    connection.Open();
+                    SqlCommand command = new SqlCommand(queryString, connection);
+                    if (print)
+                    {
+                        _databaseRead.SqlReader(command, _printData.ApplyData);
+                    }
+                    else
+                    {
+                        _databaseRead.SqlReader(command, _transferData.ApplyData);
+                    }
                 }
-                else
+                catch (SqlException e)
                 {
-                    SqlReader(command, TransferData);
-                    connection.Close(); //BUG?
-                    // Console.WriteLine("SEND TO FAKE STATE DATABASE!");
-                    // DatabaseTransfer transfer = new DatabaseTransfer();
-                    // transfer.TransferToDatabase(queryString);
+                    Console.WriteLine(e.Message);
                 }
-                
             }
         }
         
@@ -46,17 +48,20 @@ namespace DataStreamingSimulation
             using (StreamReader sr = new StreamReader(fileName))
             {
                 int i = 0;
-                while (!sr.EndOfStream)
-                {
-                    connectionString[i++] = sr.ReadLine();
-                }
+                while (!sr.EndOfStream) connectionString[i++] = sr.ReadLine();
             }
 
-            Console.WriteLine("Read: " + connectionString[0]);
-            Console.WriteLine("Write: " + connectionString[1]);
+            //Console.WriteLine("Read: " + connectionString[0]);
+            //Console.WriteLine("Write: " + connectionString[1]);
             
             if (transferData) return connectionString[1];
-            else return connectionString[0];
+            return connectionString[0];
+        }
+        
+        private void PrintConnection(SqlConnection connection)
+        {
+            Console.WriteLine("State: {0}", connection.State);
+            Console.WriteLine("ConnectionString: {0}", connection.ConnectionString);
         }
         
         public Int32 GetMaxRowsInDB(string[] tables, string connectionString)

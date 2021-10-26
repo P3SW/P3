@@ -12,33 +12,29 @@ namespace DataStreamingSimulation
     {
         static void Main(string[] args)
         {
-            const int increaseInSec = 5;
+            const int INCREASE_IN_SEC = 5;
+            const bool CONSOLE_PRINT = true;
+            const string STREAM_START_DATE = "2021-10-05 15:06:20.823";
             string[] tablesToStream = {"AFSTEMNING", "AUDIT_LOGERROR", "ENGINE_PROPERTIES", "HEALTH_REPORT", "MANAGER_TRACKING"};
             
             try
             {
-                
-                CultureInfo provider = CultureInfo.InvariantCulture;
-                
-                DateTime startTime = DateTime.Parse("2021-10-05 15:06:20.823");
-                //DateTime startTime = DateTime.ParseExact("2021-10-05 15:06:20.823", "yyyy-MM-dd HH:mm:ss.fff", provider);
-                DateTime nextTime = startTime.AddSeconds(increaseInSec);
-                
+                DateTime startTime = DateTime.Parse(STREAM_START_DATE);
+                DateTime nextTime = startTime.AddSeconds(INCREASE_IN_SEC);
                 while (true)
                 {
                     DatabaseConnect sqlConnection = new DatabaseConnect();
+                    string setupFile = sqlConnection.ReadSetupFile();
 
                     for (int i = 0; i < tablesToStream.Length; i++)
                     {
-                        Console.WriteLine("startTime " + startTime);
-                        string queryString = makeQueryString(tablesToStream[i], startTime, nextTime);
-                        sqlConnection.SqlConnect(queryString,sqlConnection.ReadSetupFile(), false);
+                        string queryString = new QuerySetup().makeQueryString(tablesToStream[i], startTime, nextTime);
+                        sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
                     }
                     
-                    //System.Threading.Thread.Sleep(1 * 1000);
-                    
                     startTime = nextTime;
-                    nextTime = startTime.AddSeconds(increaseInSec);
+                    nextTime = startTime.AddSeconds(INCREASE_IN_SEC);
+                    System.Threading.Thread.Sleep(INCREASE_IN_SEC * 1000);
                 }
             }
             catch (Exception e)
@@ -46,39 +42,5 @@ namespace DataStreamingSimulation
                 Console.WriteLine(e);
             }
         }
-        
-        static string makeQueryString(string table, DateTime startTime, DateTime nextTime)
-        {
-            string queryString = null;
-            
-            switch (table)
-            {
-                case "AFSTEMNING": // 2021-10-05 15:08:05.277
-                    queryString = $@"SELECT * FROM AFSTEMNING
-                                     WHERE START_TIME BETWEEN '{startTime}' and '{nextTime}';";
-                    break;
-                case "AUDIT_LOGERROR": // 2021-10-05 15:41:08.663
-                    queryString = $@"SELECT * FROM AUDIT_LOGERROR
-                                     WHERE CREATED BETWEEN '{startTime}' and '{nextTime}';"; 
-                    break;
-                case "ENGINE_PROPERTIES": // 2021-10-05 15:06:20.823
-                    queryString = $@"SELECT * FROM ENGINE_PROPERTIES
-                                     WHERE TIMESTAMP BETWEEN '{startTime}' and '{nextTime}';";
-                    break;
-                case "HEALTH_REPORT": // NULL
-                    queryString = $@"SELECT * FROM HEALTH_REPORT
-                                     WHERE LOG_TIME BETWEEN '{startTime}' and '{nextTime}';";
-                    break;
-                case "MANAGER_TRACKING": // 2021-10-05 00:00:00.000
-                    queryString = $@"SELECT * FROM MANAGER_TRACKING
-                                     WHERE STARTTIME BETWEEN '{startTime}' and '{nextTime}';";
-                    break;
-                default:
-                    break;
-            }
-            
-            return queryString;
-        }
-        
     }
 }
