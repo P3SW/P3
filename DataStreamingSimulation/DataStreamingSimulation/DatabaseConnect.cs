@@ -10,8 +10,6 @@ namespace DataStreamingSimulation
     public class DatabaseConnect
     {
         private readonly DatabaseRead _databaseRead = new DatabaseRead();
-        private readonly PrintData _printData = new PrintData();
-        private readonly TransferData _transferData = new TransferData();
         
         public void SqlConnect(string queryString, string connectionString, bool print = false)
         {
@@ -19,16 +17,15 @@ namespace DataStreamingSimulation
             {
                 try
                 {
-                    //PrintConnection(connection);
                     connection.Open();
                     SqlCommand command = new SqlCommand(queryString, connection);
                     if (print)
                     {
-                        _databaseRead.SqlReader(command, _printData.ApplyData);
+                        _databaseRead.SqlReader(command, new PrintData().ApplyData);
                     }
                     else
                     {
-                        _databaseRead.SqlReader(command, _transferData.ApplyData);
+                        _databaseRead.SqlReader(command, new TransferData().ApplyData);
                     }
                 }
                 catch (SqlException e)
@@ -38,7 +35,7 @@ namespace DataStreamingSimulation
             }
         }
         
-        // Edit 'bin/Debug/net5.0/setup.txt' to change DBO */
+        // Edit 'bin/Debug/net5.0/setup.txt' to change DBO 
         // Format: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False'
         public string ReadSetupFile(bool transferData = false)
         {
@@ -58,7 +55,7 @@ namespace DataStreamingSimulation
             return connectionString[0];
         }
         
-        private void PrintConnection(SqlConnection connection)
+        public void PrintConnection(SqlConnection connection)
         {
             Console.WriteLine("State: {0}", connection.State);
             Console.WriteLine("ConnectionString: {0}", connection.ConnectionString);
@@ -69,7 +66,6 @@ namespace DataStreamingSimulation
             using (SqlConnection connection = new SqlConnection(connectionString))
             {
                 connection.Open();
-
                 List<int> tableRowNum = new List<int>();
 
                 foreach (var table in tables)
