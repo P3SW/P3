@@ -1,13 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Data.Common;
-using System.Threading;
 using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
 {
-    public class TableStreamer
+    public class TableStreamer<T> where T : IData, new()
     {
         private SqlDependency _dependency;
 
@@ -15,7 +13,7 @@ namespace Datastreaming
         private string _queryString;
         private SqlConnection _connection;
         private StreamPrinter _printer;
-        private List<HealthData> dataList;
+        private List<T> dataList;
         public TableStreamer(SqlConnection connection, string connectionString, string queryString)
         {
             _connection = connection;
@@ -23,7 +21,7 @@ namespace Datastreaming
             _queryString = queryString;
             _printer = new StreamPrinter(_connection, _queryString);
             
-            dataList = new List<HealthData>();
+            dataList = new List<T>();
             
             
             using (SqlCommand command = new SqlCommand(_queryString, _connection))
@@ -32,7 +30,9 @@ namespace Datastreaming
                 {
                     while (reader.Read())
                     {
-                        dataList.Add(new HealthData((string) reader[0], (string) reader[1], (long) reader[2], (DateTime) reader[5]));
+                        T t = new T();
+                        t.ConstructFromSqlReader(reader);
+                        dataList.Add(t);
                         for (int i = 0; i < reader.VisibleFieldCount; i++)
                         {
                             Console.Write("{0} ", reader[i]);
@@ -57,7 +57,6 @@ namespace Datastreaming
                     
                     CloseReader(command);
                     
-                    //_printer.PrintReader(command);
                 }
             }
             catch (Exception e)
@@ -74,7 +73,7 @@ namespace Datastreaming
             }
             else
             {
-                _printer.PrintChanges(HealthData.GetChangesQueryString());
+                _printer.PrintChanges(new T().GetChangesQueryString());
             }
             StartListening();
         }

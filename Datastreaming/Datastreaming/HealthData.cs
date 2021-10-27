@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
 {
-    public class HealthData
+    public class HealthData : IData
     {
         public int ExecutionID { get; private set; }
         public string ReportType { get; private set; }
@@ -26,7 +26,7 @@ namespace Datastreaming
         }
 
         public HealthData(SqlDataReader r)
-        {
+        {   
             
         }
 
@@ -35,7 +35,17 @@ namespace Datastreaming
 
         }
 
-        public static string GetChangesQueryString()
+        public void ConstructFromSqlReader(SqlDataReader reader)
+        {
+            ReportType = (string) reader[0];
+            ReportKey = (string) reader[1];
+            ReportNumericValue = (long) reader[2];
+            LogTime = (DateTime) reader[5];
+            LastRowTimeStamp = (DateTime) reader[5];
+        }
+        
+        
+        public string GetChangesQueryString()
         {
             return string.Format("SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, " +
                                  "LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8 " +

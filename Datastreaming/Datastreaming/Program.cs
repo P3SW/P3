@@ -19,10 +19,12 @@ namespace Datastreaming
                     SqlDependency.Stop(connectionString);
                     SqlDependency.Start(connectionString);
                     
-                    TableStreamer streamer = new TableStreamer(connection, connectionString, "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8");
+                    TableStreamer<HealthData> streamer = new TableStreamer<HealthData>(connection, connectionString, 
+                        "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8");
                     streamer.StartListening();
-                    TableStreamer2 s2 = new TableStreamer2(connection, connectionString, "SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging");
-                    s2.StartListening();
+                    TableStreamer<LogData> streamer2 = new TableStreamer<LogData>(connection, connectionString,
+                        "SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging");
+                    streamer2.StartListening();
                     
                     Console.ReadLine();
                 }
