@@ -6,7 +6,7 @@
 
 <div class="summary">
     <h1><div class="summary_caption" style="text-align: center;">Summary</div></h1>
-    <Chart Config="_pieconfig"></Chart>
+    <Chart Config="_pieconfig" Height="75"></Chart>
     
 </div>
 
@@ -36,10 +36,11 @@
             Responsive = true,
             Title = new OptionsTitle
             {
-                Display = true,
+                Display = false,
                 Text = "Cpu & RAM usage",
                 FontColor = "#FFFFFF"
             },
+            
             Hover = new Hover
             {
                 Mode = InteractionMode.Nearest,
@@ -66,8 +67,8 @@
                         GridLines = new GridLines
                         {
                             Color = ColorUtil.ColorHexString(142,142,142),
-                        }
-                    }
+                        },
+                    },
                 },
                 YAxes = new List<CartesianAxis>  // scale for the y axes
                 {
@@ -97,27 +98,22 @@
             }
         };
         
-        var lineconfigdataset1 = new LineDataset<int>(new[] {35, 50, 15, 45, 37})
+        var lineconfigdataset1 = new LineDataset<int>(new[]{2,3,4,5,6,7,8})
         {
             Label = "Cpu usage",
-            //BackgroundColor = ColorUtil.ColorHexString
             BorderColor = ColorUtil.ColorHexString(227,95,82),
-            
+            BackgroundColor = ColorUtil.ColorString(0,0,0,0.0),
         };
-
-        var lineconfigdataset2 = new LineDataset<int>(new[] {10, 30, 1, 10, 20})
+        var lineconfigdataset2 = new LineDataset<int>(new[] {20,25,30,35,40 })
         {
-            Label = "Ram usage",
-    //BackgroundColor = ColorUtil.ColorHexString
-            BorderColor = ColorUtil.ColorHexString(92, 188, 169),
-            BackgroundColor = ColorUtil.ColorHexString(92,188,169), // ADD GRADIANT HERE!!!
-            
+            Label = ("Ram usage"),
+            BorderColor = ColorUtil.ColorString(92,188,169,1),
+            BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
+
         };
-        
         _lineconfig.Data.Datasets.Add(lineconfigdataset1);
         _lineconfig.Data.Datasets.Add(lineconfigdataset2);
         
-
     }
     
     private void ConfigurePieConfig()
@@ -137,9 +133,9 @@
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
             },
-            
+            CutoutPercentage = 50,
         };
-        
+
 
         foreach (var party in new[]{"Fatal error","Error","Warning","Info"})
         {
@@ -157,7 +153,8 @@
                 ColorUtil.ColorHexString(92, 188, 169)  //Info
                     
             },
-
+            BorderColor = ColorUtil.ColorHexString(0,0,0),
+            BorderWidth = 0,
 
         };
         _pieconfig.Data.Datasets.Add(pieconfigdataset);
