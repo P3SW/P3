@@ -72,7 +72,7 @@ namespace Datastreaming
             }
             else
             {
-                _printer.PrintChanges(LogData.GetChangesQueryString());
+                _printer.PrintChanges(new LogData().GetChangesQueryString());
             }
             StartListening();
         }
