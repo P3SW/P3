@@ -11,7 +11,7 @@
 </div>
 
 <div class="cpu_usage" style="text-align: center ">CPU Usage
-    <Chart Config="_lineconfig" ></Chart>
+    <Chart Config="_lineconfig" Height="135" ></Chart>
     <h1></h1>
 </div>
 
@@ -37,7 +37,7 @@
             Title = new OptionsTitle
             {
                 Display = true,
-                Text = "Cpu usage",
+                Text = "Cpu & RAM usage",
                 FontColor = "#FFFFFF"
             },
             Hover = new Hover
@@ -47,25 +47,52 @@
             },
             Scales = new Scales
             {
-                XAxes = new List<CartesianAxis> //data for the x axes
+                XAxes = new List<CartesianAxis> //scale for the x axes
                 {
                     new CategoryAxis
                     {
                         ScaleLabel = new ScaleLabel
+                        {   
+                            Display = true,
+                            LabelString = "Time",
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+                        },
+                        Ticks = new CategoryTicks
                         {
-                            LabelString = "Time"
+                            FontColor = "#FFFFFF",
+                            FontSize = 13,
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142,142,142),
                         }
                     }
                 },
-                YAxes = new List<CartesianAxis>  // data for the y axes
+                YAxes = new List<CartesianAxis>  // scale for the y axes
                 {
                     new LinearCartesianAxis
                     {
                         ScaleLabel = new ScaleLabel   
                         {
-                            LabelString = "%" 
+                            Display = true,
+                            LabelString = "Usage %",
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+                        },
+                        Ticks = new LinearCartesianTicks
+                        {
+                            FontSize = 13,
+                            Padding = 10,
+                            FontColor = "#FFFFFF", // Color for ticks, values on y axies
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142,142,142),
+                            DrawBorder = false, // removes the border in the y axies
+                            
                         }
-                   }
+                    }
                 }
             }
         };
@@ -84,6 +111,7 @@
     //BackgroundColor = ColorUtil.ColorHexString
             BorderColor = ColorUtil.ColorHexString(92, 188, 169),
             BackgroundColor = ColorUtil.ColorHexString(92,188,169), // ADD GRADIANT HERE!!!
+            
         };
         
         _lineconfig.Data.Datasets.Add(lineconfigdataset1);
@@ -109,6 +137,7 @@
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
             },
+            
         };
         
 
