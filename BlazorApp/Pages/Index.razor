@@ -2,6 +2,9 @@
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using System.Reflection.Emit
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
 
 <div class="summary">
@@ -91,5 +94,39 @@
         };
         _pieconfig.Data.Datasets.Add(pieconfigdataset);
 
+    }
+}
+
+@code {
+    private HubConnection hubConnection;
+    private List<string> data = new List<string>();
+    //private string userInput;
+    //private string messageInput;
+    
+    /* When a person opens the error page */
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/datahub"))
+            .Build();
+
+        hubConnection.On<string, string>("ReceiveHealth", (type, value) =>
+        {
+            /* Do something with the health received*/
+            StateHasChanged(); // updates the page
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public bool IsConnected =>
+        hubConnection.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
     }
 }

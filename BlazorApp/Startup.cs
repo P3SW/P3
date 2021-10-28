@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.AspNetCore.ResponseCompression;
+using BlazorServerSignalRApp.Server.Hubs;
 
 namespace BlazorApp
 {
@@ -27,11 +29,21 @@ namespace BlazorApp
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            
+            //SignalR setup
+            services.AddResponseCompression(opts =>
+            {
+                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
+                    new[] { "application/octet-stream" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
+            //SignalR
+            app.UseResponseCompression();
+            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -48,6 +60,7 @@ namespace BlazorApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
+                endpoints.MapHub<DataHub>("/datahub"); //Map to the chathub when connected. (SignalR stuff)
                 endpoints.MapFallbackToPage("/_Host");
             });
         }
