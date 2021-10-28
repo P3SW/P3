@@ -1,8 +1,9 @@
 using System;
+using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
 {
-    public class ManagerTrackingData
+    public class ManagerTrackingData : IData
     {
         private string _manager;
         private string _status;
@@ -12,6 +13,19 @@ namespace Datastreaming
         private DateTime _startTime;
         private DateTime _endTime;
 
+        public ManagerTrackingData()
+        {
+            
+        }
 
+        public void ConstructFromSqlReader(SqlDataReader reader)
+        {
+            throw new NotImplementedException();
+        }
+
+        public string GetChangesQueryString()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

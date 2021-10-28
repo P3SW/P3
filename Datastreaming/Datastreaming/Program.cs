@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Data.SqlClient;
 
@@ -11,21 +12,31 @@ namespace Datastreaming
             string connectionString = new ConfigReader().ReadSetupFile(); 
             try
             {
-                //string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'";
+                //Creates DB connection
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     PrintConnection(connection);
+                    
+                    //Ensures SqlDependency is stopped before starting it with the correct connection.
                     SqlDependency.Stop(connectionString);
                     SqlDependency.Start(connectionString);
                     
-                    TableStreamer<HealthData> streamer = new TableStreamer<HealthData>(connection, connectionString, 
-                        "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8");
-                    streamer.StartListening();
-                    TableStreamer<LogData> streamer2 = new TableStreamer<LogData>(connection, connectionString,
-                        "SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging");
-                    streamer2.StartListening();
-                    
+                    //Creates TableStreamers to watch for changes.
+                    //It would be quite funny to have TableStreamer implement an interface and make a list of all the objects.
+
+                    List<IStreamer> streamers = new List<IStreamer>();
+                    streamers.Add(new TableStreamer<HealthData>(connection, 
+                        "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8 ORDER BY LOG_TIME"));
+                    streamers.Add(new TableStreamer<LogData>(connection, 
+                        "SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging ORDER BY CREATED"));
+
+                    foreach (IStreamer streamer in streamers)
+                    {
+                        streamer.StartListening();
+                    }
+
+                    //Awaits a newline in the console to make the program run forever.
                     Console.ReadLine();
                 }
             }
@@ -41,11 +52,6 @@ namespace Datastreaming
             Console.WriteLine("State: {0}", connection.State);
             Console.WriteLine("ConnectionString: {0}",
                 connection.ConnectionString);
-        }
-
-        private static void PrintReader(SqlDataReader reader)
-        {
-            Console.WriteLine("{0}, {1}", reader[0], reader[1]);
         }
     }
 }

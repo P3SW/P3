@@ -5,12 +5,10 @@ namespace Datastreaming
 {
     public class StreamPrinter
     {
-        private string _queryString;
         private SqlConnection _connection;
-        public StreamPrinter(SqlConnection connection, string queryString)
+        public StreamPrinter(SqlConnection connection)
         {
             _connection = connection;
-            _queryString = queryString;
         }
         public void PrintChanges(string queryString)
         {

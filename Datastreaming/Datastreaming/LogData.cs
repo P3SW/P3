@@ -27,6 +27,7 @@ namespace Datastreaming
         {
         }
         
+        //Hack to allow the use of generic types in TableStreamer. This method is called after an object is made with the default constructor
         public void ConstructFromSqlReader(SqlDataReader reader)
         {
             Created = (DateTime) reader[0];
@@ -37,10 +38,12 @@ namespace Datastreaming
             LastRowTimeStamp = (DateTime) reader[0];
         }        
         
+        //Returns a query string with the latest timestamp to ensure only new data is queried.
         public string GetChangesQueryString()
         {
             return string.Format("SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging " +
-                                 $"WHERE CREATED > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                 $"WHERE CREATED > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
+                                 "ORDER BY CREATED");
         }
     }
 }
