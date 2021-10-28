@@ -35,6 +35,7 @@ namespace Datastreaming
 
         }
 
+        //Hack to allow the use of generic types in TableStreamer. This method is called after an object is made with the default constructor
         public void ConstructFromSqlReader(SqlDataReader reader)
         {
             ReportType = (string) reader[0];
@@ -44,12 +45,13 @@ namespace Datastreaming
             LastRowTimeStamp = (DateTime) reader[5];
         }
         
-        
+        //Returns a query string with the latest timestamp to ensure only new data is queried.
         public string GetChangesQueryString()
         {
             return string.Format("SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, " +
                                  "LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8 " +
-                                 $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'");
+                                 $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
+                                 "ORDER BY LOG_TIME");
         }
     }
 }
