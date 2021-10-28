@@ -12,25 +12,6 @@
     background-color: #0F2147; /* Netcompany blue color */
 }
 
-.top-row {
-    background-color: #f7f7f7;
-    border-bottom: 1px solid #0F2147;
-    justify-content: flex-end;
-    height: 3.5rem;
-    display: flex;
-    align-items: center;
-}
-
-    .top-row ::deep a, .top-row .btn-link {
-        white-space: nowrap;
-        margin-left: 1.5rem;
-    }
-
-    .top-row a:first-child {
-        overflow: hidden;
-        text-overflow: ellipsis;
-    }
-
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;
