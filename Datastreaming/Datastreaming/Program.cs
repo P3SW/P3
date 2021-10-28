@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Microsoft.Data.SqlClient;
 
@@ -8,24 +9,35 @@ namespace Datastreaming
     {
         static void Main(string[] args)
         {
-            string connectionString = ReadSetupFile(); //"Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP; User ID=sa; Password=Password123;Trusted_Connection=False";
+            string connectionString = new ConfigReader().ReadSetupFile(); 
             try
             {
-                string queryString = "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' OR REPORT_TYPE = 'NETWORK'";
+                //Creates DB connection
                 using (SqlConnection connection = new SqlConnection(connectionString))
                 {
                     connection.Open();
                     PrintConnection(connection);
+                    
+                    //Ensures SqlDependency is stopped before starting it with the correct connection.
+                    SqlDependency.Stop(connectionString);
+                    SqlDependency.Start(connectionString);
+                    
+                    //Creates TableStreamers to watch for changes.
+                    //It would be quite funny to have TableStreamer implement an interface and make a list of all the objects.
 
-                    SqlCommand command = new SqlCommand(queryString, connection);
+                    List<IStreamer> streamers = new List<IStreamer>();
+                    streamers.Add(new TableStreamer<HealthData>(connection, 
+                        "SELECT REPORT_TYPE, REPORT_KEY, REPORT_NUMERIC_VALUE, REPORT_VALUE_TYPE, REPORT_VALUE_HUMAN, LOG_TIME FROM dbo.HEALTH_REPORT WHERE MONITOR_NO = 8 ORDER BY LOG_TIME"));
+                    streamers.Add(new TableStreamer<LogData>(connection, 
+                        "SELECT CREATED, LOG_MESSAGE, LOG_LEVEL, EXECUTION_ID, CONTEXT_ID FROM dbo.logging ORDER BY CREATED"));
 
-                    using(SqlDataReader reader = command.ExecuteReader())
+                    foreach (IStreamer streamer in streamers)
                     {
-                        while (reader.Read())
-                        {
-                            PrintReader(reader);
-                        }
+                        streamer.StartListening();
                     }
+
+                    //Awaits a newline in the console to make the program run forever.
+                    Console.ReadLine();
                 }
             }
             catch (Exception e)
@@ -40,24 +52,6 @@ namespace Datastreaming
             Console.WriteLine("State: {0}", connection.State);
             Console.WriteLine("ConnectionString: {0}",
                 connection.ConnectionString);
-        }
-
-        private static void PrintReader(SqlDataReader reader)
-        {
-            Console.WriteLine("{0}, {1}", reader[0], reader[1]);
-        }
-
-        private static string ReadSetupFile()
-        {
-            const string fileName = "setup.txt";
-            string connectionString;
-            using (StreamReader sr = new StreamReader(fileName))
-            {
-                connectionString = sr.ReadLine();
-            }
-
-            Console.WriteLine(connectionString);
-            return connectionString;
         }
     }
 }
