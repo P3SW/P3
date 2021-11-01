@@ -41,7 +41,7 @@
             Title = new OptionsTitle
             {
                 Display = false,
-                Text = "Cpu & RAM usage",
+                Text = "Cpu & Memory usage",
                 FontColor = "#FFFFFF"
             },
             Legend = new Legend
@@ -116,7 +116,7 @@
         };
         var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12 })
         {
-            Label = ("Ram usage"),
+            Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92,188,169,1),
             BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
             LineTension = 0,
@@ -129,6 +129,16 @@
         }
         _lineconfig.Data.Datasets.Add(lineconfigdataset1);
         _lineconfig.Data.Datasets.Add(lineconfigdataset2);
+    }
+
+    private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
+    {
+        foreach (var label in labels)
+        {
+            config.Data.Labels.Add(label);
+        }
+        
+        return config;
     }
     
     private void ConfigurePieConfig()
@@ -152,13 +162,9 @@
             },
         };
         _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
-        
 
-        foreach (var party in new[]{"Fatal error","Error","Warning","Info"})
-        {
-            _pieconfigTotalErrors.Data.Labels.Add(party);
-            _pieconfigTotalReconciliations.Data.Labels.Add(party);
-        }
+        _pieconfigTotalErrors = SetUpPieLabels(_pieconfigTotalErrors, new[] {"Fatal error","Error","Warning","Info"});
+        _pieconfigTotalReconciliations = SetUpPieLabels(_pieconfigTotalReconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
 
         var pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
         {
