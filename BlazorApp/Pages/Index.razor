@@ -130,7 +130,6 @@
         _lineconfig.Data.Datasets.Add(lineconfigdataset1);
         _lineconfig.Data.Datasets.Add(lineconfigdataset2);
     }
-
     private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
     {
         foreach (var label in labels)
@@ -140,7 +139,7 @@
         
         return config;
     }
-    
+
     private void ConfigurePieConfig()
     {
         _pieconfigTotalErrors = new PieConfig();
@@ -162,7 +161,7 @@
             },
         };
         _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
-
+        
         _pieconfigTotalErrors = SetUpPieLabels(_pieconfigTotalErrors, new[] {"Fatal error","Error","Warning","Info"});
         _pieconfigTotalReconciliations = SetUpPieLabels(_pieconfigTotalReconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
 
