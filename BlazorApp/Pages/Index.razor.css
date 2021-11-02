@@ -1,25 +1,23 @@
-﻿.summary_cotainer{
+﻿.summary_container{
     background-color: #384561;
     position: absolute;
     top: 0;
     width: 45%;
     height: 100%;
-    padding: 0px !important;
+    padding: 0;
     display: flex;
     flex-direction: column;
 }
 
-.summary_cotainer > div{
+.summary_container > div{
     width: 98%;
-    margin-left: 1%;
-    margin-right: 1%;
     color: #FFFFFF;
     text-align: center;
     font-size: 30px;
     border-bottom: 2px solid #8E8E8E;
 }
 
-.summary_caption_conatiner{
+.summary_caption_container{
     height: 10%;
     font-size: 30px;
     color: #FFFFFF;
@@ -27,11 +25,11 @@
     text-decoration: underline;
 }
 
-.Current_manager_cotainer{
+.Current_manager_container{
     height: 25%;
     display: flex;
  }
-.Current_manager_cotainer > div{
+.Current_manager_container > div{
     width: 50%;
     margin: 1%;
     height: 92%;
@@ -43,13 +41,13 @@
 .in_queue_managers_container{
     height: 10%;
 }
-.Total_errors_and_reconcilations_container{
+.Total_errors_and_reconciliations_container{
     height: 25%;
     display: flex;
     
 }
 
-.Total_errors_and_reconcilations_container > div{
+.Total_errors_and_reconciliations_container > div{
     width: 25%;
     margin: 1%;
     height: 92%;
@@ -72,7 +70,7 @@
     width: 45%;
     color: #FFFFFF;
     height: 400px;
-    padding: 0 !important;
+    padding: 0;
     top: 0;
 }
 .cpu_info {
