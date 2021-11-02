@@ -1,9 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Data;
+using Datastreaming;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class TableStreamer
     {
