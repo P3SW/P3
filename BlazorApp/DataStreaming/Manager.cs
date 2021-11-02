@@ -1,5 +1,6 @@
 using System;
 using Datastreaming;
+using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
@@ -9,22 +10,35 @@ namespace BlazorApp.DataStreaming
         public int Id { get; private set; }
         
         public DateTime StartTime { get; private set; }
-        //TODO: find out whether or not TimeSpan is what we should use instead of DateTime for RunningTime property. Seems like a frontend problem to me so idk 
         public int RunningTime { get; private set; }
 
-        public HealthData Health { get; private set; }
-        public ErrorData Error { get; private set; }
-        public ReconciliationData Reconciliation { get; private set; }
+        public HealthData Health { get; set; }
+        public ErrorLog Error { get; set; }
+        public ReconciliationLog Reconciliation { get; set; }
 
         public int RowsRead { get; private set; }
         public int RowsWritten { get; private set; }
-        
         public int EfficiencyScore { get; private set; }
+        
+        public static SqlConnection Connection { get; set; }
 
-        public Manager()
+        public Manager(string name)
         {
             Health = new HealthData();
-            
+            Reconciliation = new ReconciliationLog();
+            Error = new ErrorLog();
+            Name = name;
+        }
+
+        public void WatchManager()
+        {
+            TableStreamer healthStreamer = new TableStreamer(Connection, SqlQueryStrings.HealthSelect, Health);
+            TableStreamer errorStreamer = new TableStreamer(Connection, SqlQueryStrings.ErrorSelect, Error);
+            TableStreamer reconciliationStreamer =
+                new TableStreamer(Connection, SqlQueryStrings.ReconciliationSelect, Reconciliation);
+            healthStreamer.StartListening();
+            errorStreamer.StartListening();
+            reconciliationStreamer.StartListening();
         }
 
         public void CalculateEfficiencyScore()
