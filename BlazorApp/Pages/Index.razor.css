@@ -8,18 +8,18 @@
 }
 
 .summary_container > div{
-    width: 98%;
+    margin: 0.5rem;
     color: #FFFFFF;
     text-align: center;
-    font-size: 30px;
+    font-size: 2rem;
     border-bottom: 2px solid #8E8E8E;
 }
 
 .summary_caption_container{
     height: 10%;
-    font-size: 30px;
+    font-size: 2rem;
     color: #FFFFFF;
-    line-height: 30px;
+    line-height: 2rem;
     text-decoration: underline;
 }
 
@@ -32,7 +32,7 @@
     margin: 1%;
     height: 92%;
     text-align: left;
-    font-size: 18px;
+    font-size: 0.5em;
     white-space: nowrap;
 }
 
@@ -50,35 +50,47 @@
     margin: 1%;
     height: 92%;
     text-align: left;
-    font-size: 18px;
+    font-size: 0.5em;
     white-space: nowrap;
 }
 
 
 .Total_read_written_container{
     height: 29%;
+    border: none !important;
+    margin: none !important;
 }
 
 .Overview-right{
     display: grid;
     grid-template-rows: 1fr 1fr;
-    gap: 15px;
+    gap: 1rem;
 }
 
 .cpu_usage{
     background-color: #384561;
+    font-size: 2rem;
     color: #FFFFFF;
     padding: 0;
 }
+
+.info-labels{
+    display: flex;
+    gap: 0.7rem;
+    
+}
+
 .cpu_info {
-    height: 8px;
-    width: 40px;
+    font-size: 0.5em;
     background-color: #E35F52;
     border-radius: 5px;
 }
 .memory_info {
-    height: 8px;
-    width: 40px;
+    font-size: 0.5em;
     background-color: #5CBCA9;
     border-radius: 5px;
+}
+
+.efficiency{
+    background-color: #384561;
 }

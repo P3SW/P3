@@ -8,8 +8,11 @@
 
 <div class="summary_container">
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
+    <div class="Current_manager_info_container">
+        Current manager: DepartmentManager <br/>Manager Runtime: 00:06:51 
+    </div>
     <div class="Current_manager_container">
-        <div class="Current_manager_errors">Current manager: DepartmentManager <br/>Manager Runtime: 00:06:51 <br/><br/>Current manager errors: 17
+        <div class="Current_manager_errors">Current manager errors: 17
             <ul>
                 <li>Fatal: 0</li>
                 <li>Error: 2</li>
@@ -17,7 +20,7 @@
                 <li>Info: 10</li>
             </ul>
         </div>
-        <div class="Current_manager_reconciliations"><br/><br/><br/> Current manager reconciliations: 691
+        <div class="Current_manager_reconciliations">Current manager reconciliations: 691
             <ul>
                 <li>Mismatch: 1</li>
                 <li>Failed: 2</li>
@@ -47,12 +50,12 @@
             </ul>
         </div>
         <div class="pie_config_total-reconciliations"><br><Chart Config="_pieconfigTotalReconciliations" Width="50" Height="35"></Chart></div>
+        <div class="pie_config_flex">
+                    <div class="PieConfigTotalErrors"><Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart></div>
+                <div class="pieConfigTotalReconciliations"><Chart Config="_pieconfigTotalReconciliations" Height="50" Width="50"></Chart></div>
+            </div>
     </div>
-    <div class="pie_config_flex">
-            <div class="PieConfigTotalErrors"><Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart></div>
-        <div class="pieConfigTotalReconciliations"><Chart Config="_pieconfigTotalReconciliations" Height="50" Width="50"></Chart></div>
-    </div>
-    <div class="Total_read_written_container">6 Total read/written</div>
+    <div class="Total_read_written_container">Total read/written</div>
 
 </div>
 
@@ -69,11 +72,16 @@
 
 <div class="Overview-right">
     <div class="cpu_usage" style="text-align: center "> Memory/CPU
-        <Chart Config="_lineconfig" ></Chart>
+        <div style="position: relative; width: 90%; left: 5%">
+            <Chart Config="_lineconfig" ></Chart>
+        </div>
         <div class="info-labels">
             <div class="cpu_info">CPU</div>
             <div class="memory_info">Memory</div>
         </div>
+    </div>
+    <div class="efficiency">
+        
     </div>
 </div>
 
@@ -165,7 +173,7 @@
             }
         };
         
-        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43})
+        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43, 20, 10})
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227,95,82),
@@ -173,7 +181,7 @@
             LineTension = 0,
 
         };
-        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12 })
+        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92,188,169,1),
@@ -182,7 +190,7 @@
             
 
         };
-        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17"})
+        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17", "01:25", "01:30"})
         {
             _lineconfig.Data.Labels.Add(party);
         }

@@ -11,8 +11,8 @@
     .nav-item ::deep a {
         text-decoration: none;
         color: #d7d7d7;
-        height: 150px;
-        width: 150px;
+        height: 9.375rem;
+        width: 9.375rem;
         display: flex;
         flex-flow: row wrap;
         justify-content: center;

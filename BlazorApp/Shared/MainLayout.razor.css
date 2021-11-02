@@ -1,13 +1,13 @@
 .page {
     display: grid;
-    grid-template-columns: 150px 1fr;
+    grid-template-columns: 9.375rem 1fr;
     background-color: #9299A8;
 }
 
 .main {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 15px;
+    gap: 1rem;
 }
 
 .content{
@@ -56,7 +56,7 @@
     }
 
     .sidebar {
-        width: 150px;
+        width: 9.375rem;
         height: 100vh;
         position: sticky;
         top: 0;
