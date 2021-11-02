@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
+using Datastreaming;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class HealthData : IData
     {
         public List<Data> CPU { get; private set; }
         public List<Data> Memory { get; private set; }
 
-        private List<Data> newCPU;
-        private List<Data> newMemory;
+        private List<Data> _newCpu;
+        private List<Data> _newMemory;
 
         public static DateTime LastRowTimeStamp { get; private set; }
 
@@ -22,24 +23,24 @@ namespace Datastreaming
 
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
-            newCPU = new List<Data>();
-            newMemory = new List<Data>();
+            _newCpu = new List<Data>();
+            _newMemory = new List<Data>();
 
             while (reader.Read())
             {
                 string reportType = (string) reader[0];
                 if (reportType.Equals("CPU"))
                 {
-                    newCPU.Add(new Data(reader));
+                    _newCpu.Add(new Data(reader));
                 }
                 else
                 {
-                    newMemory.Add(new Data(reader));
+                    _newMemory.Add(new Data(reader));
                 }
                 LastRowTimeStamp = (DateTime) reader[2];
             }
-            CPU.AddRange(newCPU);
-            Memory.AddRange(newMemory);
+            CPU.AddRange(_newCpu);
+            Memory.AddRange(_newMemory);
         }
         
         //Returns a query string with the latest timestamp to ensure only new data is queried.

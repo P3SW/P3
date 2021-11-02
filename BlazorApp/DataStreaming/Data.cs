@@ -1,7 +1,7 @@
 using System;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class Data
     {

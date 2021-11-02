@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BlazorApp.DataStreaming;
 using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
@@ -19,14 +20,17 @@ namespace Datastreaming
             newReconciliationData = new List<ReconciliationData>();
             while (reader.Read())
             {
-                  
+                newReconciliationData.Add(new ReconciliationData(reader));
+                LastRowTimeStamp = (DateTime) reader[0];
             }
-            
+            ReconciliationList.AddRange(newReconciliationData);
         }
 
         public string GetChangesQueryString()
         {
-            throw new System.NotImplementedException();
+            return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +
+                                 $"FROM [dbo].[AFSTEMNING] WHERE AFSTEMTDATO > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
+                                 $"ORDER BY AFSTEMTDATO");
         }
     }
 }

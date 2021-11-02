@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BlazorApp.DataStreaming;
 using Microsoft.Data.SqlClient;
 
 namespace Datastreaming
