@@ -1,8 +1,6 @@
 ﻿.summary_container{
     background-color: #384561;
-    position: absolute;
     top: 0;
-    width: 45%;
     height: 100%;
     padding: 0;
     display: flex;
@@ -61,33 +59,26 @@
     height: 29%;
 }
 
-
+.Overview-right{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 15px;
+}
 
 .cpu_usage{
     background-color: #384561;
-    position: absolute;
-    left: 55%;
-    width: 45%;
     color: #FFFFFF;
-    height: 400px;
     padding: 0;
-    top: 0;
 }
 .cpu_info {
     height: 8px;
     width: 40px;
     background-color: #E35F52;
     border-radius: 5px;
-    position: absolute;
-    left: 20px;
-    top: 375px;
 }
 .memory_info {
     height: 8px;
     width: 40px;
     background-color: #5CBCA9;
     border-radius: 5px;
-    position: absolute;
-    left: 120px;
-    top: 375px;
 }

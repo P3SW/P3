@@ -6,10 +6,12 @@
 
 .main {
     display: grid;
-    padding: 0;
     grid-template-columns: 1fr 1fr;
-    justify-content: space-between;
-    gap: 10px;
+    gap: 15px;
+}
+
+.content{
+    padding: 0;
 }
 
 .sidebar {
