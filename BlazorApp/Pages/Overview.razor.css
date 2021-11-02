@@ -1,41 +1,96 @@
-﻿.summary{
-    border: 5px;
+﻿.summary_container{
     background-color: #384561;
-    position: relative;
-    width: 48%;
-    height: 800px;
+    top: 0;
+    height: 100%;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
 }
 
-.summary_caption{
+.summary_container > div{
+    margin: 0.5rem;
     color: #FFFFFF;
+    text-align: center;
+    font-size: 2rem;
+    border-bottom: 2px solid #8E8E8E;
+}
+
+.summary_caption_container{
+    height: 10%;
+    font-size: 2rem;
+    color: #FFFFFF;
+    line-height: 2rem;
+    text-decoration: underline;
+}
+
+.Current_manager_container{
+    height: 25%;
+    display: flex;
+ }
+.Current_manager_container > div{
+    width: 50%;
+    margin: 1%;
+    height: 92%;
+    text-align: left;
+    font-size: 0.5em;
+    white-space: nowrap;
+}
+
+.in_queue_managers_container{
+    height: 10%;
+}
+.Total_errors_and_reconciliations_container{
+    height: 25%;
+    display: flex;
+    
+}
+
+.Total_errors_and_reconciliations_container > div{
+    width: 25%;
+    margin: 1%;
+    height: 92%;
+    text-align: left;
+    font-size: 0.5em;
+    white-space: nowrap;
+}
+
+
+.Total_read_written_container{
+    height: 29%;
+    border: none !important;
+    margin: none !important;
+}
+
+.Overview-right{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 1rem;
 }
 
 .cpu_usage{
-    border: 5px;
     background-color: #384561;
-    position: absolute;
-    left: 1065px;
-    top: 74px;
-    width: 43%;
+    font-size: 2rem;
     color: #FFFFFF;
-    height: 400px;
+    padding: 0;
+}
+
+.info-labels{
+    display: flex;
+    gap: 0.7rem;
+    
 }
 
 .cpu_info {
-    height: 8px;
-    width: 40px;
+    font-size: 0.5em;
     background-color: #E35F52;
     border-radius: 5px;
-    position: absolute;
-    left: 20px;
-    top: 375px;
 }
 .memory_info {
-    height: 8px;
-    width: 40px;
+    font-size: 0.5em;
     background-color: #5CBCA9;
     border-radius: 5px;
-    position: absolute;
-    left: 120px;
-    top: 375px;
+}
+
+.efficiency{
+    background-color: #384561;
 }
