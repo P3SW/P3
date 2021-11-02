@@ -1,10 +1,9 @@
 ﻿.summary_container{
     background-color: #384561;
-    top: 0;
-    height: 100%;
     padding: 0;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-rows: 10fr 10fr 20fr 10fr 20fr 30fr;
+    max-height: 100vh;
 }
 
 .summary_container > div{
@@ -16,47 +15,45 @@
 }
 
 .summary_caption_container{
-    height: 10%;
     font-size: 2rem;
     color: #FFFFFF;
     line-height: 2rem;
     text-decoration: underline;
 }
 
+.Current_manager_info_container {
+    border-bottom: 0 !important;
+}
+
 .Current_manager_container{
-    height: 25%;
-    display: flex;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #53607A 27%;
  }
+
 .Current_manager_container > div{
-    width: 50%;
     margin: 1%;
-    height: 92%;
     text-align: left;
     font-size: 0.5em;
     white-space: nowrap;
 }
 
 .in_queue_managers_container{
-    height: 10%;
 }
 .Total_errors_and_reconciliations_container{
-    height: 25%;
-    display: flex;
-    
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 
 .Total_errors_and_reconciliations_container > div{
-    width: 25%;
     margin: 1%;
-    height: 92%;
     text-align: left;
     font-size: 0.5em;
-    white-space: nowrap;
+
 }
 
 
 .Total_read_written_container{
-    height: 29%;
     border: none !important;
     margin: none !important;
 }
@@ -93,4 +90,14 @@
 
 .efficiency{
     background-color: #384561;
+}
+
+.PieConfigTotalErrors {
+    height: 100%;
+    width: 100%;
+}
+
+.pieConfigTotalReconciliations {
+    height: 100%;
+    width: 100%;
 }
