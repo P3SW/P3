@@ -1,14 +1,70 @@
-﻿.summary{
+﻿.summary_cotainer{
     background-color: #384561;
     position: absolute;
     top: 0;
     width: 45%;
     height: 100%;
     padding: 0px !important;
+    display: flex;
+    flex-direction: column;
 }
-.summary_caption{
+
+.summary_cotainer > div{
+    width: 98%;
+    margin-left: 1%;
+    margin-right: 1%;
     color: #FFFFFF;
+    text-align: center;
+    font-size: 30px;
+    border-bottom: 2px solid #8E8E8E;
 }
+
+.summary_caption_conatiner{
+    height: 10%;
+    font-size: 30px;
+    color: #FFFFFF;
+    line-height: 30px;
+    text-decoration: underline;
+}
+
+.Current_manager_cotainer{
+    height: 25%;
+    display: flex;
+ }
+.Current_manager_cotainer > div{
+    width: 50%;
+    margin: 1%;
+    height: 92%;
+    text-align: left;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+.in_queue_managers_container{
+    height: 10%;
+}
+.Total_errors_and_reconcilations_container{
+    height: 25%;
+    display: flex;
+    
+}
+
+.Total_errors_and_reconcilations_container > div{
+    width: 25%;
+    margin: 1%;
+    height: 92%;
+    text-align: left;
+    font-size: 18px;
+    white-space: nowrap;
+}
+
+
+.Total_read_written_container{
+    height: 29%;
+}
+
+
+
 .cpu_usage{
     background-color: #384561;
     position: absolute;
@@ -36,13 +92,4 @@
     position: absolute;
     left: 120px;
     top: 375px;
-}
-
-.pie_config_flex{
-    display: flex;
-}
-
-.pie_config_flex > div{
-    margin-top: 10%;
-    margin-left: 30%;
 }
