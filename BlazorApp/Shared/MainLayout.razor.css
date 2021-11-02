@@ -33,7 +33,7 @@
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
+    
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;
@@ -64,5 +64,5 @@
         position: sticky;
         top: 0;
         z-index: 1;
-    }
+
 }

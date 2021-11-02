@@ -1,3 +1,55 @@
+.nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-item {
+    font-size: 1rem;
+}
+
+    .nav-item ::deep a {
+        text-decoration: none;
+        color: #d7d7d7;
+        height: 150px;
+        width: 150px;
+        display: flex;
+        flex-flow: row wrap;
+        justify-content: center;
+        text-align: center;
+    }
+
+.nav-item ::deep a.active {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+.nav-item ::deep a:hover {
+    background-color: rgba(255,255,255,0.1);
+    color: white;
+}
+
+/*.current-page-indicator ::deep a.active {
+    position: relative;
+    height: 150px;
+    width: 10px;
+    left: 0;
+    background-color: #E35F52;
+}*/
+
+.sidebar-image { /* Icons on the buttons */
+    width: 72px;!important;
+    height: 72px;!important;
+    position: relative;
+    top: 30px;
+}
+
+.sidebar-caption { /* Text on the buttons */
+    width: 100%;
+    position: relative;
+    top: 5px;
+}
+
 @media (min-width: 641px) {
     .navbar-toggler {
         display: none;
