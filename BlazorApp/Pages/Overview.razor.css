@@ -34,24 +34,20 @@
 .Current_manager_container > div{
     margin: 1%;
     text-align: left;
-    font-size: 0.5em;
     white-space: nowrap;
+    font-size: 0.7em;
 }
 
-.in_queue_managers_container{
-}
 .Total_errors_and_reconciliations_container{
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr;
 }
 
 .Total_errors_and_reconciliations_container > div{
     margin: 1%;
     text-align: left;
-    font-size: 0.5em;
-
+    font-size: 0.7em;
 }
-
 
 .Total_read_written_container{
     border: none !important;
@@ -93,11 +89,49 @@
 }
 
 .PieConfigTotalErrors {
-    height: 100%;
-    width: 100%;
+    position: relative;
+    width: 80%;
 }
 
 .pieConfigTotalReconciliations {
-    height: 100%;
-    width: 100%;
+    position: relative;
+    width: 80%;
+}
+
+.error-reconciliation-formatting {
+    list-style: none;
+    display: grid;
+    align-items: center;
+    row-gap: 0.5em;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 0.8em 1fr;
+    font-size: 0.8em;
+}
+
+.circle-red {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: red;
+    border-radius: 100%;
+}
+
+.circle-lightred {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: #E35F52;
+    border-radius: 100%;
+}
+
+.circle-yellow {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: #DD9B2B;
+    border-radius: 100%;
+}
+
+.circle-green {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: #5CBCA9;
+    border-radius: 100%;
 }

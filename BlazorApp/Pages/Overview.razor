@@ -7,56 +7,70 @@
 
 
 <div class="summary_container">
+    
+    @* Summary text + runtime *@
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
     <div class="Current_manager_info_container">
-        Current manager: DepartmentManager <br/>Manager Runtime: 00:06:51 
+        Current manager: DepartmentManager <br/>Manager Runtime: 00:06:51
     </div>
+
+    @* Current running manager info *@
     <div class="Current_manager_container">
         <div class="Current_manager_errors">Current manager errors: 17
-            <ul>
-                <li>Fatal: 0</li>
-                <li>Error: 2</li>
-                <li>Warning: 5</li>
-                <li>Info: 10</li>
+            <ul class="error-reconciliation-formatting">
+                <div class="circle-red"></div><li>Fatal: 0</li>
+                <div class="circle-lightred"></div><li>Error: 2</li>
+                <div class="circle-yellow"></div><li>Warning: 5</li>
+                <div class="circle-green"></div><li>Info: 10</li>
             </ul>
         </div>
         <div class="Current_manager_reconciliations">Current manager reconciliations: 691
-            <ul>
-                <li>Mismatch: 1</li>
-                <li>Failed: 2</li>
-                <li>Disabled: 8</li>
-                <li>OK: 60</li>
+            <ul class="error-reconciliation-formatting">
+                <div class="circle-red"></div><li>Mismatch: 1</li>
+                <div class="circle-lightred"></div><li>Failed: 2</li>
+                <div class="circle-yellow"></div><li>Disabled: 8</li>
+                <div class="circle-green"></div><li>OK: 60</li>
             </ul>
         </div>
-
     </div>
-    <div class="in_queue_managers_container">4 in queue manager</div>
+
+    @* Manager queue *@
+    <div class="manager-queue-container">
+        <div class="queue-finished-text">Finished: <b>8</b></div>
+        <div class="queue-inqueue-text">In queue: <b>4</b></div>
+    </div>
+    
+    @* Total manager info *@
     <div class="Total_errors_and_reconciliations_container">
         <div class="info_total_errors">Total Errors: 66
-            <ul>
-                <li>Fatal: 5</li>
-                <li>Error: 10</li>
-                <li>Warning: 15</li>
-                <li>Info: 661</li>
+            <ul class="error-reconciliation-formatting">
+                <div class="circle-red"></div><li>Fatal: 1</li>
+                <div class="circle-lightred"></div><li>Error: 10</li>
+                <div class="circle-yellow"></div><li>Warning: 15</li>
+                <div class="circle-green"></div><li>Info: 63</li>
             </ul>
         </div>
         <div class="PieConfigTotalErrors">
             <Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart>
         </div>
-        
+
         <div class="info_total_reconciliations">Total Reconciliations: 691
-            <ul>
-                <li>Mismatch: 5</li>
-                <li>Failed: 10</li>
-                <li>Disabled: 15</li>
-                <li>OK: 661</li>
+            <ul class="error-reconciliation-formatting">
+                <div class="circle-red"></div><li>Mismatch: 5</li>
+                <div class="circle-lightred"></div><li>Failed: 10</li>
+                <div class="circle-yellow"></div><li>Disabled: 15</li>
+                <div class="circle-green"></div><li>OK: 661</li>
             </ul>
         </div>
         <div class="pieConfigTotalReconciliations">
             <Chart Config="_pieconfigTotalReconciliations" Height="50" Width="50"></Chart>
         </div>
     </div>
-    <div class="Total_read_written_container">Total read/written</div>
+    
+    @* Efficiency score table summary *@
+    <div>
+        <div class="Total_read_written_container">Total read/written</div>
+    </div>
 </div>
 
 
