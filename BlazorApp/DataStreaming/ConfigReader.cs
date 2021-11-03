@@ -2,9 +2,9 @@ using System.IO;
 
 namespace BlazorApp.DataStreaming
 {
-    public class ConfigReader
+    public static class ConfigReader
     {
-        public string ReadSetupFile()
+        public static string ReadSetupFile()
         {
             const string fileName = "setup.txt";
             string connectionString;

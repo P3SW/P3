@@ -5,6 +5,7 @@ namespace BlazorApp.DataStreaming
 {
     public class Manager
     {
+        //https://i.imgflip.com/34lzjo.png <--- you after looking at this code
         public string Name { get; private set; }
         public int Id { get; private set; }
         public string Status { get; private set; }
