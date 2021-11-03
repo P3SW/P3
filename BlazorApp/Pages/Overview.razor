@@ -10,30 +10,33 @@
     
     @* Summary text + runtime *@
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
-    <div class="Current_manager_info_container">
-        Current manager: DepartmentManager <br/>Manager Runtime: 00:06:51
-    </div>
-
+    
     @* Current running manager info *@
+    <div class="Current_manager_info_container">
+        <div>Current manager: DepartmentManager</div><br>
+        <div>Manager Runtime: 00:06:51</div>
+    </div>
+    
     <div class="Current_manager_container">
         <div class="Current_manager_errors">Current manager errors: 17
             <ul class="error-reconciliation-formatting">
-                <div class="circle-red"></div><li>Fatal: 1 </li>
-                <div class="circle-lightred"></div><li>Error: 2 <p id="_pieconfigTotalErrors"></p></li>
-                <div class="circle-yellow"></div><li>Warning: 5</li>
-                <div class="circle-green"></div><li>Info: 10</li>
+                <div class="circle background-red"></div><li>Fatal: 0</li>
+                <div class="circle background-lightred"></div><li>Error: 2</li>
+                <div class="circle background-yellow"></div><li>Warning: 5</li>
+                <div class="circle background-green"></div><li>Info: 10</li>
             </ul>
         </div>
         <div class="Current_manager_reconciliations">Current manager reconciliations: 691
             <ul class="error-reconciliation-formatting">
-                <div class="circle-red"></div><li>Mismatch: 1</li>
-                <div class="circle-lightred"></div><li>Failed: 2</li>
-                <div class="circle-yellow"></div><li>Disabled: 8</li>
-                <div class="circle-green"></div><li>OK: 60</li>
+                <div class="circle background-red"></div><li>Mismatch: 1</li>
+                <div class="circle background-lightred"></div><li>Failed: 2</li>
+                <div class="circle background-yellow"></div><li>Disabled: 8</li>
+                <div class="circle background-green"></div><li>OK: 60</li>
             </ul>
         </div>
     </div>
-
+    <div class="mind-the-gap">&nbsp;</div>
+    
     @* Manager queue *@
     <div class="manager-queue-container">
         <div class="queue-finished-text">Finished: <b>8</b></div>
@@ -44,10 +47,10 @@
     <div class="Total_errors_and_reconciliations_container">
         <div class="info_total_errors">Total Errors: @pieconfigTotalErrorsData.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle-red"></div><li>Fatal: @pieconfigTotalErrorsData[0]</li>
-                <div class="circle-lightred"></div><li>Error: @pieconfigTotalErrorsData[1]</li>
-                <div class="circle-yellow"></div><li>Warning: @pieconfigTotalErrorsData[2]</li>
-                <div class="circle-green"></div><li>Info: @pieconfigTotalErrorsData[3]</li>
+                <div class="circle background-red"></div><li>Fatal: 1</li>
+                <div class="circle background-lightred"></div><li>Error: 10</li>
+                <div class="circle background-yellow"></div><li>Warning: 15</li>
+                <div class="circle background-green"></div><li>Info: 63</li>
             </ul>
         </div>
         <div class="PieConfigTotalErrors">
@@ -56,10 +59,10 @@
 
         <div class="info_total_reconciliations">Total Reconciliations: @pieconfigTotalReconciliationsData.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle-red"></div><li>Mismatch: @pieconfigTotalReconciliationsData[0]</li>
-                <div class="circle-lightred"></div><li>Failed: @pieconfigTotalReconciliationsData[1]</li>
-                <div class="circle-yellow"></div><li>Disabled: @pieconfigTotalReconciliationsData[2]</li>
-                <div class="circle-green"></div><li>OK: @pieconfigTotalReconciliationsData[3]</li>
+                <div class="circle background-red"></div><li>Mismatch: 5</li>
+                <div class="circle background-lightred"></div><li>Failed: 10</li>
+                <div class="circle background-yellow"></div><li>Disabled: 15</li>
+                <div class="circle background-green"></div><li>OK: 661</li>
             </ul>
         </div>
         <div class="pieConfigTotalReconciliations">
@@ -68,8 +71,10 @@
     </div>
     
     @* Efficiency score table summary *@
-    <div>
-        <div class="Total_read_written_container">Total read/written</div>
+    <div class="efficiency-container">
+        <div class="efficiency-text">Median efficiency score: <b>2702</b></div><br/>
+        <div class="efficiency-text">Total read: <b>17021044</b></div><br/>
+        <div class="efficiency-text">Total written: <b>30461662</b></div>
     </div>
 </div>
 
@@ -79,8 +84,8 @@
             <Chart Config="_lineconfig" ></Chart>
         </div>
         <div class="info-labels">
-            <div class="cpu_info">CPU</div>
-            <div class="memory_info">Memory</div>
+            <div class="oblong background-lightred"></div><div class="cpu_text">CPU</div>
+            <div class="oblong background-green"></div><div class="memory_text">Memory</div>
         </div>
     </div>
     <div class="efficiency">
