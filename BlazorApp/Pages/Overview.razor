@@ -47,10 +47,10 @@
     <div class="Total_errors_and_reconciliations_container">
         <div class="info_total_errors">Total Errors: @pieconfigTotalErrorsData.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle background-red"></div><li>Fatal: 1</li>
-                <div class="circle background-lightred"></div><li>Error: 10</li>
-                <div class="circle background-yellow"></div><li>Warning: 15</li>
-                <div class="circle background-green"></div><li>Info: 63</li>
+                <div class="circle background-red"></div><li>Fatal:  @pieconfigTotalErrorsData[0]</li>
+                <div class="circle background-lightred"></div><li>Error: @pieconfigTotalErrorsData[1]</li>
+                <div class="circle background-yellow"></div><li>Warning:  @pieconfigTotalErrorsData[2]</li>
+                <div class="circle background-green"></div><li>Info:  @pieconfigTotalErrorsData[3]</li>
             </ul>
         </div>
         <div class="PieConfigTotalErrors">
@@ -59,10 +59,10 @@
 
         <div class="info_total_reconciliations">Total Reconciliations: @pieconfigTotalReconciliationsData.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle background-red"></div><li>Mismatch: 5</li>
-                <div class="circle background-lightred"></div><li>Failed: 10</li>
-                <div class="circle background-yellow"></div><li>Disabled: 15</li>
-                <div class="circle background-green"></div><li>OK: 661</li>
+                <div class="circle background-red"></div><li>Mismatch: @pieconfigTotalReconciliationsData[0]</li>
+                <div class="circle background-lightred"></div><li>Failed: @pieconfigTotalReconciliationsData[1]</li>
+                <div class="circle background-yellow"></div><li>Disabled: @pieconfigTotalReconciliationsData[2]</li>
+                <div class="circle background-green"></div><li>OK: @pieconfigTotalReconciliationsData[3]</li>
             </ul>
         </div>
         <div class="pieConfigTotalReconciliations">
