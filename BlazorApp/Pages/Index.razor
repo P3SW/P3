@@ -6,24 +6,33 @@
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
-
 <div class="summary">
     <h1><div class="summary_caption" style="text-align: center;">Summary</div></h1>
-    <Chart Config="_pieconfig"></Chart>
-    
+    <div class="pie_config_flex">
+        <div class="PieConfigTotalErrors"><Chart Config="_pieconfigTotalErrors" Height="100" Width="100"></Chart></div>
+        <div class="pieConfigTotalReconciliations"><Chart Config="_pieconfigTotalReconciliations" Height="100" Width="100"></Chart></div>
+    </div>
 </div>
 
-<div class="cpu_usage" style="text-align: center ">CPU Usage
-    <Chart Config="_lineconfig" ></Chart>
-    <h1></h1>
-</div>
+<div class="cpu_usage" style="text-align: center "> Memory/CPU
+
+    <Chart Config="_lineconfig" Height="135" ></Chart>
+    <div class="cpu_info">CPU</div>
+    <div class="memory_info">Memory</div>
+    </div>
 
 
 
 @code{
     private LineConfig _lineconfig;
-    private PieConfig _pieconfig;
+    private PieConfig _pieconfigTotalErrors;
+    private PieConfig _pieconfigTotalReconciliations;
+    private HubConnection hubConnection;
+    private List<string> data = new List<string>();
+    //private string userInput;
+    //private string messageInput;
 
+    
     protected override void OnInitialized()
     {
         ConfigureLineConfig();
@@ -33,77 +42,158 @@
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
-
         _lineconfig.Options = new LineOptions
         {
             Responsive = true,
             Title = new OptionsTitle
             {
-                Display = true,
-                Text = "Cpu usage",
+                Display = false,
+                Text = "Cpu & RAM usage",
                 FontColor = "#FFFFFF"
+            },
+            Legend = new Legend
+            {
+                Position = Position.Bottom,
+                Display = false,
+            },
+            Hover = new Hover
+            {
+                Mode = InteractionMode.Nearest,
+                Intersect = true
+            },
+            Scales = new Scales
+            {
+                XAxes = new List<CartesianAxis> //scale for the x axes
+                {
+                    new CategoryAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {   
+                            Display = true,
+                            //LabelString = "Time",
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+                        },
+                        Ticks = new CategoryTicks
+                        {
+                            FontColor = "#FFFFFF",
+                            FontSize = 13,
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142,142,142),
+                        },
+                    },
+                },
+                YAxes = new List<CartesianAxis>  // scale for the y axes
+                {
+                    new LinearCartesianAxis
+                    {
+                        ScaleLabel = new ScaleLabel   
+                        {
+                            //LabelString = "Usage %",
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+                        },
+                        Ticks = new LinearCartesianTicks
+                        {
+                            FontSize = 13,
+                            Padding = 10,
+                            FontColor = "#FFFFFF", // Color for ticks, values on y axies
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142,142,142),
+                            DrawBorder = false, // removes the border in the y axies
+                            
+                        }
+                    }
+                }
             }
-
         };
         
-        var lineconfigdataset = new LineDataset<int>(new[] {35, 50, 15, 45, 37});
+        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43})
         {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227,95,82),
+            BackgroundColor = ColorUtil.ColorString(0,0,0,0.0),
+            LineTension = 0,
+
+        };
+        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12 })
+        {
+            Label = ("Ram usage"),
+            BorderColor = ColorUtil.ColorString(92,188,169,1),
+            BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
+            LineTension = 0,
+            
+
+        };
+        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17"})
+        {
+            _lineconfig.Data.Labels.Add(party);
         }
-        
-     
-
-        _lineconfig.Data.Datasets.Add(lineconfigdataset);
-
+        _lineconfig.Data.Datasets.Add(lineconfigdataset1);
+        _lineconfig.Data.Datasets.Add(lineconfigdataset2);
     }
     
     private void ConfigurePieConfig()
     {
+        _pieconfigTotalErrors = new PieConfig();
+        _pieconfigTotalReconciliations = new PieConfig();
 
-        
-        
-        _pieconfig = new PieConfig();
-
-
-        _pieconfig.Options = new PieOptions
+        _pieconfigTotalErrors.Options = new PieOptions
         {
             Responsive = true,
             Title = new OptionsTitle
             {
-                Display = true,
+                Display = false,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
-
             },
-            
+            CutoutPercentage = 45,
+            Legend =new Legend
+            {
+                Display = false,
+            },
         };
+        _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
         
 
-        foreach (var party in new[]{"Fatal error","Error","Test"})
+        foreach (var party in new[]{"Fatal error","Error","Warning","Info"})
         {
-            _pieconfig.Data.Labels.Add(party);
+            _pieconfigTotalErrors.Data.Labels.Add(party);
+            _pieconfigTotalReconciliations.Data.Labels.Add(party);
         }
 
-        var pieconfigdataset = new PieDataset<int>(new[] {35, 50, 15}) //Datapoints
+        var pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
         {
             BackgroundColor = new[]   // Color for the pies
             {
-                ColorUtil.ColorHexString(255, 0, 0),
-                ColorUtil.ColorHexString(0, 255, 0),
-                ColorUtil.ColorHexString(0, 0, 255)
-            }
+                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
+                ColorUtil.ColorHexString(227, 95, 82), //Error
+                ColorUtil.ColorHexString(221, 155, 43), //Warning
+                ColorUtil.ColorHexString(92, 188, 169)  //Info
+            },
+            BorderColor = ColorUtil.ColorHexString(0,0,0), 
+            BorderWidth = 0,
         };
-        _pieconfig.Data.Datasets.Add(pieconfigdataset);
-
+        
+        var pieconfigTotalReconciliationsData = new PieDataset<int>(new[] {5,10,15,661 }){
+            BackgroundColor = new[]   // Color for the pies
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
+                ColorUtil.ColorHexString(227, 95, 82), //Failed
+                ColorUtil.ColorHexString(221, 155, 43), //Disabled
+                ColorUtil.ColorHexString(92, 188, 169)  //OK
+            },
+            BorderColor = ColorUtil.ColorHexString(0,0,0), 
+            BorderWidth = 0,
+        };
+        
+        _pieconfigTotalErrors.Data.Datasets.Add(pieconfigTotalErrorsData);
+        _pieconfigTotalReconciliations.Data.Datasets.Add(pieconfigTotalReconciliationsData);
     }
-}
-
-@code {
-    private HubConnection hubConnection;
-    private List<string> data = new List<string>();
-    //private string userInput;
-    //private string messageInput;
-    
-    /* When a person opens the error page */
     protected override async Task OnInitializedAsync()
     {
         hubConnection = new HubConnectionBuilder()
@@ -112,7 +202,7 @@
 
         hubConnection.On<string, string>("ReceiveHealth", (type, value) =>
         {
-            /* Do something with the health received*/
+    /* Do something with the health received*/
             StateHasChanged(); // updates the page
         });
 

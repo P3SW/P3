@@ -3,7 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
-    public class ManagerTrackingData : IData
+    public class ManagerTrackingData //: IData
     {
         private string _manager;
         private string _status;
@@ -18,14 +18,14 @@ namespace BlazorApp.DataStreaming
             
         }
 
-        public void AddDataFromSqlReader(SqlDataReader reader)
-        {
-            throw new NotImplementedException();
-        }
-
-        public string GetChangesQueryString()
-        {
-            throw new NotImplementedException();
-        }
+        // public void AddDataFromSqlReader(SqlDataReader reader)
+        // {
+        //     throw new NotImplementedException();
+        // }
+        //
+        // public string GetChangesQueryString()
+        // {
+        //     throw new NotImplementedException();
+        // }
     }
 }

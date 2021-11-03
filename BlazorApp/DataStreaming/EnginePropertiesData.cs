@@ -30,7 +30,6 @@ namespace BlazorApp.DataStreaming
         }
 
         
-        //TODO: Move this shit to a new class to follow the pattern of all the other classes.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
             
