@@ -3,7 +3,7 @@
     background-color: #384561;
     padding: 0;
     display: grid;
-    grid-template-rows: 10fr 10fr 17fr 2fr 11fr 20fr 32fr;
+    grid-template-rows: 10fr 8fr 17fr 2fr 13fr 20fr 32fr;
     max-height: 100vh;
 }
 
@@ -27,7 +27,6 @@
     font-size: 2rem;
     color: #FFFFFF;
     line-height: 2rem;
-    text-decoration: underline;
 }
 
 /* Current manager */
@@ -107,18 +106,15 @@
 .info-labels{
     display: flex;
     gap: 0.7rem;
+    align-items: center;
 }
 
-.cpu_info {
+.cpu_text {
     font-size: 0.5em;
-    background-color: #E35F52;
-    border-radius: 5px;
 }
 
-.memory_info {
+.memory_text {
     font-size: 0.5em;
-    background-color: #5CBCA9;
-    border-radius: 5px;
 }
 
 .efficiency{
@@ -145,33 +141,17 @@
     font-size: 0.8em;
 }
 
-/* List circles */
-.circle-red {
+/* Shapes */
+.circle {
     height: 0.5em;
     width: 0.5em;
-    background-color: red;
     border-radius: 100%;
 }
 
-.circle-lightred {
-    height: 0.5em;
-    width: 0.5em;
-    background-color: #E35F52;
-    border-radius: 100%;
-}
-
-.circle-yellow {
-    height: 0.5em;
-    width: 0.5em;
-    background-color: #DD9B2B;
-    border-radius: 100%;
-}
-
-.circle-green {
-    height: 0.5em;
-    width: 0.5em;
-    background-color: #5CBCA9;
-    border-radius: 100%;
+.oblong {
+    height: 0.3em;
+    width: 1em;
+    border-radius: 0.25em;
 }
 
 /* Manager queue */
@@ -220,3 +200,4 @@
         }
            
 }
+

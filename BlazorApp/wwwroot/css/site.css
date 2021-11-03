@@ -44,3 +44,19 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+
+.background-green {
+    background-color: rgba(92, 188, 169, 1);
+}
+
+.background-yellow {
+    background-color: rgba(221, 155, 43, 1);
+}
+
+.background-lightred {
+    background-color: rgba(227, 95, 82, 1);
+}
+
+.background-red {
+    background-color: rgba(255, 23, 0, 1);
+}
