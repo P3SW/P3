@@ -1,16 +1,14 @@
 using System;
 using System.Collections.Generic;
-using BlazorApp.DataStreaming;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class ErrorLog : IData
     {
         public List<ErrorData> ErrorList { get; private set; }
         public List<ErrorData> NewErrorList { get; private set; }
         public static DateTime LastRowTimeStamp { get; private set; }
-
 
         public ErrorLog()
         {

@@ -1,23 +1,20 @@
 using System;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class ErrorData
     {
         public DateTime Created { get; private set; }
         public string LogMessage { get; private set; }
         public string LogLevel { get; private set; }
-        public long ExecutionID { get; private set; }
-        public long ContextID { get; private set; }
-        
-        public ErrorData(DateTime created, string logMessage, string logLevel, long executionId, long contextId)
+        public string ManagerName { get; private set; }
+        public ErrorData(DateTime created, string logMessage, string logLevel, string managerName)
         {
             Created = created;
             LogMessage = logMessage;
             LogLevel = logLevel;
-            ExecutionID = executionId;
-            ContextID = contextId;
+            ManagerName = managerName;
         }
         
         public ErrorData(SqlDataReader reader)
@@ -25,8 +22,7 @@ namespace Datastreaming
             Created = (DateTime) reader[0];
             LogMessage = (string) reader[1];
             LogLevel = (string) reader[2];
-            ExecutionID = (long) reader[3];
-            ContextID = (long) reader[4];
+            ManagerName = (string) reader[3];
         }
     }
 }

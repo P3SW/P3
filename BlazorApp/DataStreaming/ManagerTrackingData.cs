@@ -1,8 +1,7 @@
 using System;
-using BlazorApp.DataStreaming;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class ManagerTrackingData : IData
     {

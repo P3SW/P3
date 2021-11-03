@@ -1,6 +1,5 @@
 using System;
 using System.Data;
-using Datastreaming;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
@@ -9,11 +8,10 @@ namespace BlazorApp.DataStreaming
     {
         private SqlDependency _dependency;
         private string _queryString;
-        private SqlConnection _connection;
+        public static SqlConnection Connection { get; set; }
         private IData _dataObject;
-        public TableStreamer(SqlConnection connection, string queryString, IData dataObject)
+        public TableStreamer(string queryString, IData dataObject)
         {
-            _connection = connection;
             _queryString = queryString;
             _dataObject = dataObject;
             
@@ -27,7 +25,7 @@ namespace BlazorApp.DataStreaming
             try
             {
                 //Creates a command and passes it to the SqlDependency constructor
-                using (SqlCommand command = new SqlCommand(_queryString, _connection))
+                using (SqlCommand command = new SqlCommand(_queryString, Connection))
                 {
                     command.CommandType = CommandType.Text;
                     command.CommandText = _queryString;
@@ -55,6 +53,7 @@ namespace BlazorApp.DataStreaming
             {
                 //To minimise network traffic, a separate list containing only the changes is made and send to the client
                 AddQueryToObject(_dataObject.GetChangesQueryString());
+                
                 //Implement SignalR interaction here.
 
             }
@@ -63,7 +62,7 @@ namespace BlazorApp.DataStreaming
         
         private void AddQueryToObject(string queryString)
         {
-            using (SqlCommand command = new SqlCommand(queryString, _connection))
+            using (SqlCommand command = new SqlCommand(queryString, Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -73,7 +72,7 @@ namespace BlazorApp.DataStreaming
         }
 
         //Closes the reader to ensure only the new data in the table is queried.
-        private static void CloseReader(SqlCommand command)
+        public static void CloseReader(SqlCommand command)
         {
             SqlDataReader reader = command.ExecuteReader();
             reader.Close();
