@@ -45,7 +45,7 @@
     
     @* Total manager info *@
     <div class="Total_errors_and_reconciliations_container">
-        <div class="info_total_errors">Total Errors: 66
+        <div class="info_total_errors">Total Errors: @pieconfigTotalErrorsData.Sum()
             <ul class="error-reconciliation-formatting">
                 <div class="circle background-red"></div><li>Fatal: 1</li>
                 <div class="circle background-lightred"></div><li>Error: 10</li>
@@ -57,7 +57,7 @@
             <Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart>
         </div>
 
-        <div class="info_total_reconciliations">Total Reconciliations: 691
+        <div class="info_total_reconciliations">Total Reconciliations: @pieconfigTotalReconciliationsData.Sum()
             <ul class="error-reconciliation-formatting">
                 <div class="circle background-red"></div><li>Mismatch: 5</li>
                 <div class="circle background-lightred"></div><li>Failed: 10</li>
@@ -78,17 +78,6 @@
     </div>
 </div>
 
-
-
-
-
-
-
-
-
-
-
-
 <div class="Overview-right">
     <div class="cpu_usage" style="text-align: center "> Memory/CPU
         <div style="position: relative; width: 90%; left: 5%">
@@ -104,13 +93,14 @@
     </div>
 </div>
 
-
-
-
 @code{
     private LineConfig _lineconfig;
     private PieConfig _pieconfigTotalErrors;
     private PieConfig _pieconfigTotalReconciliations;
+    PieDataset<int> pieconfigTotalErrorsData;
+    PieDataset<int> pieconfigTotalReconciliationsData;
+    
+    
 
     protected override void OnInitialized()
     {
@@ -147,9 +137,9 @@
                     new CategoryAxis
                     {
                         ScaleLabel = new ScaleLabel
-                        {   
+                        {
                             Display = true,
-                            //LabelString = "Time",
+    //LabelString = "Time",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
                         },
@@ -160,18 +150,18 @@
                         },
                         GridLines = new GridLines
                         {
-                            Color = ColorUtil.ColorHexString(142,142,142),
+                            Color = ColorUtil.ColorHexString(142, 142, 142),
                         },
                     },
                 },
-                YAxes = new List<CartesianAxis>  // scale for the y axes
+                YAxes = new List<CartesianAxis> // scale for the y axes
                 {
                     new LinearCartesianAxis
                     {
-                        ScaleLabel = new ScaleLabel   
+                        ScaleLabel = new ScaleLabel
                         {
                             Display = true,
-                            //LabelString = "Usage %",
+    //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
                         },
@@ -183,9 +173,9 @@
                         },
                         GridLines = new GridLines
                         {
-                            Color = ColorUtil.ColorHexString(142,142,142),
+                            Color = ColorUtil.ColorHexString(142, 142, 142),
                             DrawBorder = false, // removes the border in the y axies
-                            
+
                         }
                     }
                 }
@@ -251,7 +241,7 @@
         _pieconfigTotalErrors = SetUpPieLabels(_pieconfigTotalErrors, new[] {"Fatal error","Error","Warning","Info"});
         _pieconfigTotalReconciliations = SetUpPieLabels(_pieconfigTotalReconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
         
-        var pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
+        pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
         {
             BackgroundColor = new[]   // Color for the pies
             {
@@ -262,20 +252,20 @@
             },
             BorderColor = ColorUtil.ColorHexString(0,0,0), 
             BorderWidth = 0,
+            
         };
-        
-        var pieconfigTotalReconciliationsData = new PieDataset<int>(new[] {5,10,15,661 }){
-            BackgroundColor = new[]   // Color for the pies
+        pieconfigTotalReconciliationsData = new PieDataset<int>(new[] {5, 10, 15, 661})
+        {
+            BackgroundColor = new[] // Color for the pies
             {
                 ColorUtil.ColorHexString(255, 23, 0), //Mismatch
                 ColorUtil.ColorHexString(227, 95, 82), //Failed
                 ColorUtil.ColorHexString(221, 155, 43), //Disabled
-                ColorUtil.ColorHexString(92, 188, 169)  //OK
+                ColorUtil.ColorHexString(92, 188, 169) //OK
             },
-            BorderColor = ColorUtil.ColorHexString(0,0,0), 
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
             BorderWidth = 0,
         };
-        
         _pieconfigTotalErrors.Data.Datasets.Add(pieconfigTotalErrorsData);
         _pieconfigTotalReconciliations.Data.Datasets.Add(pieconfigTotalReconciliationsData);
     }
