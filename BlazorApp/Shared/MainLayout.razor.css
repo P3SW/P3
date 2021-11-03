@@ -1,11 +1,17 @@
 .page {
-    position: relative;
-    display: flex;
-    flex-direction: column;
+    display: grid;
+    grid-template-columns: 9.375rem 1fr;
+    background-color: #9299A8;
 }
 
 .main {
-    flex: 1;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.content{
+    padding: 0;
 }
 
 .sidebar {
@@ -23,14 +29,13 @@
 
     .top-row ::deep a, .top-row .btn-link {
         white-space: nowrap;
-        margin-left: 1.5rem;
     }
 
     .top-row a:first-child {
         overflow: hidden;
         text-overflow: ellipsis;
     }
-
+    
 @media (max-width: 640.98px) {
     .top-row:not(.auth) {
         display: none;
@@ -51,7 +56,7 @@
     }
 
     .sidebar {
-        width: 250px;
+        width: 9.375rem;
         height: 100vh;
         position: sticky;
         top: 0;
@@ -61,10 +66,5 @@
         position: sticky;
         top: 0;
         z-index: 1;
-    }
 
-    .main > div {
-        padding-left: 2rem !important;
-        padding-right: 1.5rem !important;
-    }
 }
