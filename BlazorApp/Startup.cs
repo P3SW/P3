@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlazorApp.DataStreaming;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
@@ -56,13 +57,19 @@ namespace BlazorApp
             app.UseStaticFiles();
 
             app.UseRouting();
-
+            
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
                 endpoints.MapHub<DataHub>("/datahub"); //Map to the chathub when connected. (SignalR stuff)
                 endpoints.MapFallbackToPage("/_Host");
             });
+            
+            //The codebase is a toilet and I'm the asshole who is gonna shit all over it
+            
+            
+            
+            
         }
     }
 }
