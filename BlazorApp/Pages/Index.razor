@@ -1,4 +1,5 @@
 @page "/"
+
 @page "/overview"
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
@@ -8,7 +9,10 @@
 <div class="summary">
     <h1><div class="summary_caption" style="text-align: center;">Summary</div></h1>
     <Chart Config="_pieconfig" Height="60"></Chart>
-    
+    <div class="pie_config_flex">
+        <div class="PieConfigTotalErrors"><Chart Config="_pieconfigTotalErrors" Height="100" Width="100"></Chart></div>
+        <div class="pieConfigTotalReconciliations"><Chart Config="_pieconfigTotalReconciliations" Height="100" Width="100"></Chart></div>
+    </div>
 </div>
 
 <div class="cpu_usage" style="text-align: center "> Memory/CPU
@@ -22,7 +26,8 @@
 
 @code{
     private LineConfig _lineconfig;
-    private PieConfig _pieconfig;
+    private PieConfig _pieconfigTotalErrors;
+    private PieConfig _pieconfigTotalReconciliations;
 
     protected override void OnInitialized()
     {
@@ -33,9 +38,7 @@
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
-        
-       
-        
+
         _lineconfig.Options = new LineOptions
         {
             Responsive = true,
@@ -135,17 +138,17 @@
     private void ConfigurePieConfig()
     {
 
-        
-        
-        _pieconfig = new PieConfig();
+        _pieconfigTotalErrors = new PieConfig();
+        _pieconfigTotalReconciliations = new PieConfig();
 
+        _pieconfigTotalErrors.Options = new PieOptions
 
-        _pieconfig.Options = new PieOptions
         {
             Responsive = true,
             Title = new OptionsTitle
             {
-                Display = true,
+
+                Display = false,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
             },
@@ -156,13 +159,16 @@
             },
         };
 
+        _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
+        
 
         foreach (var party in new[]{"Fatal error","Error","Warning","Info"})
         {
-            _pieconfig.Data.Labels.Add(party);
+            _pieconfigTotalErrors.Data.Labels.Add(party);
+            _pieconfigTotalReconciliations.Data.Labels.Add(party);
         }
 
-        var pieconfigdataset = new PieDataset<int>(new[] {20,10,10,60 }) //Datapoints
+        var pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
         {
             BackgroundColor = new[]   // Color for the pies
             {
@@ -170,13 +176,25 @@
                 ColorUtil.ColorHexString(227, 95, 82), //Error
                 ColorUtil.ColorHexString(221, 155, 43), //Warning
                 ColorUtil.ColorHexString(92, 188, 169)  //Info
-                    
+
             },
-            BorderColor = ColorUtil.ColorHexString(0,0,0),
+            BorderColor = ColorUtil.ColorHexString(0,0,0), 
             BorderWidth = 0,
-
         };
-        _pieconfig.Data.Datasets.Add(pieconfigdataset);
-
+        
+        var pieconfigTotalReconciliationsData = new PieDataset<int>(new[] {5,10,15,661 }){
+            BackgroundColor = new[]   // Color for the pies
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
+                ColorUtil.ColorHexString(227, 95, 82), //Failed
+                ColorUtil.ColorHexString(221, 155, 43), //Disabled
+                ColorUtil.ColorHexString(92, 188, 169)  //OK
+            },
+            BorderColor = ColorUtil.ColorHexString(0,0,0), 
+            BorderWidth = 0,
+        };
+        
+        _pieconfigTotalErrors.Data.Datasets.Add(pieconfigTotalErrorsData);
+        _pieconfigTotalReconciliations.Data.Datasets.Add(pieconfigTotalReconciliationsData);
     }
 }

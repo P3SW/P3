@@ -1,14 +1,18 @@
+
 ﻿@* Sidebar with the navigation buttons *@
 <div class="@NavMenuCssClass" @onclick="ToggleNavMenu">
+
     <ul class="nav flex-column">
         <li class="nav-item current-page-indicator"> @* Button1 *@
             <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
                 <img src="Icons/overview-icon.svg" alt="Overview" class="sidebar-image"/><span aria-hidden="true">&nbsp;</span>
                 <div class="sidebar-caption">Overview</div>
+
             </NavLink>
         </li>
         <li class="nav-item current-page-indicator"> @* Button2 *@
             <NavLink class="nav-link" href="errors">
+
                 <img src="Icons/error-icon.svg" alt="Errors" class="sidebar-image"/><span aria-hidden="true">&nbsp;</span>
                 <div class="sidebar-caption">Errors</div>
             </NavLink>

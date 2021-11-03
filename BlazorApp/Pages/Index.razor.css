@@ -1,4 +1,5 @@
-﻿.summary{
+.summary{
+
     border: 5px;
     background-color: #384561;
     position: relative;
@@ -20,7 +21,6 @@
     color: #FFFFFF;
     height: 400px;
 }
-
 .cpu_info {
     height: 8px;
     width: 40px;
