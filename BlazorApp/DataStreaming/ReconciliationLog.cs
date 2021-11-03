@@ -1,14 +1,13 @@
 using System;
 using System.Collections.Generic;
-using BlazorApp.DataStreaming;
 using Microsoft.Data.SqlClient;
 
-namespace Datastreaming
+namespace BlazorApp.DataStreaming
 {
     public class ReconciliationLog : IData
     {
         public List<ReconciliationData> ReconciliationList { get; private set; }
-        private List<ReconciliationData> newReconciliationData;
+        public List<ReconciliationData> newReconciliationData { get; private set; }
         public static DateTime LastRowTimeStamp { get; private set; }
 
         public ReconciliationLog()
