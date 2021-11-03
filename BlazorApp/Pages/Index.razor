@@ -1,4 +1,6 @@
 @page "/"
+
+@page "/overview"
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using System.Reflection.Emit
@@ -6,6 +8,7 @@
 
 <div class="summary">
     <h1><div class="summary_caption" style="text-align: center;">Summary</div></h1>
+    <Chart Config="_pieconfig" Height="60"></Chart>
     <div class="pie_config_flex">
         <div class="PieConfigTotalErrors"><Chart Config="_pieconfigTotalErrors" Height="100" Width="100"></Chart></div>
         <div class="pieConfigTotalReconciliations"><Chart Config="_pieconfigTotalReconciliations" Height="100" Width="100"></Chart></div>
@@ -35,6 +38,7 @@
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
+
         _lineconfig.Options = new LineOptions
         {
             Responsive = true,
@@ -133,14 +137,17 @@
     
     private void ConfigurePieConfig()
     {
+
         _pieconfigTotalErrors = new PieConfig();
         _pieconfigTotalReconciliations = new PieConfig();
 
         _pieconfigTotalErrors.Options = new PieOptions
+
         {
             Responsive = true,
             Title = new OptionsTitle
             {
+
                 Display = false,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
@@ -151,6 +158,7 @@
                 Display = false,
             },
         };
+
         _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
         
 
@@ -168,6 +176,7 @@
                 ColorUtil.ColorHexString(227, 95, 82), //Error
                 ColorUtil.ColorHexString(221, 155, 43), //Warning
                 ColorUtil.ColorHexString(92, 188, 169)  //Info
+
             },
             BorderColor = ColorUtil.ColorHexString(0,0,0), 
             BorderWidth = 0,
