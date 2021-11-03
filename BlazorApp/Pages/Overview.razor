@@ -1,26 +1,109 @@
 @page "/"
-
 @page "/overview"
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using System.Reflection.Emit
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
 
-<div class="summary">
-    <h1><div class="summary_caption" style="text-align: center;">Summary</div></h1>
-    <Chart Config="_pieconfig" Height="60"></Chart>
-    <div class="pie_config_flex">
-        <div class="PieConfigTotalErrors"><Chart Config="_pieconfigTotalErrors" Height="100" Width="100"></Chart></div>
-        <div class="pieConfigTotalReconciliations"><Chart Config="_pieconfigTotalReconciliations" Height="100" Width="100"></Chart></div>
+<div class="summary_container">
+    
+    @* Summary text + runtime *@
+    <div class="summary_caption_container" style="text-align: center;">Summary</div>
+    
+    @* Current running manager info *@
+    <div class="Current_manager_info_container">
+        <div>Current manager: DepartmentManager</div><br>
+        <div>Manager Runtime: 00:06:51</div>
+    </div>
+    
+    <div class="Current_manager_container">
+        <div class="Current_manager_errors">Current manager errors: 17
+            <ul class="error-reconciliation-formatting">
+                <div class="circle background-red"></div><li>Fatal: 0</li>
+                <div class="circle background-lightred"></div><li>Error: 2</li>
+                <div class="circle background-yellow"></div><li>Warning: 5</li>
+                <div class="circle background-green"></div><li>Info: 10</li>
+            </ul>
+        </div>
+        <div class="Current_manager_reconciliations">Current manager reconciliations: 691
+            <ul class="error-reconciliation-formatting">
+                <div class="circle background-red"></div><li>Mismatch: 1</li>
+                <div class="circle background-lightred"></div><li>Failed: 2</li>
+                <div class="circle background-yellow"></div><li>Disabled: 8</li>
+                <div class="circle background-green"></div><li>OK: 60</li>
+            </ul>
+        </div>
+    </div>
+    <div class="mind-the-gap">&nbsp;</div>
+    
+    @* Manager queue *@
+    <div class="manager-queue-container">
+        <div class="queue-finished-text">Finished: <b>8</b></div>
+        <div class="queue-inqueue-text">In queue: <b>4</b></div>
+    </div>
+    
+    @* Total manager info *@
+    <div class="Total_errors_and_reconciliations_container">
+        <div class="info_total_errors">Total Errors: 66
+            <ul class="error-reconciliation-formatting">
+                <div class="circle background-red"></div><li>Fatal: 1</li>
+                <div class="circle background-lightred"></div><li>Error: 10</li>
+                <div class="circle background-yellow"></div><li>Warning: 15</li>
+                <div class="circle background-green"></div><li>Info: 63</li>
+            </ul>
+        </div>
+        <div class="PieConfigTotalErrors">
+            <Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart>
+        </div>
+
+        <div class="info_total_reconciliations">Total Reconciliations: 691
+            <ul class="error-reconciliation-formatting">
+                <div class="circle background-red"></div><li>Mismatch: 5</li>
+                <div class="circle background-lightred"></div><li>Failed: 10</li>
+                <div class="circle background-yellow"></div><li>Disabled: 15</li>
+                <div class="circle background-green"></div><li>OK: 661</li>
+            </ul>
+        </div>
+        <div class="pieConfigTotalReconciliations">
+            <Chart Config="_pieconfigTotalReconciliations" Height="50" Width="50"></Chart>
+        </div>
+    </div>
+    
+    @* Efficiency score table summary *@
+    <div class="efficiency-container">
+        <div class="efficiency-text">Median efficiency score: <b>2702</b></div><br/>
+        <div class="efficiency-text">Total read: <b>17021044</b></div><br/>
+        <div class="efficiency-text">Total written: <b>30461662</b></div>
     </div>
 </div>
 
-<div class="cpu_usage" style="text-align: center "> Memory/CPU
 
-    <Chart Config="_lineconfig" Height="135" ></Chart>
-    <div class="cpu_info">CPU</div>
-    <div class="memory_info">Memory</div>
+
+
+
+
+
+
+
+
+
+
+<div class="Overview-right">
+    <div class="cpu_usage" style="text-align: center "> Memory/CPU
+        <div style="position: relative; width: 90%; left: 5%">
+            <Chart Config="_lineconfig" ></Chart>
+        </div>
+        <div class="info-labels">
+            <div class="oblong background-lightred"></div><div class="cpu_text">CPU</div>
+            <div class="oblong background-green"></div><div class="memory_text">Memory</div>
+        </div>
     </div>
+    <div class="efficiency">
+        
+    </div>
+</div>
+
 
 
 
@@ -38,14 +121,13 @@
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
-
         _lineconfig.Options = new LineOptions
         {
             Responsive = true,
             Title = new OptionsTitle
             {
                 Display = false,
-                Text = "Cpu & RAM usage",
+                Text = "Cpu & Memory usage",
                 FontColor = "#FFFFFF"
             },
             Legend = new Legend
@@ -110,7 +192,7 @@
             }
         };
         
-        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43})
+        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43, 20, 10})
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227,95,82),
@@ -118,36 +200,42 @@
             LineTension = 0,
 
         };
-        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12 })
+        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
         {
-            Label = ("Ram usage"),
+            Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92,188,169,1),
             BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
             LineTension = 0,
             
 
         };
-        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17"})
+        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17", "01:25", "01:30"})
         {
             _lineconfig.Data.Labels.Add(party);
         }
         _lineconfig.Data.Datasets.Add(lineconfigdataset1);
         _lineconfig.Data.Datasets.Add(lineconfigdataset2);
     }
-    
+    private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
+    {
+        foreach (var label in labels)
+        {
+            config.Data.Labels.Add(label);
+        }
+        
+        return config;
+    }
+
     private void ConfigurePieConfig()
     {
-
         _pieconfigTotalErrors = new PieConfig();
         _pieconfigTotalReconciliations = new PieConfig();
 
         _pieconfigTotalErrors.Options = new PieOptions
-
         {
             Responsive = true,
             Title = new OptionsTitle
             {
-
                 Display = false,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
@@ -158,16 +246,11 @@
                 Display = false,
             },
         };
-
         _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
         
-
-        foreach (var party in new[]{"Fatal error","Error","Warning","Info"})
-        {
-            _pieconfigTotalErrors.Data.Labels.Add(party);
-            _pieconfigTotalReconciliations.Data.Labels.Add(party);
-        }
-
+        _pieconfigTotalErrors = SetUpPieLabels(_pieconfigTotalErrors, new[] {"Fatal error","Error","Warning","Info"});
+        _pieconfigTotalReconciliations = SetUpPieLabels(_pieconfigTotalReconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
+        
         var pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
         {
             BackgroundColor = new[]   // Color for the pies
@@ -176,7 +259,6 @@
                 ColorUtil.ColorHexString(227, 95, 82), //Error
                 ColorUtil.ColorHexString(221, 155, 43), //Warning
                 ColorUtil.ColorHexString(92, 188, 169)  //Info
-
             },
             BorderColor = ColorUtil.ColorHexString(0,0,0), 
             BorderWidth = 0,
