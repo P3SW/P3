@@ -1,0 +1,137 @@
+﻿.summary_container{
+    background-color: #384561;
+    padding: 0;
+    display: grid;
+    grid-template-rows: 10fr 10fr 20fr 10fr 20fr 30fr;
+    max-height: 100vh;
+}
+
+.summary_container > div{
+    margin: 0.5rem;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 2rem;
+    border-bottom: 2px solid #8E8E8E;
+}
+
+.summary_caption_container{
+    font-size: 2rem;
+    color: #FFFFFF;
+    line-height: 2rem;
+    text-decoration: underline;
+}
+
+.Current_manager_info_container {
+    border-bottom: 0 !important;
+}
+
+.Current_manager_container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: #53607A 27%;
+ }
+
+.Current_manager_container > div{
+    margin: 1%;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0.7em;
+}
+
+.Total_errors_and_reconciliations_container{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr;
+}
+
+.Total_errors_and_reconciliations_container > div{
+    margin: 1%;
+    text-align: left;
+    font-size: 0.7em;
+}
+
+.Total_read_written_container{
+    border: none !important;
+    margin: none !important;
+}
+
+.Overview-right{
+    display: grid;
+    grid-template-rows: 1fr 1fr;
+    gap: 1rem;
+}
+
+.cpu_usage{
+    background-color: #384561;
+    font-size: 2rem;
+    color: #FFFFFF;
+    padding: 0;
+}
+
+.info-labels{
+    display: flex;
+    gap: 0.7rem;
+    
+}
+
+.cpu_info {
+    font-size: 0.5em;
+    background-color: #E35F52;
+    border-radius: 5px;
+}
+.memory_info {
+    font-size: 0.5em;
+    background-color: #5CBCA9;
+    border-radius: 5px;
+}
+
+.efficiency{
+    background-color: #384561;
+}
+
+.PieConfigTotalErrors {
+    position: relative;
+    width: 80%;
+}
+
+.pieConfigTotalReconciliations {
+    position: relative;
+    width: 80%;
+}
+
+.error-reconciliation-formatting {
+    list-style: none;
+    display: grid;
+    align-items: center;
+    row-gap: 0.5em;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 0.8em 1fr;
+    font-size: 0.8em;
+}
+
+.circle-red {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: red;
+    border-radius: 100%;
+}
+
+.circle-lightred {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: #E35F52;
+    border-radius: 100%;
+}
+
+.circle-yellow {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: #DD9B2B;
+    border-radius: 100%;
+}
+
+.circle-green {
+    height: 0.5em;
+    width: 0.5em;
+    background-color: #5CBCA9;
+    border-radius: 100%;
+}
