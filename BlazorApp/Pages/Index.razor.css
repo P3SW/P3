@@ -67,6 +67,100 @@
     gap: 1rem;
 }
 
+.chart-header{
+    display: grid;
+    grid-template-columns: 30fr 70fr;
+}
+
+.dropdown {
+    position: relative;
+    left: 5%;
+    height: 1.1em;
+    background-color: #4B5772;
+    font-family: inherit;
+    font-size: 0.6em;
+    color: #e3e3e3;
+    padding: 0;
+    cursor: pointer;
+    border: 1px solid #384561;
+    border-bottom: 1px solid #8E8E8E;
+    align-self: end;
+}
+
+.selected-manager-name{
+    position: absolute;
+    width: 95%;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.dropdown-arrow{
+    position: absolute;
+    left: 94%;
+    height: 1em;
+    width: 5%;
+}
+
+.dropup-arrow{
+    display: none;
+    position: absolute;
+    left: 94%;
+    height: 1em;
+    width: 5%;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    width: 100%;
+    height: 10em;
+    font-size: 1em;
+    transform: translate(0,11%);
+    overflow-x: hidden;
+    overflow-y: auto;
+    border-top: 1px solid #8E8E8E;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    background-color: #4B5772;
+    z-index: 2;
+}
+.dropdown:hover .dropdown-content{
+    display: block;
+}
+
+.dropdown:hover .dropdown-arrow{
+    display: none;
+}
+
+.dropdown:hover .dropup-arrow{
+    display: inline-block;
+}
+
+.dropdown-content a{
+    display: block;
+    color: #e3e3e3;
+    text-decoration: none;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    border-top: 1px solid #8E8E8E;
+}
+
+.dropdown-content-first{
+    border-top: none !important;
+}
+
+.dropdown-content a:hover {
+    background-color: #0F2147;
+}
+
+.chart-title{
+    position: relative;
+    left: 15%;
+    width: 50%;
+    align-self: end;
+}
+
 .cpu_usage{
     background-color: #384561;
     font-size: 2rem;
@@ -94,3 +188,4 @@
 .efficiency{
     background-color: #384561;
 }
+
