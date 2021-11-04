@@ -99,6 +99,8 @@
     private PieConfig _pieconfigTotalReconciliations;
     PieDataset<int> pieconfigTotalErrorsData;
     PieDataset<int> pieconfigTotalReconciliationsData;
+    LineDataset<int> lineconfigdataset1;
+    LineDataset<int> lineconfigdataset2;
     
     
 
@@ -182,15 +184,15 @@
             }
         };
         
-        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43, 20, 10})
+        lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43, 20, 10})
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227,95,82),
             BackgroundColor = ColorUtil.ColorString(0,0,0,0.0),
             LineTension = 0,
-
         };
-        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
+        
+        lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92,188,169,1),
