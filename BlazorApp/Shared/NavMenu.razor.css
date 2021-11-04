@@ -18,24 +18,20 @@
         justify-content: center;
         text-align: center;
     }
-
-.nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.1);
-    color: white;
-}
-
+    
 .nav-item ::deep a:hover {
     background-color: rgba(255,255,255,0.1);
     color: white;
 }
 
-/*.current-page-indicator ::deep a.active {
-    position: relative;
-    height: 150px;
-    width: 10px;
+.nav-item ::deep a.active .current-page-indicator { /* Orange indicator on sidebar */
+    display: block;
+    position: absolute;
+    height: 9.375rem;
+    width: 3.33%; /* About 5 pixels wide */
     left: 0;
     background-color: #E35F52;
-}*/
+}
 
 .sidebar-image { /* Icons on the buttons */
     width: 72px;!important;
