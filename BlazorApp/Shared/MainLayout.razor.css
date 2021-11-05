@@ -1,3 +1,7 @@
+.html {
+    font-size: 100%;
+}
+
 .page {
     display: grid;
     grid-template-columns: 9.375rem 1fr;
@@ -16,6 +20,7 @@
 
 .sidebar {
     background-color: #0F2147; /* Netcompany blue color */
+    filter: drop-shadow(0 0 0.25rem);
 }
 
 .top-row {
@@ -56,7 +61,7 @@
     }
 
     .sidebar {
-        width: 9.375rem;
+        width: 100%;
         height: 100vh;
         position: sticky;
         top: 0;
