@@ -1,8 +1,10 @@
+using System;
+
 namespace BlazorApp.Data
 {
     public abstract class Log
     {
-        protected int _id;
+        public int _id { get; protected set; }
 
         public int Id
         {
@@ -11,7 +13,7 @@ namespace BlazorApp.Data
                 return _id;
             }
         }
-        protected string _timestamp;
+        public DateTime _timestamp { get; protected set; }
 
 
     }

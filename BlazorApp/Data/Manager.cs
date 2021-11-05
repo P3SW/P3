@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,7 +12,7 @@ namespace BlazorApp.Data
             _running = running;
         }
 
-        private string _startTime;
+        // private string _startTime;
         private string _name;
         private bool _running;
         private int _reconciliationid = 1;
@@ -30,13 +31,13 @@ namespace BlazorApp.Data
         private List<Error> _errorLogs = new List<Error>();
         private List<Reconciliation> _reconciliations = new List<Reconciliation>();
 
-        public void AddError(string severity, string timestamp, string message)
+        public void AddError(string severity, DateTime timestamp, string message)
         {
             _errorLogs.Add(new Error(_errorlogid, severity, timestamp, message));
             _errorlogid++;
         }
         
-        public void AddReconciliation(string result, string timestamp, string description)
+        public void AddReconciliation(string result, DateTime timestamp, string description)
         {
             _reconciliations.Add(new Reconciliation(_reconciliationid, result, timestamp, description));
             _errorlogid++;

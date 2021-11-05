@@ -14,7 +14,6 @@
 
 .top-row {
     background-color: #f7f7f7;
-    border-bottom: 1px solid #0F2147;
     justify-content: flex-end;
     height: 3.5rem;
     display: flex;
@@ -66,5 +65,10 @@
     .main > div {
         padding-left: 2rem !important;
         padding-right: 1.5rem !important;
+        background-color: #9299A8 !important;
     }
+}
+
+.main {
+    background-color: #9299A8 !important;
 }
