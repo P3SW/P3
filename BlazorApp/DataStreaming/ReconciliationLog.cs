@@ -14,6 +14,8 @@ namespace BlazorApp.DataStreaming
         {
             ReconciliationList = new List<ReconciliationData>();
         }
+        
+        //Inserts data from the reader into temporary list and adds these to the full list of data.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
             newReconciliationData = new List<ReconciliationData>();
@@ -25,6 +27,7 @@ namespace BlazorApp.DataStreaming
             ReconciliationList.AddRange(newReconciliationData);
         }
 
+        //Returns a query string with the latest timestamp to ensure only new data is queried.
         public string GetChangesQueryString()
         {
             return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +

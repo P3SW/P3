@@ -17,8 +17,12 @@ namespace BlazorApp.DataStreaming
         public ReconciliationLog Reconciliation { get; set; }
         public int RowsRead { get; private set; }
         public int RowsWritten { get; private set; }
+        public int Cpu { get; set; }
         public int EfficiencyScore { get; private set; }
         public static SqlConnection Connection { get; set; }
+        private TableStreamer _healthStreamer;
+        private TableStreamer _errorStreamer;
+        private TableStreamer _reconciliationStreamer;
 
         public Manager(string name, int id)
         {
@@ -29,34 +33,44 @@ namespace BlazorApp.DataStreaming
             Id = id;
         }
 
+        //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {
-            TableStreamer.Connection = Connection;
-            TableStreamer healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect, Health);
-            TableStreamer errorStreamer = new TableStreamer(SqlQueryStrings.ErrorSelect, Error);
-            TableStreamer reconciliationStreamer =
-                new TableStreamer(SqlQueryStrings.ReconciliationSelect, Reconciliation);
-            healthStreamer.StartListening();
-            errorStreamer.StartListening();
-            reconciliationStreamer.StartListening();
+            Console.WriteLine($"Manager {Name} started");
+            AssignStartTime();
+             _healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect,GetSelectStringsForTableStreamer(0), Health);
+            _errorStreamer = new TableStreamer(SqlQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer(1), Error);
+            _reconciliationStreamer =
+                new TableStreamer(SqlQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer(2), Reconciliation);
+            _healthStreamer.StartListening();
+            _errorStreamer.StartListening();
+            _reconciliationStreamer.StartListening();
         }
 
-        public void FinishedManagerDataCollection()
+        //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
+        public void FinishManager()
         {
+            _healthStreamer.StopListening();
+            _errorStreamer.StopListening();
+            _reconciliationStreamer.StopListening();
+
             AssignManagerTrackingData();
             AssignEndTime();
             
             CalculateEfficiencyScore();
         }
 
-        //The efficiency score is in no way a recognised way of measuring performance and is based on the data made available to us.
+        //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
+        //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
             double averageCpu = CalculateAverageCpuUsage();
+            Cpu = Convert.ToInt32(averageCpu);
             double result = (double) (RowsRead + RowsWritten) / RunTime * averageCpu;
             EfficiencyScore = Convert.ToInt32(result);
         }
 
+        //Calculates the average CPU usage logged in the HEALTH_REPORT table
         private double CalculateAverageCpuUsage()
         {
             double result = 0.0;
@@ -71,25 +85,31 @@ namespace BlazorApp.DataStreaming
 
             return result;
         }
-        //TODO: Learn to parse dates from strings lmao
+
+        
         private void AssignStartTime()
         {
+            
             using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger(0), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    StartTime = DateTime.Parse((string) reader["VALUE"]);   //(DateTime) reader["VALUE"];
+                    reader.Read();
+                    StartTime = DateTime.Parse((string) reader[0]);
+                    Console.WriteLine(StartTime);
                     reader.Close();
                 }
             }
         }
         
+        //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.
         private void AssignManagerTrackingData()
         {
             using (SqlCommand command = new SqlCommand(GetManagerTrackingQueryString(), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
+                    reader.Read();
                     Status = (string) reader["STATUS"];
                     RunTime = (int) reader["RUNTIME"];
                     RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
@@ -99,38 +119,65 @@ namespace BlazorApp.DataStreaming
             }
         }
 
+        //Queries the end time from the ENGINE_PROPERTIES table 🤢️🤢️🤢️🤮️🤮🤢️️🤮🤢️️🤮️🤮️
         private void AssignEndTime()
         {
             using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger(3), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    EndTime = (DateTime) reader["TIMESTAMP"];
+                    reader.Read();
+                    EndTime = (DateTime) reader[0];
                     reader.Close();
                 }
             }
         }
         
+        //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES 🤢️🤢️🤢️🤮️🤮️🤮️🤮️
         private string ObtainEnginePropertiesQueryStringByInteger(int i)
         {
             switch (i)
             {
                 case 0:
-                    return string.Format($"SELECT VALUE FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [dbo].[KEY] = 'START_TIME'");
-                // case 1:
-                //     return string.Format($"SELECT VALUE FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [dbo].[KEY] = 'Læste rækker'");
-                // case 2:
-                //     return string.Format($"SELECT VALUE FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [dbo].[KEY] = 'Skrevne rækker'");
+                    return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [KEY] = 'START_TIME'");
                 case 3:
-                    return string.Format($"SELECT TIMESTAMP FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [dbo].[KEY] = 'runtimeOverall'");
+                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [KEY] = 'runtimeOverall'");
                 default:
                     throw new ArgumentException($"{i} is an invalid argument");
             }
         }
 
+        //Queries data from the MANAGER_TRACKING table
         private string GetManagerTrackingQueryString()
         {
             return string.Format($"SELECT STATUS, RUNTIME, PERFORMANCECOUNTROWSREAD, PERFORMANCECOUNTROWSWRITTEN FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
+        }
+
+        private string GetSelectStringsForTableStreamer(int i)
+        {
+            switch (i)
+            {
+                case 0:
+                    return string.Format($"SELECT REPORT_TYPE, REPORT_NUMERIC_VALUE, LOG_TIME FROM dbo.HEALTH_REPORT " +
+                                         $"WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY'" +
+                                         $"AND LOG_TIME > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
+                                         "ORDER BY LOG_TIME");
+                case 1:
+                    return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
+                                         $"[dbo].[LOGGING].[CONTEXT_ID]," +
+                                         $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
+                                         $"FROM [dbo].[LOGGING] " +
+                                         $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
+                                         $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
+                                         $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
+                                         $"ORDER BY CREATED");
+                case 2:
+                    return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +
+                                         $"FROM dbo.AFSTEMNING WHERE AFSTEMTDATO > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
+                                         $"ORDER BY AFSTEMTDATO");
+                default:
+                    throw new ArgumentException();
+            }
         }
     }
 }
