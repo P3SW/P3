@@ -10,18 +10,32 @@ namespace BlazorApp.DataStreaming
         private string _queryString;
         public static SqlConnection Connection { get; set; }
         private IData _dataObject;
-        public TableStreamer(string queryString, IData dataObject)
+        private bool run;
+        public TableStreamer(string queryString, string currentDataQueryString, IData dataObject)
         {
             _queryString = queryString;
             _dataObject = dataObject;
+            run = true;
             
             //Queries the database for data currently in the database
-            AddQueryToObject(_queryString);
+            AddQueryToObject(currentDataQueryString);
         }
 
-        //Function responsible for listening for changes in the tables.
+        //Removes the OnChange event handler and stops the StartListening method
+        public void StopListening()
+        {
+            run = false;
+            _dependency.OnChange -= SqlDependencyChange;
+        }
+
+        //Method responsible for listening for changes in the tables.
         public void StartListening()
-        {   
+        {
+            if (!run)
+            {
+                return;
+            }
+            
             try
             {
                 //Creates a command and passes it to the SqlDependency constructor

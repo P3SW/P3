@@ -14,7 +14,8 @@ namespace BlazorApp.DataStreaming
         {
             ErrorList = new List<ErrorData>();
         }
-        
+
+        //Inserts data from the reader into temporary list and adds these to the full list of data.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
             NewErrorList = new List<ErrorData>();
@@ -27,6 +28,7 @@ namespace BlazorApp.DataStreaming
             ErrorList.AddRange(NewErrorList);
         }
 
+        //Returns a query string with the latest timestamp to ensure only new data is queried.
         public string GetChangesQueryString()
         {
             return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
