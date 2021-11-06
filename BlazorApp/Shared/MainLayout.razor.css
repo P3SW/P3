@@ -20,7 +20,7 @@
 
 .sidebar {
     background-color: #0F2147; /* Netcompany blue color */
-    
+    filter: drop-shadow(0 0 0.25rem);
 }
 
 .top-row {
@@ -71,5 +71,5 @@
         position: sticky;
         top: 0;
         z-index: 1;
-
+    }
 }

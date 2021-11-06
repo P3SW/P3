@@ -45,6 +45,30 @@ a, .btn-link {
         top: 0.5rem;
     }
 
+
+/* width */
+::-webkit-scrollbar {
+    width: 0.5rem;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #8c8c8c;
+    border-radius: 10px;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #384561;
+    border-radius: 10px;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #0F2147;
+}
+
+/* Colours */
 .background-green {
     background-color: rgba(92, 188, 169, 1);
 }
