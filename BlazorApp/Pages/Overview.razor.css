@@ -122,7 +122,7 @@
     width: 80%;
     aspect-ratio: 1;
     align-self: center;
-    padding: 5px;
+    padding: 0.3rem;
 }
 
 .pieConfigTotalReconciliations {
@@ -132,7 +132,7 @@
     width: 80%;
     aspect-ratio: 1;
     align-self: center;
-    padding: 5px;
+    padding: 0.3rem;
 }
 
 .error-reconciliation-formatting {
