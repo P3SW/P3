@@ -4,28 +4,7 @@ html, body {
     margin: 0;
 }
 
-a, .btn-link {
-    color: #0366d6;
-}
-
-.btn-primary {
-    color: #fff;
-    background-color: #1b6ec2;
-    border-color: #1861ac;
-}
-
-.valid.modified:not([type=checkbox]) {
-    outline: 1px solid #26b050;
-}
-
-.invalid {
-    outline: 1px solid red;
-}
-
-.validation-message {
-    color: red;
-}
-
+/* Blazor default error CSS */
 #blazor-error-ui {
     background: lightyellow;
     bottom: 0;
@@ -44,7 +23,6 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
-
 
 /* width */
 ::-webkit-scrollbar {
