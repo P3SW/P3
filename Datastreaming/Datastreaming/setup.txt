@@ -1,1 +1,0 @@
-Server=localhost;Database=ANS_CUSTOM_MVP; User Id=sa; Password=Password123;Trusted_Connection=False
