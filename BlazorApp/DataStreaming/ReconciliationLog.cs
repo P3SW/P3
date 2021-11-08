@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
+    //Class containing lists of reconciliation data. Implements IData which ensures the class contains necessary methods.
     public class ReconciliationLog : IData
     {
         public List<ReconciliationData> ReconciliationList { get; private set; }

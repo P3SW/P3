@@ -38,10 +38,10 @@ namespace BlazorApp.DataStreaming
         {
             Console.WriteLine($"Manager {Name} started");
             AssignStartTime();
-             _healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect,GetSelectStringsForTableStreamer(0), Health);
-            _errorStreamer = new TableStreamer(SqlQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer(1), Error);
+             _healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health);
+            _errorStreamer = new TableStreamer(SqlQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), Error);
             _reconciliationStreamer =
-                new TableStreamer(SqlQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer(2), Reconciliation);
+                new TableStreamer(SqlQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), Reconciliation);
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
@@ -80,7 +80,7 @@ namespace BlazorApp.DataStreaming
             }
             foreach (Data value in Health.Cpu )
             {
-                result += value.NumericValue / Health.Cpu.Count;
+                result += (double) value.NumericValue / Health.Cpu.Count;
             }
 
             return result;
@@ -90,7 +90,7 @@ namespace BlazorApp.DataStreaming
         private void AssignStartTime()
         {
             
-            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger(0), Connection))
+            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("startTime"), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -122,7 +122,7 @@ namespace BlazorApp.DataStreaming
         //Queries the end time from the ENGINE_PROPERTIES table 🤢️🤢️🤢️🤮️🤮🤢️️🤮🤢️️🤮️🤮️
         private void AssignEndTime()
         {
-            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger(3), Connection))
+            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("runtime"), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -134,16 +134,16 @@ namespace BlazorApp.DataStreaming
         }
         
         //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES 🤢️🤢️🤢️🤮️🤮️🤮️🤮️
-        private string ObtainEnginePropertiesQueryStringByInteger(int i)
+        private string ObtainEnginePropertiesQueryStringByInteger(string s)
         {
-            switch (i)
+            switch (s)
             {
-                case 0:
+                case "startTime":
                     return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [KEY] = 'START_TIME'");
-                case 3:
+                case "runtime":
                     return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [KEY] = 'runtimeOverall'");
                 default:
-                    throw new ArgumentException($"{i} is an invalid argument");
+                    throw new ArgumentException($"{s} is an invalid argument");
             }
         }
 
@@ -153,16 +153,17 @@ namespace BlazorApp.DataStreaming
             return string.Format($"SELECT STATUS, RUNTIME, PERFORMANCECOUNTROWSREAD, PERFORMANCECOUNTROWSWRITTEN FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
         }
 
-        private string GetSelectStringsForTableStreamer(int i)
+        //Returns the select string for the table streamers
+        private string GetSelectStringsForTableStreamer(string s)
         {
-            switch (i)
+            switch (s)
             {
-                case 0:
+                case "health":
                     return string.Format($"SELECT REPORT_TYPE, REPORT_NUMERIC_VALUE, LOG_TIME FROM dbo.HEALTH_REPORT " +
                                          $"WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY'" +
                                          $"AND LOG_TIME > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          "ORDER BY LOG_TIME");
-                case 1:
+                case "logging":
                     return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
                                          $"[dbo].[LOGGING].[CONTEXT_ID]," +
                                          $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
@@ -171,7 +172,7 @@ namespace BlazorApp.DataStreaming
                                          $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          $"ORDER BY CREATED");
-                case 2:
+                case "reconciliation":
                     return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +
                                          $"FROM dbo.AFSTEMNING WHERE AFSTEMTDATO > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
                                          $"ORDER BY AFSTEMTDATO");

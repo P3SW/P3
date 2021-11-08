@@ -4,6 +4,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
+    //Class contains lists of error data and methods for querying and storing new data.
     public class ErrorLog : IData
     {
         public List<ErrorData> ErrorList { get; private set; }

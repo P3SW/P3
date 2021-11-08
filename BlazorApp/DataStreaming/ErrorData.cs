@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
+    //Class responsible for storing data from the logging table. Contains a constructor to create object from reader.
     public class ErrorData
     {
         public DateTime Created { get; private set; }

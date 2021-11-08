@@ -3,6 +3,7 @@ using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
+    //Class contains reconciliation data from the database. Has constructor with SqlDataReader.
     public class ReconciliationData
     {
         public DateTime Timestamp { get; private set; }
