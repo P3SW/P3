@@ -1,5 +1,45 @@
-@page "/Errors"
+@page "/errors"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
-<h1>Errors</h1>
+@* Font *@
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
+
+<ErrorTable></ErrorTable>
 
 
+
+@code {
+    private HubConnection hubConnection;
+    private List<string> data = new List<string>();
+    //private string userInput;
+    //private string messageInput;
+    
+    /* When a person opens the error page */
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/datahub"))
+            .Build();
+
+        hubConnection.On<string, string, string, string>("ReceiveError", (managerName, severity, timestamp, message) =>
+        {
+            /* Do something with the errors received*/
+            StateHasChanged();
+        });
+
+        await hubConnection.StartAsync();
+    }
+
+    public bool IsConnected =>
+        hubConnection.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

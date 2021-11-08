@@ -1,5 +1,46 @@
 ﻿@page "/reconciliations"
+@using Microsoft.AspNetCore.SignalR.Client
+@inject NavigationManager NavigationManager
+@implements IAsyncDisposable
 
-<h1>Reconciliations</h1>
+@* Font *@
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
 
+<ReconciliationTable></ReconciliationTable>
+
+
+
+@code {
+    private HubConnection hubConnection;
+    private List<string> data = new List<string>();
+    //private string userInput;
+    //private string messageInput;
+    
+    /* When a person opens the error page */
+    protected override async Task OnInitializedAsync()
+    {
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl(NavigationManager.ToAbsoluteUri("/datahub"))
+            .Build();
+
+        hubConnection.On<string, string, string, string>("ReceiveError", (managerName, result, timestamp, description) =>
+        {
+            /* Do something with the reconciliation received*/
+            StateHasChanged();
+        });
+        
+        await hubConnection.StartAsync();
+    }
+
+    public bool IsConnected =>
+        hubConnection.State == HubConnectionState.Connected;
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}
