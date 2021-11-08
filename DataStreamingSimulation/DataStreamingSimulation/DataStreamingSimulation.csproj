@@ -9,4 +9,13 @@
       <PackageReference Include="Microsoft.Data.SqlClient" Version="3.0.1" />
     </ItemGroup>
 
+    <ItemGroup>
+      <None Include="bin\Debug\net5.0\runtimes\setup.txt" />
+      <None Include="bin\Debug\net5.0\setup.txt" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="bin\Debug\net5.0\runtimes" />
+    </ItemGroup>
+
 </Project>

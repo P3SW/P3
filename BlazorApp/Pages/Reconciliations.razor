@@ -3,7 +3,13 @@
 @inject NavigationManager NavigationManager
 @implements IAsyncDisposable
 
+@* Font *@
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
+
+
 <ReconciliationTable></ReconciliationTable>
+
+
 
 @code {
     private HubConnection hubConnection;
@@ -23,7 +29,7 @@
             /* Do something with the reconciliation received*/
             StateHasChanged();
         });
-
+        
         await hubConnection.StartAsync();
     }
 
