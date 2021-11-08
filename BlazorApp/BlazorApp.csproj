@@ -6,18 +6,11 @@
 
   <ItemGroup>
     <None Include="wwwroot\Icons\error-icon.svg" />
+    <None Update="Pages\ReconciliationTable.razor.css">
+      <DependentUpon>ReconciliationTable.razor</DependentUpon>
+    </None>
   </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="ChartJs.Blazor" Version="1.1.0" />
     <PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
-    <PackageReference Include="Radzen.Blazor" Version="3.11.12" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <_ContentIncludedByDefault Remove="Charts\Linechart.cshtml" />
-    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css" />
-    <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css.map" />
-  </ItemGroup>
-
-</Project>
