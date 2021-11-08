@@ -2,12 +2,18 @@
 @using System.Reflection.Metadata
 @inject Test reconList;
 
+
 @if (reconciliation == null)
 {
     <p>Loading ....</p>
 }
 else
 {
+    <!-- The table with reconciliations 
+    RadzenTabsItem is each tab
+    RadzenDataGrid is each data grid 
+    Template is configuration of data in each column-->
+    
     <RadzenTabs id="reconciliation-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
@@ -187,12 +193,14 @@ else
 
 @code {
     IEnumerable<Reconciliation> reconciliation;
-
+    
+    //When the application starts, get the list of reconciliations
     protected override async Task OnInitializedAsync()
     {
         reconciliation = await Task.Run(() => reconList.ReconList());
     }
-
+    
+    //When rendering the cells, change the background color and remove the border.
     void CellRender(DataGridCellRenderEventArgs<Reconciliation> dataGridCellRenderEventArgs)
     {
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");

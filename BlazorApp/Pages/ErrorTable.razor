@@ -8,6 +8,10 @@
 }
 else
 {
+    <!-- The table with errors 
+    RadzenTabsItem is each tab
+    RadzenDataGrid is each data grid 
+    Template is configuration of data in each column-->
     <RadzenTabs id="errorlog-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
@@ -188,10 +192,13 @@ else
 @code {
     IEnumerable<Error> errors;
     
+    //When the application starts, get the list of errors
     protected override async Task OnInitializedAsync()
     {
         errors = await Task.Run(() => errorList.ErrorList());
     }
+
+    //When rendering the cells, change the background color and remove the border.
 
     void CellRender(DataGridCellRenderEventArgs<Error> dataGridCellRenderEventArgs)
     {

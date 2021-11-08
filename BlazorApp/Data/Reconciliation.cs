@@ -2,7 +2,7 @@ using System;
 
 namespace BlazorApp.Data
 {
-    public class Reconciliation : Log
+    public class Reconciliation
     {
 
         public Reconciliation(int id, string result, DateTime timestamp, string description)
@@ -13,6 +13,8 @@ namespace BlazorApp.Data
             _description = description;
         }
 
+        public int _id { get; protected set; }
+        public DateTime _timestamp { get; protected set; }
         public string _result { get; private set; }
         public string _description { get; private set; }
 
