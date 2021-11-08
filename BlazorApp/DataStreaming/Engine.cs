@@ -7,7 +7,7 @@ namespace BlazorApp.DataStreaming
 {
     public class Engine
     {
-        public List<Manager> Managers { get; private set; }
+        public List<Manager> FinishedManagers { get; private set; }
         private Manager _currentManager;
         private SqlConnection _connection;
         private Queue<Manager> _managerQueue;
@@ -18,7 +18,7 @@ namespace BlazorApp.DataStreaming
         {
             _connectionString = ConfigReader.ReadSetupFile();
             _managerQueue = new Queue<Manager>();
-            Managers = new List<Manager>();
+            FinishedManagers = new List<Manager>();
         }
 
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
@@ -31,9 +31,7 @@ namespace BlazorApp.DataStreaming
             
             try
             {
-                Console.Write("pog");
                 conn.Open();
-                Console.WriteLine("champ");
                 
                 SqlDependency.Stop(_connectionString);
                 SqlDependency.Start(_connectionString);
@@ -151,7 +149,7 @@ namespace BlazorApp.DataStreaming
         {
             if (_currentManager != null) //Checks if a manager is running
             {
-                Managers.Add(_currentManager);
+                FinishedManagers.Add(_currentManager);
                 _currentManager.FinishManager();
                 PrintFinishedManager();
             }

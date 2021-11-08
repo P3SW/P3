@@ -1,5 +1,6 @@
 namespace BlazorApp.DataStreaming
 {
+    //Class containing constant sql strings. These are used for sql dependencies.
     public static class SqlQueryStrings
     {
         public const string HealthSelect = "SELECT REPORT_TYPE, REPORT_NUMERIC_VALUE, LOG_TIME FROM dbo.HEALTH_REPORT WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY' ORDER BY LOG_TIME";
