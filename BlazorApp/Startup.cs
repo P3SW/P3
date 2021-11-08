@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BlazorApp.Data;
 using BlazorApp.DataStreaming;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
@@ -30,6 +31,8 @@ namespace BlazorApp
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
+            services.AddScoped<Test>(); 
+            services.AddScoped<AnotherTest>();
             
             //SignalR setup
             services.AddResponseCompression(opts =>
