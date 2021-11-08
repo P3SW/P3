@@ -16,7 +16,7 @@
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.11" />
     <PackageReference Include="Microsoft.Data.SqlClient" Version="4.0.0-preview3.21293.2" />
     <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.11" />
-    <PackageReference Include="Radzen.Blazor" Version="3.11.11" />
+    <PackageReference Include="Radzen.Blazor" Version="3.11.12" />
   </ItemGroup>
 
   <ItemGroup>
