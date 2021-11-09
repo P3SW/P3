@@ -40,8 +40,7 @@ namespace BlazorApp.DataStreaming
             AssignStartTime();
              _healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health);
             _errorStreamer = new TableStreamer(SqlQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), Error);
-            _reconciliationStreamer =
-                new TableStreamer(SqlQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), Reconciliation);
+            _reconciliationStreamer = new TableStreamer(SqlQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), Reconciliation);
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
@@ -94,10 +93,12 @@ namespace BlazorApp.DataStreaming
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    reader.Read();
-                    Console.WriteLine("TEST");
-                    StartTime = DateTime.Parse((string) reader[0]);
-                    Console.WriteLine(StartTime);
+                    Console.WriteLine(reader.HasRows);
+                    while (reader.Read())
+                    {
+                        StartTime = DateTime.Parse((string)reader[0]);
+                        Console.WriteLine(StartTime); 
+                    }
                     reader.Close();
                 }
             }
@@ -140,9 +141,9 @@ namespace BlazorApp.DataStreaming
             switch (s)
             {
                 case "startTime":
-                    return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [KEY] = 'START_TIME'");
+                    return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'START_TIME'");
                 case "runtime":
-                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER = '{Name}' AND [KEY] = 'runtimeOverall'");
+                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'runtimeOverall'");
                 default:
                     throw new ArgumentException($"{s} is an invalid argument");
             }
@@ -172,6 +173,7 @@ namespace BlazorApp.DataStreaming
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
                                          $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
+                                         $"AND [dbo].[LOGGING_CONTEXT].[CONTEXT] LIKE 'dk.aes.ans.konvertering.managers.conversionUser.AnsConversionUserManager%'" +
                                          $"ORDER BY CREATED");
                 case "reconciliation":
                     return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +
