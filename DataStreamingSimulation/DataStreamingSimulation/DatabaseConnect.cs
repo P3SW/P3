@@ -42,7 +42,7 @@ namespace DataStreamingSimulation
         /// </remarks>
         public string ReadSetupFile(bool transferData = false)
         {
-            const string fileName = "setup.txt";
+            const string fileName = "../../../setup.txt";
             string[] connectionString = new[] {"","" };
             
             using (StreamReader sr = new StreamReader(fileName))

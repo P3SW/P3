@@ -153,6 +153,8 @@
     private PieConfig _pieconfigTotalReconciliations;
     PieDataset<int> pieconfigTotalErrorsData;
     PieDataset<int> pieconfigTotalReconciliationsData;
+    LineDataset<int> lineconfigdataset1;
+    LineDataset<int> lineconfigdataset2;
     
     
 
@@ -209,7 +211,7 @@
                     },
                 },
                 YAxes = new List<CartesianAxis> // scale for the y axes
-                {
+                { 
                     new LinearCartesianAxis
                     {
                         ScaleLabel = new ScaleLabel
@@ -218,12 +220,16 @@
     //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
+                            
                         },
                         Ticks = new LinearCartesianTicks
                         {
                             FontSize = 13,
                             Padding = 10,
                             FontColor = "#FFFFFF", // Color for ticks, values on y axies
+                            BeginAtZero = true,
+                            StepSize = 10,
+                            Max = 100,
                         },
                         GridLines = new GridLines
                         {
@@ -236,15 +242,15 @@
             }
         };
         
-        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43, 20, 10})
+        lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,50,87,50,70,40,70,43, 20, 10})
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227,95,82),
             BackgroundColor = ColorUtil.ColorString(0,0,0,0.0),
             LineTension = 0,
-
         };
-        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
+        
+        lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92,188,169,1),
@@ -253,7 +259,7 @@
             
 
         };
-        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17", "01:25", "01:30"})
+        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17", "01:25","", "01:30"})
         {
             _lineconfig.Data.Labels.Add(party);
         }
