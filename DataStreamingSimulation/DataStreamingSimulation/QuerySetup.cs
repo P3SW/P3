@@ -13,6 +13,9 @@ namespace DataStreamingSimulation
                 case "LOGGING_CONTEXT": // NULL
                     queryString = $@"SELECT * FROM LOGGING_CONTEXT;";
                     break;
+                case "MANAGERS": // NULL
+                    queryString = $@"SELECT * FROM MANAGERS;";
+                    break;
                 default: 
                     break;
             }
