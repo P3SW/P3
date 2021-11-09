@@ -265,7 +265,28 @@
 /* Manager queue */
 .manager-queue-container > div {
     font-size: 0.6em;
+    margin: 0.5rem;
 }
+    .manager-queue-container{
+        display: grid;
+        grid-template-rows: 0.6em 1fr;
+        align-items: center;
+    }
+
+    .dot {
+        height: 80px;
+        width: 80px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .manager-queue-circle {
+        display: block;
+        background: rgba(83, 96, 122, 0.27);
+        overflow-y: none;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
     .queue-finished-text {
         float: left;
     }
@@ -273,9 +294,7 @@
     .queue-inqueue-text {
         float: right;
     }
-    
-    
-    
+
 /* Efficiency table */    
 .efficiency-container {
     line-height: 80%;
