@@ -1,8 +1,8 @@
 # Important
 
 First time using this solution, follow these steps:
-1. Make a "setup.txt" file in the following directory: **DataStreamingSimulation/bin/Debug/net5.0**
-2. This setup file should contain the following 2 lines of code:
+
+1. Make sure that the "setup.txt" file contains the correct configurations for your database:
     
         Server=localhost,1433;Database=ANS_CUSTOM_2; User ID=sa; Password=Password123;Trusted_Connection=False
         Server=localhost,1433;Database=ANS_DB_P3; User ID=sa; Password=Password123;Trusted_Connection=False
