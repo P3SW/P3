@@ -24,11 +24,16 @@ namespace BlazorApp.DataStreaming
             while (reader.Read())
             {
                 Console.WriteLine("test");
-                NewErrorList.Add(new ErrorData(reader));
-                LastRowTimeStamp = (DateTime) reader[0];
+                NewErrorList.Add(new ErrorData(
+                    (DateTime) reader["CREATED"], 
+                    (string) reader["LOG_MESSAGE"], 
+                    (string) reader["LOG_LEVEL"], 
+                    (string) reader["CONTEXT"] ));
+                LastRowTimeStamp = NewErrorList[NewErrorList.Count - 1].Created;
             }
-            // PrintLogs(NewErrorList);
             ErrorList.AddRange(NewErrorList);
+            Console.WriteLine(ErrorList.Count);
+            PrintLogs(ErrorList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
@@ -44,12 +49,12 @@ namespace BlazorApp.DataStreaming
                                  $"ORDER BY CREATED");
         }
 
-        // public void PrintLogs(List<ErrorData> errorlist)
-        // {
-        //     foreach (var error in errorlist)
-        //     {
-        //         Console.WriteLine(error.LogLevel + " " + error.Created + " " + error.LogMessage);
-        //     }
-        // }
+        public void PrintLogs(List<ErrorData> errorlist)
+        {
+            foreach (var error in errorlist)
+            {
+                Console.WriteLine(error.LogLevel + " " + error.Created + " " + error.LogMessage);
+            }
+        }
     }
 }

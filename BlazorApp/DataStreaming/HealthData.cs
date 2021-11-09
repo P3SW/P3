@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
@@ -39,6 +40,7 @@ namespace BlazorApp.DataStreaming
             }
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
+            PrintCPUAndMemory(Cpu, Memory);
         }
         
         //Returns a query string with the latest timestamp to ensure only new data is queried.
@@ -48,6 +50,20 @@ namespace BlazorApp.DataStreaming
                                  $"WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY'" +
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
+        }
+
+        public void PrintCPUAndMemory(List<Data> cpu, List<Data> memory)
+        {
+            foreach (var data in cpu)
+            {
+                Console.WriteLine(data.LogTime + " " + data.ReportType + " " + data.NumericValue);
+            }
+            
+            foreach (var data in memory)
+            {
+                Console.WriteLine(data.LogTime + " " + data.ReportType + " " + data.NumericValue);
+            }
+            
         }
     }
 }

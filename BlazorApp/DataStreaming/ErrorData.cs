@@ -18,21 +18,21 @@ namespace BlazorApp.DataStreaming
             ManagerName = managerName;
         }
         
-        public ErrorData(SqlDataReader reader)
-        {
-            while (reader.Read())
-            {
-                Created = (DateTime) reader["CREATED"];
-                LogMessage = (string) reader["LOG_MESSAGE"];
-                Console.WriteLine(LogMessage);
-                LogLevel = (string) reader["LOG_LEVEL"];
-                ManagerName = (string) reader["CONTEXT"];
-                Console.WriteLine("ManagerName");
-                Console.WriteLine(ManagerName);
-                Console.WriteLine(reader.Read());
-            }
-
-            reader.Close();
-        }
+        // public ErrorData(SqlDataReader reader)
+        // {
+        //     if (reader.HasRows)
+        //     {
+        //         while (reader.Read())
+        //         {
+        //             Created = (DateTime) reader["CREATED"];
+        //             LogMessage = (string) reader["LOG_MESSAGE"];
+        //             LogLevel = (string) reader["LOG_LEVEL"];
+        //             ManagerName = (string) reader["CONTEXT"];
+        //             Console.WriteLine("ManagerName");
+        //             Console.WriteLine(ManagerName);
+        //             Console.WriteLine(reader.Read());
+        //         } 
+        //     }
+        // }
     }
 }
