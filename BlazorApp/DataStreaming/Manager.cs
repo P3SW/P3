@@ -89,12 +89,13 @@ namespace BlazorApp.DataStreaming
         
         private void AssignStartTime()
         {
-            
+            Console.WriteLine("FUNKTION BEGYNDT");
             using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("startTime"), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
                     reader.Read();
+                    Console.WriteLine("TEST");
                     StartTime = DateTime.Parse((string) reader[0]);
                     Console.WriteLine(StartTime);
                     reader.Close();
@@ -119,7 +120,7 @@ namespace BlazorApp.DataStreaming
             }
         }
 
-        //Queries the end time from the ENGINE_PROPERTIES table 🤢️🤢️🤢️🤮️🤮🤢️️🤮🤢️️🤮️🤮️
+        //Queries the end time from the ENGINE_PROPERTIES table
         private void AssignEndTime()
         {
             using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("runtime"), Connection))
@@ -133,7 +134,7 @@ namespace BlazorApp.DataStreaming
             }
         }
         
-        //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES 🤢️🤢️🤢️🤮️🤮️🤮️🤮️
+        //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES
         private string ObtainEnginePropertiesQueryStringByInteger(string s)
         {
             switch (s)

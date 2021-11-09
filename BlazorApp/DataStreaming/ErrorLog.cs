@@ -23,9 +23,11 @@ namespace BlazorApp.DataStreaming
 
             while (reader.Read())
             {
+                Console.WriteLine("test");
                 NewErrorList.Add(new ErrorData(reader));
                 LastRowTimeStamp = (DateTime) reader[0];
             }
+            // PrintLogs(NewErrorList);
             ErrorList.AddRange(NewErrorList);
         }
 
@@ -41,5 +43,13 @@ namespace BlazorApp.DataStreaming
                                  $"WHERE CREATED > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  $"ORDER BY CREATED");
         }
+
+        // public void PrintLogs(List<ErrorData> errorlist)
+        // {
+        //     foreach (var error in errorlist)
+        //     {
+        //         Console.WriteLine(error.LogLevel + " " + error.Created + " " + error.LogMessage);
+        //     }
+        // }
     }
 }

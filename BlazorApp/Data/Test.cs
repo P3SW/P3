@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace BlazorApp.Data
 {
-    public class Test
+    public class Test // TEST DATA FOR RECONCILIATION TABLE
     {
         List<Reconciliation> recons = new List<Reconciliation>()
         {
@@ -18,6 +18,11 @@ namespace BlazorApp.Data
         public async Task<List<Reconciliation>> ReconList()
         {
             return await Task.FromResult(recons);
+        }
+        
+        public void addClass()
+        {
+            recons.Add(new Reconciliation(5, "MISMATCH", Convert.ToDateTime("21-May-2021"), "This is a message"));
         }
     }
 }
