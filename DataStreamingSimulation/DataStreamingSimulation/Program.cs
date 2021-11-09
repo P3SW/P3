@@ -36,7 +36,7 @@ namespace DataStreamingSimulation
                     }
                     
                     startTime = nextTime;
-                    nextTime = startTime.AddSeconds(INCREASE_IN_SEC * 100);
+                    nextTime = startTime.AddSeconds(INCREASE_IN_SEC);
                     System.Threading.Thread.Sleep(INCREASE_IN_SEC * 1000); // How frequently it inserts into ANS_DB_P3
                 }
             }
