@@ -1,5 +1,6 @@
 using System;
 using System.Data;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
@@ -80,7 +81,11 @@ namespace BlazorApp.DataStreaming
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    _dataObject.AddDataFromSqlReader(reader);
+                    if (reader.HasRows)
+                    {
+                        _dataObject.AddDataFromSqlReader(reader);
+                    }
+                    reader.Close();
                 }
             }
         }
