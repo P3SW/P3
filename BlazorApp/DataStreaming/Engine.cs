@@ -39,15 +39,20 @@ namespace BlazorApp.DataStreaming
                 TableStreamer.Connection = conn;
 
                 _connection = conn;
+
+                Console.WriteLine("CONNECTED");
                 
                 using (SqlCommand command = new SqlCommand(SqlQueryStrings.ManagersSelect, _connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
+                        Console.WriteLine("EXECUTING READER");
                         if (reader.HasRows) //If the result of the query contains any rows, they will be added to the queue
                         {
+                            Console.WriteLine("FOUND ROWS");
                             while (reader.Read())
                             {
+                                Console.WriteLine("READING");
                                 AddManagerToQueue((string) reader[0], (int) reader[1]);
                             }
                             reader.Close();

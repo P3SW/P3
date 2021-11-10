@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Channels;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
@@ -20,10 +21,19 @@ namespace BlazorApp.DataStreaming
         
         public ErrorData(SqlDataReader reader)
         {
-            Created = (DateTime) reader[0];
-            LogMessage = (string) reader[1];
-            LogLevel = (string) reader[2];
-            ManagerName = (string) reader[3];
+            while (reader.Read())
+            {
+                Created = (DateTime) reader["CREATED"];
+                LogMessage = (string) reader["LOG_MESSAGE"];
+                //Console.WriteLine(LogMessage);
+                LogLevel = (string) reader["LOG_LEVEL"];
+                ManagerName = (string) reader["CONTEXT"];
+                //Console.WriteLine("ManagerName");
+                //Console.WriteLine(ManagerName);
+            }
+
+            Console.WriteLine("End of read");
+            
         }
     }
 }

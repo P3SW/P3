@@ -68,9 +68,8 @@ namespace BlazorApp
                 endpoints.MapFallbackToPage("/_Host");
             });
             
-            //The codebase is a toilet and I'm the asshole who is gonna shit all over it
-            // Engine engine = new Engine();
-            // engine.Start();
+            Engine engine = new Engine();
+            engine.Start();
             
         }
     }

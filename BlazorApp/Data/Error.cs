@@ -2,7 +2,7 @@ using System;
 
 namespace BlazorApp.Data
 {
-    public class Error
+    public class Error // TEST CLASS FOR ERROR TABLE
     {
         public Error(int id, string severity, DateTime timestamp, string message)
         {

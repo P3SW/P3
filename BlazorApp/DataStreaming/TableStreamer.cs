@@ -80,7 +80,9 @@ namespace BlazorApp.DataStreaming
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
+                    Console.WriteLine("Start");
                     _dataObject.AddDataFromSqlReader(reader);
+                    Console.WriteLine("Stop");
                 }
             }
         }
