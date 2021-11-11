@@ -1,12 +1,13 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
     public class HealthData : IData
     {
-        public List<Data> Cpu { get; private set; }
+        public List<Data> Cpu { get; private set; } 
         public List<Data> Memory { get; private set; }
         public List<Data> NewCpu { get; private set; }
         public List<Data> NewMemory { get; private set; }
@@ -15,8 +16,10 @@ namespace BlazorApp.DataStreaming
         public HealthData()
         {
             Cpu = new List<Data>();
-            Memory = new List<Data>();
+            Memory = new List<Data>();  
         }
+        
+        
 
         //Inserts data from the reader into temporary lists and adds these to the full list of data.
         public void AddDataFromSqlReader(SqlDataReader reader)

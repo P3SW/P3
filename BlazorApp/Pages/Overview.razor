@@ -3,6 +3,10 @@
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using System.Reflection.Emit
+@using System.Text.Json
+@using BlazorApp.Data
+@using BlazorApp.DataStreaming
+@inject Test dataList;
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
@@ -155,14 +159,25 @@
     PieDataset<int> pieconfigTotalReconciliationsData;
     LineDataset<int> lineconfigdataset1;
     LineDataset<int> lineconfigdataset2;
-    
-    
+    List<HealthDataTest> healthdatatests;
 
-    protected override void OnInitialized()
+
+
+
+    protected override async void OnInitialized()
     {
         ConfigureLineConfig();
         ConfigurePieConfig();
+        healthdatatests = await Task.Run(() => dataList.DataList());
+        
+    //Takes data from test and stores in list
+        foreach (var cpu_data in healthdatatests)
+        {
+            lineconfigdataset1.Add(cpu_data._NumericValue);
+        }
     }
+
+
 
     private void ConfigureLineConfig()
     {
@@ -207,7 +222,7 @@
                         GridLines = new GridLines
                         {
                             Color = ColorUtil.ColorHexString(142, 142, 142),
-                        },
+                        }
                     },
                 },
                 YAxes = new List<CartesianAxis> // scale for the y axes
@@ -236,13 +251,14 @@
                             Color = ColorUtil.ColorHexString(142, 142, 142),
                             DrawBorder = false, // removes the border in the y axies
 
-                        }
-                    }
+                        },
+                     }
                 }
             }
         };
         
-        lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,50,87,50,70,40,70,43, 20, 10})
+        
+        lineconfigdataset1 = new LineDataset<int>
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227,95,82),
@@ -342,10 +358,10 @@
         List<string> GetManagerNames(List<string> managers)
         {
             string managerName = default;
-        
+
             for (int i = 0; i < 20; i++)
             {
-                managerName += (string)"M";
+                managerName += (string) "M";
                 managers.Add(managerName);
             }
             return managers;
@@ -356,10 +372,10 @@
 
     List<string> managers = CreateList();
 
-    
+
 
     int selectedManager { get; set; }
-    
+
     public void GetSelectedManagerID(int selectedID)
     {
         selectedManager = selectedID;
