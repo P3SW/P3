@@ -76,28 +76,28 @@
     
     @* Total manager info *@
     <div class="Total_errors_and_reconciliations_container">
-        <div class="info_total_errors">Total Errors: @pieconfigTotalErrorsData.Sum()
+        <div class="info_total_errors">Total Errors: @pieconfig_dataset_errors.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle background-red"></div><li>Fatal:  @pieconfigTotalErrorsData[0]</li>
-                <div class="circle background-lightred"></div><li>Error: @pieconfigTotalErrorsData[1]</li>
-                <div class="circle background-yellow"></div><li>Warning:  @pieconfigTotalErrorsData[2]</li>
-                <div class="circle background-green"></div><li>Info:  @pieconfigTotalErrorsData[3]</li>
+                <div class="circle background-red"></div><li>Fatal:  @pieconfig_dataset_errors[0]</li>
+                <div class="circle background-lightred"></div><li>Error: @pieconfig_dataset_errors[1]</li>
+                <div class="circle background-yellow"></div><li>Warning:  @pieconfig_dataset_errors[2]</li>
+                <div class="circle background-green"></div><li>Info:  @pieconfig_dataset_errors[3]</li>
             </ul>
         </div>
         <div class="PieConfigTotalErrors">
-            <Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart>
+            <Chart Config="_pieconfig_errors" Height="50" Width="50"></Chart>
         </div>
 
-        <div class="info_total_reconciliations">Total Reconciliations: @pieconfigTotalReconciliationsData.Sum()
+        <div class="info_total_reconciliations">Total Reconciliations: @pieconfig_dataset_reconciliations.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle background-red"></div><li>Mismatch: @pieconfigTotalReconciliationsData[0]</li>
-                <div class="circle background-lightred"></div><li>Failed: @pieconfigTotalReconciliationsData[1]</li>
-                <div class="circle background-yellow"></div><li>Disabled: @pieconfigTotalReconciliationsData[2]</li>
-                <div class="circle background-green"></div><li>OK: @pieconfigTotalReconciliationsData[3]</li>
+                <div class="circle background-red"></div><li>Mismatch: @pieconfig_dataset_reconciliations[0]</li>
+                <div class="circle background-lightred"></div><li>Failed: @pieconfig_dataset_reconciliations[1]</li>
+                <div class="circle background-yellow"></div><li>Disabled: @pieconfig_dataset_reconciliations[2]</li>
+                <div class="circle background-green"></div><li>OK: @pieconfig_dataset_reconciliations[3]</li>
             </ul>
         </div>
         <div class="pieConfigTotalReconciliations">
-            <Chart Config="_pieconfigTotalReconciliations" Height="50" Width="50"></Chart>
+            <Chart Config="_pieconfig_reconciliations" Height="50" Width="50"></Chart>
         </div>
     </div>
     
@@ -154,12 +154,14 @@
 
 @code{
     private LineConfig _lineconfig;
-    private PieConfig _pieconfigTotalErrors;
-    private PieConfig _pieconfigTotalReconciliations;
-    PieDataset<int> pieconfigTotalErrorsData;
-    PieDataset<int> pieconfigTotalReconciliationsData;
-    LineDataset<int> lineconfigdataset1;
-    LineDataset<int> lineconfigdataset2;
+    LineDataset<int> lineconfig_dataset_cpu;
+    LineDataset<int> lineconfig_dataset_memory;
+    
+    private PieConfig _pieconfig_errors;
+    private PieConfig _pieconfig_reconciliations;
+    PieDataset<int> pieconfig_dataset_errors;
+    PieDataset<int> pieconfig_dataset_reconciliations;
+    
     List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
 
 
@@ -175,14 +177,17 @@
     //Takes data from test and stores in list
         foreach (var cpu_data in healthdatatests)
         {
-            lineconfigdataset1.Add(cpu_data._NumericValue);
+            lineconfig_dataset_cpu.Add(cpu_data._NumericValue);
         }
         foreach (var party in healthdatatests)
         {
             _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors,2,StringSplitOptions.RemoveEmptyEntries))[1]);
         }
-        
+        _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
+        _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
     }
+    
+    
     
     private void ConfigureLineConfig()
     {
@@ -261,9 +266,7 @@
                 }
             }
         };
-        
-        
-        lineconfigdataset1 = new LineDataset<int>
+        lineconfig_dataset_cpu = new LineDataset<int>
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227,95,82),
@@ -271,17 +274,14 @@
             LineTension = 0,
         };
         
-        lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
+        lineconfig_dataset_memory = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })    // need data From healdata cpu class, Like the data above
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92,188,169,1),
             BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
             LineTension = 0,
-            
-
         };
-        _lineconfig.Data.Datasets.Add(lineconfigdataset1);
-        _lineconfig.Data.Datasets.Add(lineconfigdataset2);
+        
     }
     private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
     {
@@ -295,10 +295,10 @@
 
     private void ConfigurePieConfig()
     {
-        _pieconfigTotalErrors = new PieConfig();
-        _pieconfigTotalReconciliations = new PieConfig();
+        _pieconfig_errors = new PieConfig();
+        _pieconfig_reconciliations = new PieConfig();
 
-        _pieconfigTotalErrors.Options = new PieOptions
+        _pieconfig_errors.Options = new PieOptions
         {
             Responsive = true,
             Title = new OptionsTitle
@@ -313,12 +313,12 @@
                 Display = false,
             },
         };
-        _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
+        _pieconfig_reconciliations.Options = _pieconfig_errors.Options;
         
-        _pieconfigTotalErrors = SetUpPieLabels(_pieconfigTotalErrors, new[] {"Fatal error","Error","Warning","Info"});
-        _pieconfigTotalReconciliations = SetUpPieLabels(_pieconfigTotalReconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
+        _pieconfig_errors = SetUpPieLabels(_pieconfig_errors, new[] {"Fatal error","Error","Warning","Info"});
+        _pieconfig_reconciliations = SetUpPieLabels(_pieconfig_reconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
         
-        pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
+        pieconfig_dataset_errors = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
         {
             BackgroundColor = new[]   // Color for the pies
             {
@@ -331,7 +331,7 @@
             BorderWidth = 0,
             
         };
-        pieconfigTotalReconciliationsData = new PieDataset<int>(new[] {5, 10, 15, 661})
+        pieconfig_dataset_reconciliations = new PieDataset<int>(new[] {5, 10, 15, 661})
         {
             BackgroundColor = new[] // Color for the pies
             {
@@ -343,8 +343,8 @@
             BorderColor = ColorUtil.ColorHexString(0, 0, 0),
             BorderWidth = 0,
         };
-        _pieconfigTotalErrors.Data.Datasets.Add(pieconfigTotalErrorsData);
-        _pieconfigTotalReconciliations.Data.Datasets.Add(pieconfigTotalReconciliationsData);
+        _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
+        _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
     }
 }
 
