@@ -1,11 +1,12 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace BlazorApp.Data
 {
     public class HealthDataTest
     {
 
-        public HealthDataTest(string ReportType, int NumericValue, string Date)
+        public HealthDataTest(string ReportType, int NumericValue, DateTime Date)
         {
             _ReportType = ReportType;
             _NumericValue = NumericValue;
@@ -14,7 +15,7 @@ namespace BlazorApp.Data
         
         public string _ReportType { get; private set; }
         public int _NumericValue { get; private set; }
-        public string _Date { get; private set; }
+        public DateTime _Date { get; private set; }
         
     }
 }

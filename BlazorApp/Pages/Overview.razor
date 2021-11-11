@@ -8,11 +8,11 @@
 @using BlazorApp.DataStreaming
 @inject Test dataList;
 
+
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-
-<div class="summary_container">
+    <div class="summary_container">
     
     @* Summary text + runtime *@
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
@@ -151,6 +151,7 @@
     </div>
 </div>
 
+
 @code{
     private LineConfig _lineconfig;
     private PieConfig _pieconfigTotalErrors;
@@ -159,26 +160,30 @@
     PieDataset<int> pieconfigTotalReconciliationsData;
     LineDataset<int> lineconfigdataset1;
     LineDataset<int> lineconfigdataset2;
-    List<HealthDataTest> healthdatatests;
+    List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
 
 
 
 
-    protected override async void OnInitialized()
+    protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
         ConfigurePieConfig();
         healthdatatests = await Task.Run(() => dataList.DataList());
+        string[] separtors = new string[] {" "};
         
     //Takes data from test and stores in list
         foreach (var cpu_data in healthdatatests)
         {
             lineconfigdataset1.Add(cpu_data._NumericValue);
         }
+        foreach (var party in healthdatatests)
+        {
+            _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors,2,StringSplitOptions.RemoveEmptyEntries))[1]);
+        }
+        
     }
-
-
-
+    
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
@@ -275,10 +280,6 @@
             
 
         };
-        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17", "01:25","", "01:30"})
-        {
-            _lineconfig.Data.Labels.Add(party);
-        }
         _lineconfig.Data.Datasets.Add(lineconfigdataset1);
         _lineconfig.Data.Datasets.Add(lineconfigdataset2);
     }
@@ -347,7 +348,6 @@
     }
 }
 
-
 @code{
     //private string[] managers = {"manager1", "manager2", "manager3", "manager4"};
     static List<string> CreateList()
@@ -371,9 +371,7 @@
     }
 
     List<string> managers = CreateList();
-
-
-
+    
     int selectedManager { get; set; }
 
     public void GetSelectedManagerID(int selectedID)
