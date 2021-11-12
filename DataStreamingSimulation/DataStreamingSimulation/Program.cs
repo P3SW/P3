@@ -12,9 +12,9 @@ namespace DataStreamingSimulation
     {
         static void Main(string[] args)
         {
-            const int INCREASE_IN_SEC = 5;
+            const int INCREASE_IN_SEC = 1;
             const bool CONSOLE_PRINT = false;
-            const string STREAM_START_DATE = "2021-10-28 15:04:42.693"; 
+            const string STREAM_START_DATE = "2021-10-28 15:07:10.347"; 
             string[] tablesToStream = {"AFSTEMNING", "LOGGING", "ENGINE_PROPERTIES", "HEALTH_REPORT", "MANAGER_TRACKING"};
             
             try
