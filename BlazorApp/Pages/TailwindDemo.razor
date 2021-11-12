@@ -5,8 +5,8 @@
 <div class="bg-gray-50">
     <div class="mx-auto py-12 px-4">
         <div class="mt-8 flex">
-            <button class="bg-gray-500 hover:bg-purple-600 p-4 shadow-md rounded-md text-white m-10">
-                Download
+            <button class="bg-gray-500 hover:bg-purple-600 p-4 shadow-md rounded-md text-white m-10" @onclick="Test">
+                @download
             </button>
             <button class="bg-gray-500 hover:bg-red-600 p-4 shadow-md rounded-md text-white m-10">
                 Visit
@@ -15,6 +15,30 @@
     </div>
 </div>
 
+@code{
+    string download = "Download";
+    void Test()
+    {
+        download = "Reset";
+        ResetUpdate("Reset");
+    }
+}
+
+@if (_update != null)
+{
+      <div>
+      @_update.Date @_update.Message
+      </div>
+}
+<div>
+    <H1>EVENT: @if (_update != null)
+              {
+                  <div>
+                  @_update.Date @_update.Message
+                  </div>
+              }
+    </H1>
+</div>
 <div class="rounded-t-xl overflow-hidden bg-gradient-to-r from-emerald-50 to-teal-100 p-10">
     <p class="px-4 py-2 text-emerald-600">Median efficiency score: <span class="font-weight-bold"> 2702</span> </p>
     <p class="px-4 py-2 text-emerald-600">Total read: <span class="font-weight-bold"> 17021044 </span> </p>
@@ -61,6 +85,28 @@
   </table>
 </div>
 
-@code {
+@* ------------- Event subscriber ------------- *@
+@code
+{
+    UpdateEventArgs _update;
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateTriggered += async (o, args) =>
+        {
+            _update = args;
+            _update.Message = "Display Time";
+            await InvokeAsync( StateHasChanged);
+        };
+        
+        UpdateResseted += async (a, args) =>
+        {
+            _update = null;
+            await  InvokeAsync(StateHasChanged);
+        };
+    }
     
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
 }

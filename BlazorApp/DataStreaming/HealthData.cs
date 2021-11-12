@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing.Printing;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
@@ -19,14 +21,14 @@ namespace BlazorApp.DataStreaming
         }
 
         //Inserts data from the reader into temporary lists and adds these to the full list of data.
-        public void AddDataFromSqlReader(SqlDataReader reader)
+        public async void AddDataFromSqlReader(SqlDataReader reader)
         {
             NewCpu = new List<Data>();
             NewMemory = new List<Data>();
 
             while (reader.Read())
             {
-                string reportType = (string) reader[0];
+                string reportType = (string)reader[0];
                 if (reportType.Equals("CPU"))
                 {
                     NewCpu.Add(new Data(reader));
@@ -35,12 +37,15 @@ namespace BlazorApp.DataStreaming
                 {
                     NewMemory.Add(new Data(reader));
                 }
-                LastRowTimeStamp = (DateTime) reader[2];
+
+                LastRowTimeStamp = (DateTime)reader[2];
             }
+            
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
+            PrintCPUAndMemory(NewCpu, NewMemory);
         }
-        
+
         //Returns a query string with the latest timestamp to ensure only new data is queried.
         public string GetChangesQueryString()
         {
@@ -48,6 +53,20 @@ namespace BlazorApp.DataStreaming
                                  $"WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY'" +
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
+        }
+
+        public void PrintCPUAndMemory(List<Data> cpu, List<Data> memory)
+        {
+            foreach (var data in cpu)
+            {
+                Console.WriteLine(data.LogTime + " " + data.ReportType + " " + data.NumericValue);
+            }
+            
+            foreach (var data in memory)
+            {
+                Console.WriteLine(data.LogTime + " " + data.ReportType + " " + data.NumericValue);
+            }
+            
         }
     }
 }

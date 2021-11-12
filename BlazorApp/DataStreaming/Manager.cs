@@ -1,9 +1,13 @@
 using System;
+using System.Data;
+using System.Linq;
+using System.Threading.Tasks;
+using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
-    public class Manager
+    public class Manager : EventBase
     {
         //https://i.imgflip.com/34lzjo.png <--- you after looking at this code
         public string Name { get; private set; }
@@ -23,6 +27,7 @@ namespace BlazorApp.DataStreaming
         private TableStreamer _healthStreamer;
         private TableStreamer _errorStreamer;
         private TableStreamer _reconciliationStreamer;
+        private SqlCommand command;
 
         public Manager(string name, int id)
         {
@@ -38,7 +43,12 @@ namespace BlazorApp.DataStreaming
         {
             Console.WriteLine($"Manager {Name} started");
             AssignStartTime();
-             _healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health);
+        }
+
+        public void SetupDataPoints()
+        {
+            Console.WriteLine("MANAGER START TIME IS: " + StartTime);
+            _healthStreamer = new TableStreamer(SqlQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health);
             _errorStreamer = new TableStreamer(SqlQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), Error);
             _reconciliationStreamer = new TableStreamer(SqlQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), Reconciliation);
             _healthStreamer.StartListening();
@@ -84,26 +94,41 @@ namespace BlazorApp.DataStreaming
 
             return result;
         }
-
         
-        private void AssignStartTime()
+        private async void AssignStartTime()
         {
-            Console.WriteLine("FUNKTION BEGYNDT");
-            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("startTime"), Connection))
+            Console.WriteLine("Finder Manager Start Time....");
+            // ****************************
+            TriggerUpdate("UPDATED");
+            // ****************************
+            using (command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("startTime"), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    Console.WriteLine(reader.HasRows);
-                    while (reader.Read())
+                    if (!reader.HasRows)
                     {
-                        StartTime = DateTime.Parse((string)reader[0]);
-                        Console.WriteLine(StartTime); 
+                        reader.Close();
+                        Console.WriteLine("reader closed...");
+                        await Task.Delay(1000);
+                        AssignStartTime();
                     }
-                    reader.Close();
+                    else
+                    {
+                        while (reader.Read())
+                        {
+                            Console.WriteLine("found starttime!");
+                            StartTime = DateTime.Parse((string)reader[0]);
+                            //Console.WriteLine("reader almost closed...");
+                        } 
+                        reader.Close();
+                        Console.WriteLine("reader closed...");
+                        SetupDataPoints();
+                    }
+                    
                 }
             }
         }
-        
+
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.
         private void AssignManagerTrackingData()
         {
@@ -173,7 +198,6 @@ namespace BlazorApp.DataStreaming
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
                                          $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
-                                         $"AND [dbo].[LOGGING_CONTEXT].[CONTEXT] LIKE 'dk.aes.ans.konvertering.managers.conversionUser.AnsConversionUserManager%'" +
                                          $"ORDER BY CREATED");
                 case "reconciliation":
                     return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +

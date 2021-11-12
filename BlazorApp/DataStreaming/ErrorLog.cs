@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
@@ -17,19 +18,20 @@ namespace BlazorApp.DataStreaming
         }
 
         //Inserts data from the reader into temporary list and adds these to the full list of data.
-        public void AddDataFromSqlReader(SqlDataReader reader)
+        public async void AddDataFromSqlReader(SqlDataReader reader)
         {
             NewErrorList = new List<ErrorData>();
 
             while (reader.Read())
             {
-                Console.WriteLine("test reader[0]");
-                Console.WriteLine(reader[0].GetType());
                 NewErrorList.Add(new ErrorData(reader));
-                LastRowTimeStamp = (DateTime) reader[0];
             }
-            PrintLogs(NewErrorList);
+
+            LastRowTimeStamp = NewErrorList[NewErrorList.Count - 1].Timestamp;
+            Console.WriteLine(LastRowTimeStamp);
             ErrorList.AddRange(NewErrorList);
+            Console.WriteLine(ErrorList.Count);
+            PrintLogs(NewErrorList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
@@ -49,7 +51,7 @@ namespace BlazorApp.DataStreaming
         {
             foreach (var error in errorlist)
             {
-                Console.WriteLine(error.LogLevel + " " + error.Created + " " + error.LogMessage);
+                Console.WriteLine(error.LogLevel + " " + error.Timestamp + " " + error.LogMessage);
             }
         }
     }

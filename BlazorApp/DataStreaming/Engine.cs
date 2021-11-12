@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.DataStreaming
 {
-    public class Engine
+    public class Engine : EventBase
     {
         public List<Manager> FinishedManagers { get; private set; }
         private Manager _currentManager;
@@ -26,7 +27,9 @@ namespace BlazorApp.DataStreaming
         public void Start()
         {
             Console.WriteLine("Engine started");
-
+            //new EventBase().TriggerUpdate("UPDATED");
+            //TriggerUpdate("UPDATED");
+            
             SqlConnection conn = new SqlConnection(_connectionString);
             
             try
@@ -39,20 +42,16 @@ namespace BlazorApp.DataStreaming
                 TableStreamer.Connection = conn;
 
                 _connection = conn;
-
-                Console.WriteLine("CONNECTED");
                 
                 using (SqlCommand command = new SqlCommand(SqlQueryStrings.ManagersSelect, _connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
-                        Console.WriteLine("EXECUTING READER");
                         if (reader.HasRows) //If the result of the query contains any rows, they will be added to the queue
                         {
-                            Console.WriteLine("FOUND ROWS");
                             while (reader.Read())
                             {
-                                Console.WriteLine("READING");
+                                Console.WriteLine("READING MANAGER");
                                 AddManagerToQueue((string) reader[0], (int) reader[1]);
                             }
                             reader.Close();
