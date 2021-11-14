@@ -1,2 +1,0 @@
-Server=localhost,1433;Database=ANS_CUSTOM_2; User ID=sa; Password=Password123;Trusted_Connection=False
-Server=localhost,1433;Database=ANS_DB_P3; User ID=sa; Password=Password123;Trusted_Connection=False
