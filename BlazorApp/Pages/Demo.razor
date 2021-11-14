@@ -1,0 +1,72 @@
+@page "/DEMO"
+
+<h3>DEMO</h3>
+
+<div class="bg-gray-50">
+    <div class="mx-auto py-12 px-4">
+        <div class="mt-8 flex">
+            <button class="bg-gray-500 hover:bg-purple-600 p-4 shadow-md rounded-md text-white m-10" @onclick="ManuelReset">
+                @reset
+            </button>
+            <button class="bg-gray-500 hover:bg-red-600 p-4 shadow-md rounded-md text-white m-10" @onclick="ManuelTrigger">
+                @trigger
+            </button>
+        </div>
+    </div>
+</div>
+
+<div>
+    <H1>EVENT: @if (_update != null)
+               {
+                   <div>
+                       @_update.Date @_update.Message
+                   </div>
+               }
+    </H1>
+</div>
+
+@code{
+    //string reset = "ResetUpdate";
+    //string trigger = "TriggerUpdate";
+    string reset = "ResetUpdate";
+    string trigger = "TriggerUpdate";
+    void ManuelReset()
+    {
+        reset = "Resat";
+        trigger = "TriggerUpdate";
+        ResetUpdate("Resat");
+    }
+
+    void ManuelTrigger()
+    {
+        trigger = "Triggered";
+        reset = "ResetUpdate";
+        TriggerUpdate("Triggered");
+    }
+}
+
+@* ------------- Event subscriber ------------- *@
+@code
+{
+    UpdateEventArgs _update;
+    protected override async Task OnInitializedAsync()
+    {
+        UpdateTriggered += async (o, args) =>
+        {
+            _update = args;
+            _update.Message = "Display Time";
+            await InvokeAsync( StateHasChanged);
+        };
+        
+        UpdateResseted += async (a, args) =>
+        {
+            _update = null;
+            await  InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    protected override Task OnAfterRenderAsync(bool firstRender)
+    {
+        return base.OnAfterRenderAsync(firstRender);
+    }
+}

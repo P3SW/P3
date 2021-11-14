@@ -20,7 +20,7 @@ namespace BlazorApp.DataStreaming.Events
         public void ResetUpdate(string message)
         {
             // If NOT null do..
-            UpdateResseted?.Invoke(this, null);
+            UpdateResseted?.Invoke(this, new UpdateEventArgs { Message = message});
         }
     }
 }
