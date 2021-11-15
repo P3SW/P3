@@ -56,7 +56,7 @@ else{
             <span class="queue-inqueue-text">In queue: <b>4</b></span>
         </div>
         <div class="manager-queue-circle">
-			@foreach(Manager manager in managers)
+			@foreach(Manager_test manager in managers)
 			{
 				<div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@(() => GetHoveredManager(manager._id))">
 				@if(hoveredManager == manager._id)
@@ -160,6 +160,7 @@ else{
     PieDataset<int> pieconfig_dataset_reconciliations;
     
     List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
+    List<Manager_test> managers = new List<Manager_test>();
 
 
 
@@ -169,6 +170,7 @@ else{
         ConfigureLineConfig();
         ConfigurePieConfig();
         healthdatatests = await Task.Run(() => dataList.DataList());
+        managers = await Task.Run(() => managerList.ManagerList());
         string[] separtors = new string[] {" "};
         
     //Takes data from test and stores in list
@@ -346,15 +348,6 @@ else{
 }
 
 @code{
-	 List<Manager> managers = new List<Manager>();
-    
-    //When the application starts, get the list of errors
-    protected override async Task OnInitializedAsync()
-    {
-        managers = await Task.Run(() => managerList.ManagerList());
-    }
-
-
     //private string[] managers = {"manager1", "manager2", "manager3", "manager4"};
     /*static List<string> CreateList()
     {
@@ -419,7 +412,7 @@ else{
 		return counter;
 	}
 
-    private string ManagerCircleColour(Manager manager)
+    private string ManagerCircleColour(Manager_test manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager._errors);
 

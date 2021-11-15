@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace BlazorApp.Data
 {
-    public class Manager
+    public class Manager_test
     {
-        public Manager(int id, string name, DateTime timestamp, List<Error> errors, List<Reconciliation> recons)
+        public Manager_test(int id, string name, DateTime timestamp, List<Error> errors, List<Reconciliation> recons)
         {
             _id = id;
             _name = name;
