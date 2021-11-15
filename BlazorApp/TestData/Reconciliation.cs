@@ -1,9 +1,11 @@
+using System;
+
 namespace BlazorApp.Data
 {
-    public class Reconciliation : Log
+    public class Reconciliation // TEST CLASS FOR RECONCILIATION TABLE
     {
 
-        public Reconciliation(int id, string result, string timestamp, string description)
+        public Reconciliation(int id, string result, DateTime timestamp, string description)
         {
             _id = id;
             _result = result;
@@ -11,8 +13,10 @@ namespace BlazorApp.Data
             _description = description;
         }
 
-        private string _result;
-        private string _description;
+        public int _id { get; protected set; }
+        public DateTime _timestamp { get; protected set; }
+        public string _result { get; private set; }
+        public string _description { get; private set; }
 
         public string DecideResultColor()
         {

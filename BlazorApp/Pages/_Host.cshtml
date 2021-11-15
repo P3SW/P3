@@ -8,31 +8,61 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>BlazorApp</title>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+   <title>Conversion Dashboard</title>
     <base href="~/" />
-    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css" />
+    <link rel="stylesheet" href="css/bootstrap/bootstrap.min.css"/>
     <link href="css/site.css" rel="stylesheet" />
     <link href="BlazorApp.styles.css" rel="stylesheet" />
+    <style>
+       #errorlog-tab > .rz-tabview-panels, #reconciliation-tab > .rz-tabview-panels{
+           background-color: #384561 !important;
+           border: none !important;
+       }
+       .TabElement > a {
+           color: #FFFFFF !important;
+           text-decoration: none !important;
+       }
+       .TabElement {
+           border-radius: 0 !important; 
+           border: none !important;
+           background-color: #0F2147 !important;
+       }
+       .rz-tabview-selected {
+           background-color: #384561 !important;
+       }
+       .rz-column-title, .rz-sortable-column-icon, .rz-grid-filter-icon  {
+           color: #FFFFFF !important;
+       }
+       .rz-unselectable-text {
+           background-color: #384561 !important;
+           border: none !important;
+       }
+       .rz-data-grid{
+           border: none !important;
+       }
+    </style>
+    <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
 </head>
 <body>
-    <component type="typeof(App)" render-mode="ServerPrerendered" />
+<component type="typeof(App)" render-mode="ServerPrerendered"/>
 
-    <div id="blazor-error-ui">
-        <environment include="Staging,Production">
-            An error has occurred. This application may no longer respond until reloaded.
-        </environment>
-        <environment include="Development">
-            An unhandled exception has occurred. See browser dev tools for details.
-        </environment>
-        <a href="" class="reload">Reload</a>
-        <a class="dismiss">🗙</a>
-    </div>
+<div id="blazor-error-ui">
+    <environment include="Staging,Production">
+        An error has occurred. This application may no longer respond until reloaded.
+    </environment>
+    <environment include="Development">
+        An unhandled exception has occurred. See browser dev tools for details.
+    </environment>
+    <a href="" class="reload">Reload</a>
+    <a class="dismiss">🗙</a>
+</div>
 
 <script src="_framework/blazor.server.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
-
+<script src="_content/Radzen.Blazor/Radzen.Blazor.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@2.9.4/dist/Chart.min.js"></script>
 
 <!-- This is the glue between Blazor and Chart.js -->

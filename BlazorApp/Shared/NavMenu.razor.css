@@ -1,55 +1,49 @@
-.navbar-toggler {
-    background-color: rgba(255, 255, 255, 0.1);
-}
-
-.top-row {
-    height: 3.5rem;
-    background-color: rgba(0,0,0,0.4);
-}
-
-
-
-.navbar-brand {
-    font-size: 1.1rem;
-}
-
-.oi {
-    width: 2rem;
-    font-size: 1.1rem;
-    vertical-align: text-top;
-    top: -2px;
+.nav {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-item {
-    font-size: 0.9rem;
-    padding-bottom: 0.5rem;
+    font-size: 1rem;
 }
 
-    .nav-item:first-of-type {
-        padding-top: 1rem;
-    }
-
-    .nav-item:last-of-type {
-        padding-bottom: 1rem;
-    }
-
-    .nav-item ::deep a {
-        color: #d7d7d7;
-        border-radius: 4px;
-        height: 3rem;
-        display: flex;
-        align-items: center;
-        line-height: 3rem;
-    }
-
-.nav-item ::deep a.active {
-    background-color: rgba(255,255,255,0.25);
-    color: white;
+.nav-item ::deep a {
+    text-decoration: none;
+    color: #d7d7d7;
+    height: 9.375rem;
+    width: 100%;
+    display: flex;
+    flex-flow: row wrap;
+    justify-content: center;
+    text-align: center;
 }
 
 .nav-item ::deep a:hover {
     background-color: rgba(255,255,255,0.1);
     color: white;
+}
+
+.nav-item ::deep a.active .current-page-indicator { /* Orange indicator on sidebar */
+    display: block;
+    position: absolute;
+    height: 9.375rem;
+    width: 3.33%; /* About 5 pixels wide */
+    left: 0;
+    background-color: #E35F52;
+}
+
+.sidebar-image { /* Icons on the buttons */
+    width: 72px;!important;
+    height: 72px;!important;
+    position: relative;
+    top: 30px;
+}
+
+.sidebar-caption { /* Text on the buttons */
+    width: 100%;
+    position: relative;
+    top: 5px;
 }
 
 @media (min-width: 641px) {

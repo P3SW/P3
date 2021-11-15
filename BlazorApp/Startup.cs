@@ -5,11 +5,12 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.AspNetCore.ResponseCompression;
-using BlazorServerSignalRApp.Server.Hubs;
+using BlazorApp.Data;
+
 
 namespace BlazorApp
 {
@@ -18,7 +19,6 @@ namespace BlazorApp
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            //test
         }
 
         public IConfiguration Configuration { get; }
@@ -29,21 +29,13 @@ namespace BlazorApp
         {
             services.AddRazorPages();
             services.AddServerSideBlazor();
-            
-            //SignalR setup
-            services.AddResponseCompression(opts =>
-            {
-                opts.MimeTypes = ResponseCompressionDefaults.MimeTypes.Concat(
-                    new[] { "application/octet-stream" });
-            });
+            services.AddScoped<Test>(); 
+            services.AddScoped<AnotherTest>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            //SignalR
-            app.UseResponseCompression();
-            
             if (env.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
@@ -51,8 +43,13 @@ namespace BlazorApp
             else
             {
                 app.UseExceptionHandler("/Error");
+                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+                // app.UseHsts();
             }
+            
+            app.UseStaticFiles();
 
+            // app.UseHttpsRedirection();
             app.UseStaticFiles();
 
             app.UseRouting();
@@ -60,9 +57,11 @@ namespace BlazorApp
             app.UseEndpoints(endpoints =>
             {
                 endpoints.MapBlazorHub();
-                endpoints.MapHub<DataHub>("/datahub"); //Map to the chathub when connected. (SignalR stuff)
                 endpoints.MapFallbackToPage("/_Host");
             });
+            
+            ConversionDataAssigner conversionDataAssigner = new ConversionDataAssigner();
+            conversionDataAssigner.Start();
         }
     }
 }
