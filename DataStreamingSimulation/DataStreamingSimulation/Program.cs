@@ -25,7 +25,8 @@ namespace DataStreamingSimulation
                 string setupFile = sqlConnection.ReadSetupFile();
                 string queryString = new QuerySetup().MakeOneTimeQueryString("LOGGING_CONTEXT");
                 sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
-                
+                queryString = new QuerySetup().MakeOneTimeQueryString("MANAGERS");
+                sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
                 while (true)
                 {
                     for (int i = 0; i < tablesToStream.Length; i++)
@@ -36,7 +37,7 @@ namespace DataStreamingSimulation
                     
                     startTime = nextTime;
                     nextTime = startTime.AddSeconds(INCREASE_IN_SEC);
-                    System.Threading.Thread.Sleep(INCREASE_IN_SEC * 1000);
+                    System.Threading.Thread.Sleep(INCREASE_IN_SEC * 1000); // How frequently it inserts into ANS_DB_P3
                 }
             }
             catch (Exception e)
