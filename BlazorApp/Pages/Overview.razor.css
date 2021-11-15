@@ -1,4 +1,4 @@
-﻿/* Summary root */
+/* Summary root */
 .summary_container{
     background-color: #384561;
     padding: 0;
@@ -46,7 +46,7 @@
     grid-template-columns: 1fr 1fr;
     background: rgba(83, 96, 122, 0.27);
     border-bottom: 0 !important;
- }
+}
 
 .Current_manager_container > div{
     margin: 0.5rem;
@@ -117,22 +117,12 @@
 
 .PieConfigTotalErrors {
     position: relative;
-    background-color: rgba(15, 33, 71, 0.2);
-    border-radius: 50%;
     width: 80%;
-    aspect-ratio: 1;
-    align-self: center;
-    padding: 0.3rem;
 }
 
 .pieConfigTotalReconciliations {
     position: relative;
-    background-color: rgba(15, 33, 71, 0.2);
-    border-radius: 50%;
     width: 80%;
-    aspect-ratio: 1;
-    align-self: center;
-    padding: 0.3rem;
 }
 
 .error-reconciliation-formatting {
@@ -162,18 +152,18 @@
     height: 1.1em;
     background-color: #4B5772;
     font-family: inherit;
-    font-size: 0.5em;
+    font-size: 0.6em;
     color: #e3e3e3;
-    padding: 0.3em;
+    padding: 0;
     cursor: pointer;
     border: 1px solid #384561;
     border-bottom: 1px solid #8E8E8E;
-    align-self: center;
+    align-self: end;
 }
 
 .selected-manager-name{
     position: absolute;
-    width: 90%;
+    width: 95%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -181,28 +171,26 @@
 
 .dropdown-arrow{
     position: absolute;
-    top: 25%;
-    right: 3%;
+    left: 94%;
     height: 1em;
-    width: 6%;
+    width: 5%;
 }
 
 .dropup-arrow{
     display: none;
     position: absolute;
-    top: 25%;
-    right: 3%;
+    left: 94%;
     height: 1em;
-    width: 6%;
+    width: 5%;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
     width: 100%;
-    max-height: 10em;
+    height: 10em;
     font-size: 1em;
-    transform: translate(-0.3em,1.4em);
+    transform: translate(0,11%);
     overflow-x: hidden;
     overflow-y: auto;
     border-top: 1px solid #8E8E8E;
@@ -225,7 +213,6 @@
 .dropdown-content > div{
     display: block;
     color: #e3e3e3;
-    padding: 0.5em;
     user-select: none;
     text-decoration: none;
     overflow: hidden;
@@ -265,41 +252,21 @@
 /* Manager queue */
 .manager-queue-container > div {
     font-size: 0.6em;
-    margin: 0.5rem;
 }
-    .manager-queue-container{
-        display: grid;
-        grid-template-rows: 0.6em 1fr;
-        align-items: center;
-    }
+.queue-finished-text {
+    float: left;
+}
 
-    .dot {
-        height: 80px;
-        width: 80px;
-        border-radius: 50%;
-        display: inline-block;
-    }
+.queue-inqueue-text {
+    float: right;
+}
 
-    .manager-queue-circle {
-        display: block;
-        background: rgba(83, 96, 122, 0.27);
-        overflow-y: none;
-        overflow-x: auto;
-        white-space: nowrap;
-    }
-    .queue-finished-text {
-        float: left;
-    }
-    
-    .queue-inqueue-text {
-        float: right;
-    }
 
-/* Efficiency table */    
+/* Efficiency table */
 .efficiency-container {
     line-height: 80%;
     border-bottom: none !important;
-}    
+}
 
 .efficiency-container > div {
     font-size: 0.6em;
@@ -310,22 +277,22 @@
 
 /* 2k monitor w/ 150% zoom compatibility */
 @media screen and (max-width: 1500px) {
-        
-        .Current_manager_info_container > div {
-            font-size: 0.6em;
-        }
-    
-        .Current_manager_container > div {
-            font-size: 0.6em;
-        }
-    
-        .Total_errors_and_reconciliations_container{
-            grid-template-columns: 1.5fr 1fr 2.5fr 1fr;
-        }
-        
-        .Total_errors_and_reconciliations_container > div{
-            font-size: 0.6em;
-        }
-           
+
+    .Current_manager_info_container > div {
+        font-size: 0.6em;
+    }
+
+    .Current_manager_container > div {
+        font-size: 0.6em;
+    }
+
+    .Total_errors_and_reconciliations_container{
+        grid-template-columns: 1.5fr 1fr 2.5fr 1fr;
+    }
+
+    .Total_errors_and_reconciliations_container > div{
+        font-size: 0.6em;
+    }
+
 }
 

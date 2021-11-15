@@ -3,20 +3,22 @@ using System.Data;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 
-namespace BlazorApp.DataStreaming
+namespace SQLDatabaseRead
 {
     public class TableStreamer
     {
         private SqlDependency _dependency;
         private string _queryString;
         public static SqlConnection Connection { get; set; }
-        private IData _dataObject;
+        private IDataHandler _dataHandlerObject;
         private bool run;
-        public TableStreamer(string queryString, string currentDataQueryString, IData dataObject)
+        private string dataType;
+        public TableStreamer(string queryString, string currentDataQueryString, IDataHandler dataHandlerObject, string type)
         {
             _queryString = queryString;
-            _dataObject = dataObject;
+            _dataHandlerObject = dataHandlerObject;
             run = true;
+            dataType = type;
             
             //Queries the database for data currently in the database
             AddQueryToObject(currentDataQueryString);
@@ -49,7 +51,6 @@ namespace BlazorApp.DataStreaming
                     _dependency.OnChange += SqlDependencyChange;
                     
                     CloseReader(command);
-                    
                 }
             }
             catch (Exception e)
@@ -66,11 +67,9 @@ namespace BlazorApp.DataStreaming
             }
             else
             {
+                //Console.WriteLine("QUERY STRING LOOKS LIKE THIS: " + _dataObject.GetChangesQueryString());
                 //To minimise network traffic, a separate list containing only the changes is made and send to the client
-                AddQueryToObject(_dataObject.GetChangesQueryString());
-                
-                //Implement SignalR interaction here.
-
+                AddQueryToObject(_dataHandlerObject.GetNewestDataQueryString(dataType));
             }
             StartListening();
         }
@@ -83,7 +82,7 @@ namespace BlazorApp.DataStreaming
                 {
                     if (reader.HasRows)
                     {
-                        _dataObject.AddDataFromSqlReader(reader);
+                        _dataHandlerObject.AddDataFromSqlReader(reader);
                     }
                     reader.Close();
                 }

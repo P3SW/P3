@@ -45,7 +45,9 @@ namespace DataStreamingSimulation
                     break;
                 case "MANAGER_TRACKING": // 2021-10-28 00:00:00.000
                     queryString = $@"SELECT * FROM MANAGER_TRACKING
-                                     WHERE STARTTIME BETWEEN '{startTime}' and '{nextTime}';";
+                                     WHERE [MGR] = (SELECT [MANAGER] FROM ENGINE_PROPERTIES WHERE 
+                                     [TIMESTAMP] = (SELECT [TIMESTAMP] FROM ENGINE_PROPERTIES WHERE [TIMESTAMP] 
+                                     BETWEEN '{startTime}' and '{nextTime}' AND [KEY] = 'END_TIME'));";
                     break;
                 default:
                     break;

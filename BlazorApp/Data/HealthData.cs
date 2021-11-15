@@ -1,23 +1,23 @@
 using System;
 using Microsoft.Data.SqlClient;
 
-namespace BlazorApp.DataStreaming
+namespace BlazorApp.Data
 {
     //Class containing the CPU and memory data read from the HEALTH_REPORT. Class contains properties to store this data and constructors.
-    public class Data
+    public class HealthData
     {
         public string ReportType { get; set; }
         public long NumericValue { get; set; }
         public DateTime LogTime { get; set; }
 
-        public Data(string reportType, long numericValue, DateTime logTime)
+        public HealthData(string reportType, long numericValue, DateTime logTime)
         {
             ReportType = reportType;
             NumericValue = numericValue;
             LogTime = logTime;
         }
 
-        public Data(SqlDataReader reader)
+        public HealthData(SqlDataReader reader)
         {
             ReportType = (string) reader[0];
             NumericValue = (long) reader[1];

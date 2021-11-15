@@ -1,6 +1,6 @@
 using System.IO;
 
-namespace BlazorApp.DataStreaming
+namespace BlazorApp.Data
 {
     //Class responsible for reading the setup.txt file and returns the connection string.
     public static class ConfigReader
