@@ -30,13 +30,12 @@ namespace BlazorApp.Data
         private SqlCommand command;
         private int run_number = 0;
 
-        public ManagerStatusHandler(string name, int id, DateTime startTime)
+        public ManagerStatusHandler(string name, int id)
         {
             Health = new HealthDataHandler();
             ReconciliationHandler = new LogDataHandler();
             ErrorHandler = new LogDataHandler();
             Name = name;
-            StartTime = startTime;
             Id = id;
         }
 
@@ -48,12 +47,13 @@ namespace BlazorApp.Data
             AssignStartTime();
         }
 
-        public void SetupDataPoints()
+        public async void SetupDataPoints()
         {
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
             _healthStreamer = new TableStreamer(DatabaseListenerQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
             _errorStreamer = new TableStreamer(DatabaseListenerQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
             _reconciliationStreamer = new TableStreamer(DatabaseListenerQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
+            
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
@@ -62,6 +62,10 @@ namespace BlazorApp.Data
         //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
         public void FinishManager()
         {
+            Console.WriteLine(Health.Cpu.Count);
+            Console.WriteLine(Health.Memory.Count);
+            Console.WriteLine(ReconciliationHandler.LogDataList.Count);
+            Console.WriteLine(ErrorHandler.LogDataList.Count);
             Console.WriteLine("Stopping the data from listening");
             _healthStreamer.StopListening();
             _errorStreamer.StopListening();
@@ -197,7 +201,6 @@ namespace BlazorApp.Data
                                          "ORDER BY LOG_TIME");
                 case "logging":
                     return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
-                                         $"[dbo].[LOGGING].[CONTEXT_ID]," +
                                          $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          $"FROM [dbo].[LOGGING] " +
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
