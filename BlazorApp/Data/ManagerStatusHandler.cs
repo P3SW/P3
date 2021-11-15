@@ -24,9 +24,9 @@ namespace BlazorApp.Data
         public int Cpu { get; set; }
         public int EfficiencyScore { get; private set; }
         public static SqlConnection Connection { get; set; }
-        private TableStreamer _healthStreamer;
-        private TableStreamer _errorStreamer;
-        private TableStreamer _reconciliationStreamer;
+        private SQLDependencyListener _healthStreamer;
+        private SQLDependencyListener _errorStreamer;
+        private SQLDependencyListener _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
 
@@ -50,9 +50,9 @@ namespace BlazorApp.Data
         public async void SetupDataPoints()
         {
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
-            _healthStreamer = new TableStreamer(DatabaseListenerQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
-            _errorStreamer = new TableStreamer(DatabaseListenerQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
-            _reconciliationStreamer = new TableStreamer(DatabaseListenerQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
+            _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
+            _errorStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
+            _reconciliationStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
             
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
