@@ -137,6 +137,9 @@ _TeamCity*
 .axoCover/*
 !.axoCover/settings.json
 
+#MacOS Stuff
+*.DS_Store
+
 # Visual Studio code coverage results
 *.coverage
 *.coveragexml
@@ -348,3 +351,9 @@ MigrationBackup/
 
 # Ionide (cross platform F# VS Code tools) working folder
 .ionide/
+
+#.idea
+.idea/
+
+# MACOS
+.DS_Store
