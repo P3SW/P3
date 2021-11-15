@@ -23,10 +23,13 @@ namespace DataStreamingSimulation
                 DateTime nextTime = startTime.AddSeconds(INCREASE_IN_SEC);
                 DatabaseConnect sqlConnection = new DatabaseConnect();
                 string setupFile = sqlConnection.ReadSetupFile();
-                string queryString = new QuerySetup().MakeOneTimeQueryString("LOGGING_CONTEXT");
+                
+                string queryString = new QuerySetup().MakeOneTimeQueryString("MANAGERS");
                 sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
-                queryString = new QuerySetup().MakeOneTimeQueryString("MANAGERS");
+                
+                queryString = new QuerySetup().MakeOneTimeQueryString("LOGGING_CONTEXT");
                 sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
+                
                 while (true)
                 {
                     for (int i = 0; i < tablesToStream.Length; i++)

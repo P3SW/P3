@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
@@ -9,16 +10,17 @@ namespace BlazorApp.Data
     public class ConversionDataAssigner
     {
         public List<ManagerStatusHandler> FinishedManagers { get; private set; }
-        private ManagerStatusHandler _currentManagerStatusHandler;
+        private ManagerStatusHandler _currentManager;
         private SqlConnection _connection;
-        private int _managerQueue;
         private string _connectionString;
-        
+        private Queue<ManagerStatusHandler> _managerQueue;
+
+
         //Constructor initialising the some of the fields in the class
         public ConversionDataAssigner()
         {
             _connectionString = ConfigReader.ReadSetupFile();
-            _managerQueue = 0;
+            _managerQueue = new Queue<ManagerStatusHandler>();
             FinishedManagers = new List<ManagerStatusHandler>();
         }
 
@@ -40,7 +42,7 @@ namespace BlazorApp.Data
                 TableStreamer.Connection = conn;
 
                 _connection = conn;
-                
+
                 using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -50,8 +52,7 @@ namespace BlazorApp.Data
                             while (reader.Read())
                             {
                                 Console.WriteLine("READING MANAGER");
-                                _managerQueue++;
-                                //AddManagerToQueue((string) reader[0], (int) reader[1]);
+                                AddManagerToQueue((string) reader[0], (int) reader[1]);
                             }
                             reader.Close();
                             ManagerTrackingListener();
@@ -81,20 +82,23 @@ namespace BlazorApp.Data
                 command.CommandText = DatabaseListenerQueryStrings.ManagersSelect;
                     
                 SqlDependency dependency = new SqlDependency(command);
-                dependency.OnChange += ContinueSetup;
+                dependency.OnChange +=  ContinueSetup;
                     
                 TableStreamer.CloseReader(command);
+
             }            
         }
         
         //Continues the setup by adding managers to the queue when rows are inserted into the MANAGERS table
         //The MANAGER_TRACKING table will be watched and the first manager will be started after the rows in MANAGERS are read
-        private void ContinueSetup(object sender, SqlNotificationEventArgs eventArgs)
+        private async void ContinueSetup(object sender, SqlNotificationEventArgs eventArgs)
         {
             if (eventArgs.Info == SqlNotificationInfo.Invalid)
             {
                 Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source, eventArgs.Type);
             }
+            
+            await Task.Delay(1000);
             
             using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
             {
@@ -103,8 +107,7 @@ namespace BlazorApp.Data
                     while (reader.Read())
                     {
                         Console.WriteLine("READING MANAGER");
-                        _managerQueue++;
-                        //AddManagerToQueue((string) reader[0], (int) reader[1]);
+                        AddManagerToQueue((string) reader[0], (int) reader[1]);
                     }
                     reader.Close();
                 }
@@ -114,10 +117,10 @@ namespace BlazorApp.Data
         }
 
         //Creates a manager from a string and an int and enqueues it.
-        // public void AddManagerToQueue(string name, int id)
-        // {
-        //     _managerQueue.Enqueue(new Manager(name, id));
-        // }
+        public void AddManagerToQueue(string name, int id)
+        {
+            _managerQueue.Enqueue(new ManagerStatusHandler(name, id));
+        }
         
         //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
         private void ManagerTrackingListener()
@@ -139,7 +142,6 @@ namespace BlazorApp.Data
         //Method handling the event. Calls the next manager and creates a new SqlDependency to track the table again
         private void ManagerTrackingChange(object sender, SqlNotificationEventArgs eventArgs)
         {
-            Console.WriteLine("Tjekker manager");
             if (eventArgs.Info == SqlNotificationInfo.Invalid)
             {
                 Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source,
@@ -156,23 +158,22 @@ namespace BlazorApp.Data
         //Stops the current manager and starts the next one. This does nothing if the queue is empty
         private void WatchNextManager()
         {
-            if (_currentManagerStatusHandler != null) //Checks if a manager is running
+            if (_currentManager != null) //Checks if a manager is running
             {
                 Console.WriteLine("Finishing manager");
-                FinishedManagers.Add(_currentManagerStatusHandler);
-                _currentManagerStatusHandler.FinishManager();
+                FinishedManagers.Add(_currentManager);
+                _currentManager.FinishManager();
                 PrintFinishedManager();
             }
 
-            if (_managerQueue == 0) //If the last manager has run the method will stop
+            if (_managerQueue.Count == 0) //If the last manager has run the method will stop
             {
-                _currentManagerStatusHandler = null;
+                _currentManager = null;
                 return;
             }
 
-            _managerQueue--;
-            
-            _currentManagerStatusHandler.WatchManager();
+            _currentManager = _managerQueue.Dequeue();
+            _currentManager.WatchManager();
 
             //Send status of finished manager here
             
@@ -180,10 +181,10 @@ namespace BlazorApp.Data
 
         private void PrintFinishedManager()
         {
-            Console.WriteLine($"Name: {_currentManagerStatusHandler.Name}\nStatus: {_currentManagerStatusHandler.Status}\n" +
-                              $"Runtime: {_currentManagerStatusHandler.RunTime}\nRows read: {_currentManagerStatusHandler.RowsRead}\n" +
-                              $"Rows written: {_currentManagerStatusHandler.RowsWritten}\nAverage CPU: {_currentManagerStatusHandler.Cpu}\n" +
-                              $"Efficiency score: {_currentManagerStatusHandler.EfficiencyScore}");
+            Console.WriteLine($"Name: {_currentManager.Name}\nStatus: {_currentManager.Status}\n" +
+                              $"Runtime: {_currentManager.RunTime}\nRows read: {_currentManager.RowsRead}\n" +
+                              $"Rows written: {_currentManager.RowsWritten}\nAverage CPU: {_currentManager.Cpu}\n" +
+                              $"Efficiency score: {_currentManager.EfficiencyScore}");
         }
         
     }

@@ -29,6 +29,7 @@ namespace BlazorApp.Data
 
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
+            PrintLogData(newLogDataList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
@@ -38,7 +39,7 @@ namespace BlazorApp.Data
             {
                 case "ERROR" :
                     return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
-                                         $"[dbo].[LOGGING_CONTEXT].[CONTEXT], [dbo].[LOGGING].[CONTEXT_ID]" +
+                                         $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          $"FROM [dbo].[LOGGING] " +
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
                                          $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +

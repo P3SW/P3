@@ -60,8 +60,8 @@ namespace BlazorApp
                 endpoints.MapFallbackToPage("/_Host");
             });
             
-            // ConversionDataAssigner conversionDataAssigner = new ConversionDataAssigner();
-            // conversionDataAssigner.Start();
+            ConversionDataAssigner conversionDataAssigner = new ConversionDataAssigner();
+            conversionDataAssigner.Start();
         }
     }
 }

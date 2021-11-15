@@ -41,8 +41,7 @@ namespace BlazorApp.Data
 
                 LastRowTimeStamp = (DateTime)reader[2];
             }
-            // Console.WriteLine("Printing new values for cpu and memory!");
-            // PrintCPUAndMemory(NewCpu, NewMemory);
+            PrintCPUAndMemory(NewCpu, NewMemory);
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
         }
