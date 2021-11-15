@@ -146,6 +146,7 @@
 }
 
 .Overview-right{
+    max-height: 100vh;
     display: grid;
     grid-template-rows: 1fr 1fr;
     gap: 1rem;
@@ -273,20 +274,36 @@
         align-items: center;
     }
 
-    .dot {
+    .manager-circle {
         height: 80px;
         width: 80px;
         border-radius: 50%;
         display: inline-block;
+        position: relative;
     }
 
     .manager-queue-circle {
         display: block;
         background: rgba(83, 96, 122, 0.27);
-        overflow-y: none;
+        overflow-y: visible;
         overflow-x: auto;
-        white-space: nowrap;
+        white-space: nowrap;        
     }
+    
+    .hovered-manager{
+        display: none;
+        position: absolute;
+        height: 10em;
+        width: 10em;
+        background-color: #0F2147;
+        z-index: 2;
+        top: 100%;
+    }
+    
+    .manager-circle:hover > .hovered-manager{
+        display: block;
+    }
+    
     .queue-finished-text {
         float: left;
     }

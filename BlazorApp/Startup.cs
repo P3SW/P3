@@ -33,6 +33,7 @@ namespace BlazorApp
             services.AddServerSideBlazor();
             services.AddScoped<Test>(); 
             services.AddScoped<AnotherTest>();
+			services.AddScoped<QueueTest>();
             
             //SignalR setup
             services.AddResponseCompression(opts =>
