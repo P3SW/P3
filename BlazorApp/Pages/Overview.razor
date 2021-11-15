@@ -7,12 +7,18 @@
 @using BlazorApp.Data
 @using BlazorApp.DataStreaming
 @inject Test dataList;
-
+@inject QueueTest managerList;
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-    <div class="summary_container">
+
+@if (managers == null || managers.Count == 0)
+{
+    <p>Loading ....</p>
+}
+else{
+<div class="summary_container">
     
     @* Summary text + runtime *@
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
@@ -49,27 +55,16 @@
             <span class="queue-finished-text">Finished: <b>8</b></span>
             <span class="queue-inqueue-text">In queue: <b>4</b></span>
         </div>
-            <div class="manager-queue-circle">
-            <div class="dot background-green"></div>
-            <div class="dot background-yellow"></div>
-            <div class="dot background-red"></div>
-            <div class="dot background-lightred"></div>
-            <div class="dot background-green"></div>
-            <div class="dot background-yellow"></div>
-            <div class="dot background-red"></div>
-            <div class="dot background-lightred"></div>
-            <div class="dot background-green"></div>    
-            <div class="dot background-yellow"></div>
-            <div class="dot background-red"></div>
-            <div class="dot background-lightred"></div>
-            <div class="dot background-green"></div>
-            <div class="dot background-yellow"></div>
-            <div class="dot background-red"></div>
-            <div class="dot background-lightred"></div>
-            <div class="dot background-green"></div>
-            <div class="dot background-yellow"></div>
-            <div class="dot background-red"></div>
-            <div class="dot background-lightred"></div>
+        <div class="manager-queue-circle">
+			@foreach(Manager manager in managers)
+			{
+				<div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@(() => GetHoveredManager(manager._id))">
+				@if(hoveredManager == manager._id)
+				{
+					<div class="hovered-manager">@manager._name</div>
+				}
+				</div>
+			}
         </div>
     </div>
 
@@ -109,15 +104,16 @@
     </div>
 </div>
 
+
 <div class="Overview-right">
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="@managers[selectedManager]">@(selectedManager + "-" + managers[selectedManager])</b>
+                <b class="selected-manager-name" title="">@(selectedManager + "-" + managers[selectedManager]._name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
-                    @for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                   	@for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
                         int managerID = i;
                         if (i == selectedManager)
@@ -127,10 +123,10 @@
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@managers[managerID]" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID])</div>
+                            <div class="dropdown-content-first" title="@managers[managerID]._name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID]._name)</div>
                             continue;
                         }
-                        <div title="@managers[managerID]" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID])</div>
+                        <div title="@managers[managerID]._name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID]._name)</div>
                     }
                 </div>
             </div>
@@ -150,6 +146,7 @@
         
     </div>
 </div>
+}
 
 
 @code{
@@ -349,8 +346,17 @@
 }
 
 @code{
+	 List<Manager> managers = new List<Manager>();
+    
+    //When the application starts, get the list of errors
+    protected override async Task OnInitializedAsync()
+    {
+        managers = await Task.Run(() => managerList.ManagerList());
+    }
+
+
     //private string[] managers = {"manager1", "manager2", "manager3", "manager4"};
-    static List<string> CreateList()
+    /*static List<string> CreateList()
     {
         List<string> managers = new List<string>();
         managers = GetManagerNames(managers);
@@ -368,14 +374,71 @@
         }
 
         return managers;
-    }
+    }*/
 
-    List<string> managers = CreateList();
-    
+    //List<string> managers = CreateList();
+
+    	
+
     int selectedManager { get; set; }
-
-    public void GetSelectedManagerID(int selectedID)
+    
+    private void GetSelectedManagerID(int selectedID)
     {
         selectedManager = selectedID;
     }
+
+	private int[] ErrorSeverityCounter(List<Error> errors)
+	{
+		int[] counter = {0, 0, 0, 0};
+
+		foreach(Error error in errors)
+		{
+			switch(error._severity)
+			{
+				case "FATAL":
+					counter[0]++;
+				break;
+
+				case "ERROR":
+					counter[1]++;
+				break;
+
+				case "WARNING":
+					counter[2]++;
+				break;
+
+				case "INFO":
+					counter[3]++;
+				break;
+
+				default:
+					throw new ArgumentException($"{error} is not a valid argument");
+			}
+		}
+
+		return counter;
+	}
+
+    private string ManagerCircleColour(Manager manager)
+	{
+		int[] errors = ErrorSeverityCounter(manager._errors);
+
+		if(errors[0] > 0){
+		return "background-red";
+		}
+		else if(errors[1] > 0){
+		return "background-lightred";
+		}
+		else if(errors[2] > 0){
+		return "background-yellow";
+		}
+		else return "background-green";
+	}  
+	
+	int hoveredManager {get; set;}
+	
+	private void GetHoveredManager(int hovered)
+	{
+		hoveredManager = hovered;
+	}
 }
