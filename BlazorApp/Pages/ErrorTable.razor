@@ -1,5 +1,6 @@
 @using BlazorApp.Data
 @using System.Reflection.Metadata
+@using System.Net.Sockets
 @inject AnotherTest errorList;
 
 @if (errors == null)
@@ -190,7 +191,7 @@ else
 
 
 @code {
-    IEnumerable<Error> errors;
+    List<Error> errors;
     
     //When the application starts, get the list of errors
     protected override async Task OnInitializedAsync()

@@ -1,4 +1,4 @@
-﻿/* Summary root */
+/* Summary root */
 .summary_container{
     background-color: #384561;
     padding: 0;
@@ -46,7 +46,7 @@
     grid-template-columns: 1fr 1fr;
     background: rgba(83, 96, 122, 0.27);
     border-bottom: 0 !important;
- }
+}
 
 .Current_manager_container > div{
     margin: 0.5rem;
@@ -341,7 +341,7 @@
 .efficiency-container {
     line-height: 80%;
     border-bottom: none !important;
-}    
+}
 
 .efficiency-container > div {
     font-size: 0.6em;
@@ -352,22 +352,22 @@
 
 /* 2k monitor w/ 150% zoom compatibility */
 @media screen and (max-width: 1500px) {
-        
-        .Current_manager_info_container > div {
-            font-size: 0.6em;
-        }
-    
-        .Current_manager_container > div {
-            font-size: 0.6em;
-        }
-    
-        .Total_errors_and_reconciliations_container{
-            grid-template-columns: 1.5fr 1fr 2.5fr 1fr;
-        }
-        
-        .Total_errors_and_reconciliations_container > div{
-            font-size: 0.6em;
-        }
-           
+
+    .Current_manager_info_container > div {
+        font-size: 0.6em;
+    }
+
+    .Current_manager_container > div {
+        font-size: 0.6em;
+    }
+
+    .Total_errors_and_reconciliations_container{
+        grid-template-columns: 1.5fr 1fr 2.5fr 1fr;
+    }
+
+    .Total_errors_and_reconciliations_container > div{
+        font-size: 0.6em;
+    }
+
 }
 

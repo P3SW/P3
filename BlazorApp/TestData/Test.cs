@@ -5,7 +5,7 @@ using BlazorApp.DataStreaming;
 
 namespace BlazorApp.Data
 {
-    public class Test
+    public class Test // TEST DATA FOR RECONCILIATION TABLE
     {
         List<Reconciliation> recons = new List<Reconciliation>()
         {
@@ -19,7 +19,6 @@ namespace BlazorApp.Data
         {
             return await Task.FromResult(recons);
         }
-        
         private List<HealthDataTest> usage = new List<HealthDataTest>()
         {
             new HealthDataTest("CPU", 70, Convert.ToDateTime("2021-09-09 12:12")),
@@ -51,6 +50,8 @@ namespace BlazorApp.Data
         {
             return await Task.FromResult(usage);
         }
-
-    }
+        public void addClass()
+        {
+            recons.Add(new Reconciliation(5, "MISMATCH", Convert.ToDateTime("21-May-2021"), "This is a message"));
+        }
 }
