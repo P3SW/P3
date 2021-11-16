@@ -6,12 +6,12 @@
 @using System.Text.Json
 @using BlazorApp.Data
 @using BlazorApp.DataStreaming
+@using Microsoft.JSInterop
 @inject Test dataList;
 @inject QueueTest managerList;
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
-
 
 @if (managers == null || managers.Count == 0)
 {
@@ -19,7 +19,6 @@
 }
 else{
 <div class="summary_container">
-    
     @* Summary text + runtime *@
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
     
@@ -58,11 +57,39 @@ else{
         <div class="manager-queue-circle">
 			@foreach(Manager_test manager in managers)
 			{
-				<div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@(() => GetHoveredManager(manager._id))">
-				@if(hoveredManager == manager._id)
-				{
-					<div class="hovered-manager">@manager._name</div>
-				}
+				<div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@((e) => GetHoveredManager(manager._id, e, manager))">
+				    @if(hoveredManager == manager._id && hoveredManagerErrors != null)
+				    {
+				        <div class="hovered-manager" style="position: absolute; left: @(mousePositionX + "px"); top: @(mousePositionY + "px"); transform: translateY(-12rem);">
+                            <div class="hoverbox-info">
+                                <div>Manager: @manager._name</div>
+                                <div>Runtime: </div>
+                                <div>Status: </div>
+                            </div>
+                            <div class="hoverbox-errors-recons">
+                                <div class="hoverbox-erros">
+                                    <div>Errors</div>
+                                    <ul class="error-reconciliation-formatting">
+                                        <div class="circle background-red"></div><li>Fatal: @hoveredManagerErrors[0]</li>
+                                        <div class="circle background-lightred"></div><li>Error: @hoveredManagerErrors[1]</li>
+                                        <div class="circle background-yellow"></div><li>Warning: @hoveredManagerErrors[2]</li>
+                                        <div class="circle background-green"></div><li>Info: @hoveredManagerErrors[3]</li>    
+                                    </ul>
+                                </div>
+                                <div class="hoverbox-recons">
+                                    <div>Reconciliations</div>
+                                    <ul class="error-reconciliation-formatting">
+                                        <div class="circle background-red"></div><li>Mismatch: @hoveredManagerRecons[0]</li>
+                                        <div class="circle background-lightred"></div><li>Failed: @hoveredManagerRecons[1]</li>
+                                        <div class="circle background-yellow"></div><li>Disabled: @hoveredManagerRecons[2]</li>
+                                        <div class="circle background-green"></div><li>OK: @hoveredManagerRecons[3]</li>    
+                                    </ul>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+				    }
 				</div>
 			}
         </div>
@@ -412,26 +439,72 @@ else{
 		return counter;
 	}
 
+    private int[] ReconSeverityCounter(List<Reconciliation> recons)
+    {
+        int[] counter = {0, 0, 0, 0};
+
+        foreach(Reconciliation recon in recons)
+        {
+            switch(recon._result)
+            {
+                case "MISMATCH":
+                    counter[0]++;
+                    break;
+
+                case "FAILED":
+                    counter[1]++;
+                    break;
+
+                case "DISABLED":
+                    counter[2]++;
+                    break;
+
+                case "OK":
+                    counter[3]++;
+                    break;
+
+                default:
+                    throw new ArgumentException($"{recon} is not a valid argument");
+            }
+        }
+
+        return counter;
+    }
+    
     private string ManagerCircleColour(Manager_test manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager._errors);
+        int[] recons = ReconSeverityCounter(manager._recons);
 
-		if(errors[0] > 0){
+		if(errors[0] > 0 || recons[0] > 0){
 		return "background-red";
 		}
-		else if(errors[1] > 0){
+		else if(errors[1] > 0 || recons[1] > 0){
 		return "background-lightred";
 		}
-		else if(errors[2] > 0){
+		else if(errors[2] > 0 || recons[2] > 0){
 		return "background-yellow";
 		}
 		else return "background-green";
 	}  
 	
 	int hoveredManager {get; set;}
+    int[] hoveredManagerErrors { get; set; }
+    int[] hoveredManagerRecons { get; set; }
 	
-	private void GetHoveredManager(int hovered)
+    double mousePositionX { get; set; }
+    double mousePositionY { get; set; }
+
+    
+	private void GetHoveredManager(int hovered, MouseEventArgs e, Manager_test manager)
 	{
 		hoveredManager = hovered;
+	    mousePositionX = e.ClientX;
+	    mousePositionY = e.ClientY;
+	    hoveredManagerErrors = ErrorSeverityCounter(manager._errors);
+	    hoveredManagerRecons = ReconSeverityCounter(manager._recons);
 	}
+
+
+
 }
