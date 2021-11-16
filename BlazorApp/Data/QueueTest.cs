@@ -41,6 +41,10 @@ namespace BlazorApp.Data
             new Error(5, "ERROR", Convert.ToDateTime("21-May-2021"), "This is a message")
         };
         
+        
+        //Only takes tests from here and down!!
+        
+        
         List<Manager_test> managers = new List<Manager_test>()
         {
             new Manager_test(0, "DepartmentManager", Convert.ToDateTime("01-May-2021"), new List<Error>() {new Error(1, "INFO", Convert.ToDateTime("01-May-2021"), "This is a message"),
