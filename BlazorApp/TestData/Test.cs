@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-using BlazorApp.DataStreaming;
 
 namespace BlazorApp.Data
 {
@@ -15,10 +14,12 @@ namespace BlazorApp.Data
             new Reconciliation(4, "OK", Convert.ToDateTime("10-May-2021"), "This is a message"),
             new Reconciliation(5, "MISMATCH", Convert.ToDateTime("21-May-2021"), "This is a message")
         };
+
         public async Task<List<Reconciliation>> ReconList()
         {
             return await Task.FromResult(recons);
         }
+
         private List<HealthDataTest> usage = new List<HealthDataTest>()
         {
             new HealthDataTest("CPU", 70, Convert.ToDateTime("2021-09-09 12:12")),
@@ -32,7 +33,7 @@ namespace BlazorApp.Data
             new HealthDataTest("CPU", 70, Convert.ToDateTime("2021-09-09 12:20")),
             new HealthDataTest("CPU", 43, Convert.ToDateTime("2021-09-09 12:21")),
             new HealthDataTest("CPU", 20, Convert.ToDateTime("2021-09-09 12:22")),
-            new HealthDataTest("CPU", 100,Convert.ToDateTime("2021-09-09 12:23")),
+            new HealthDataTest("CPU", 100, Convert.ToDateTime("2021-09-09 12:23")),
             new HealthDataTest("MEMORY", 12, Convert.ToDateTime("2021-09-09 12:12")),
             new HealthDataTest("MEMORY", 41, Convert.ToDateTime("2021-09-09 12:13")),
             new HealthDataTest("MEMORY", 11, Convert.ToDateTime("2021-09-09 12:14")),
@@ -44,14 +45,17 @@ namespace BlazorApp.Data
             new HealthDataTest("MEMORY", 80, Convert.ToDateTime("2021-09-09 12:20")),
             new HealthDataTest("MEMORY", 3, Convert.ToDateTime("2021-09-09 12:21")),
             new HealthDataTest("MEMORY", 2, Convert.ToDateTime("2021-09-09 12:22")),
-            new HealthDataTest("MEMORY", 10,Convert.ToDateTime("2021-09-09 12:23"))
+            new HealthDataTest("MEMORY", 10, Convert.ToDateTime("2021-09-09 12:23"))
         };
+
         public async Task<List<HealthDataTest>> DataList()
         {
             return await Task.FromResult(usage);
         }
+
         public void addClass()
         {
             recons.Add(new Reconciliation(5, "MISMATCH", Convert.ToDateTime("21-May-2021"), "This is a message"));
         }
+    }
 }

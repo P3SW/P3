@@ -11,14 +11,6 @@ namespace BlazorApp.Data
         public int NumericValue { get; set; }
         public DateTime LogTime { get; set; }
 
-
-        public Data(string reportType, int numericValue, DateTime logTime)
-        {
-            ReportType = reportType;
-            NumericValue = numericValue;
-            LogTime = logTime;
-        }
-
         public HealthData(SqlDataReader reader)
         {
             ReportType = (string) reader[0];
