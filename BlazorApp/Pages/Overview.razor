@@ -198,13 +198,23 @@ else{
         string[] separtors = new string[] {" "};
 
     //Takes data from test and stores in list
-        foreach (var cpu_data in healthdatatests)
+        foreach (var data in healthdatatests)
         {
-            lineconfig_dataset_cpu.Add(cpu_data._NumericValue);
+            if (data._ReportType == "CPU")
+            {
+                lineconfig_dataset_cpu.Add(data._NumericValue);
+            }
+            else if (data._ReportType =="MEMORY")
+            {
+                lineconfig_dataset_memory.Add(data._NumericValue);
+            }
         }
         foreach (var party in healthdatatests)
         {
-            _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            if (party._ReportType == "CPU")
+            {
+                _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            }
         }
         
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
@@ -325,7 +335,7 @@ else{
             LineTension = 0,
         };
 
-        lineconfig_dataset_memory = new LineDataset<int>(new[] {2, 5, 8, 2, 6, 47, 32, 5, 9, 12, 20, 30}) // need data From healdata memeory class, Like the data above
+        lineconfig_dataset_memory = new LineDataset<int> // need data From healdata memeory class, Like the data above
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
