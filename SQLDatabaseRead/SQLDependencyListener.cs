@@ -1,7 +1,10 @@
 using System;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+[assembly: InternalsVisibleTo("SQLDatabaseRead.Test")]
+
 
 namespace SQLDatabaseRead
 {
@@ -74,7 +77,7 @@ namespace SQLDatabaseRead
             StartListening();
         }
         
-        private void AddQueryToObject(string queryString)
+        internal void AddQueryToObject(string queryString)
         {
             using (SqlCommand command = new SqlCommand(queryString, Connection))
             {

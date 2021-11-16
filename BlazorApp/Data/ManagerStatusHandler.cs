@@ -1,10 +1,12 @@
 using System;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
+[assembly: InternalsVisibleTo("SQLDatabaseRead.Test")]
 
 namespace BlazorApp.Data
 {
@@ -190,7 +192,7 @@ namespace BlazorApp.Data
         }
 
         //Returns the select string for the table streamers
-        private string GetSelectStringsForTableStreamer(string s)
+        internal string GetSelectStringsForTableStreamer(string s)
         {
             switch (s)
             {
