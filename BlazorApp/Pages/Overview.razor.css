@@ -84,7 +84,7 @@
 
 .Total_read_written_container{
     border: none !important;
-    margin: none !important;
+    margin: 0 !important;
 }
 
 
@@ -279,7 +279,6 @@
         width: 80px;
         border-radius: 50%;
         display: inline-block;
-        position: relative;
     }
 
     .manager-queue-circle {
@@ -293,15 +292,18 @@
     .hovered-manager{
         display: none;
         position: absolute;
-        height: 10em;
-        width: 10em;
+        height: 12rem;
+        width: 20rem;
+        text-align: left;
+        font-size: 0.8em;
         background-color: #0F2147;
         z-index: 2;
         top: 100%;
     }
     
     .manager-circle:hover > .hovered-manager{
-        display: block;
+        display: grid;
+        grid-template-rows: 2fr 3fr;
     }
     
     .queue-finished-text {
@@ -312,6 +314,29 @@
         float: right;
     }
 
+.hoverbox-errors-recons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 2px solid #8E8E8E;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    font-size: 1em;
+}
+
+.hoverbox-info{
+    padding-left: 0.5em;
+}
+
+.hoverbox-errors-recons  ul{
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.9em;
+}
+
+.hoverbox-recons{
+    padding-left: 2em;
+}
+    
 /* Efficiency table */    
 .efficiency-container {
     line-height: 80%;
