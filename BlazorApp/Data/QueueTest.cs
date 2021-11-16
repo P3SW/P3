@@ -66,7 +66,7 @@ namespace BlazorApp.Data
             {
                 new Reconciliation(1, "OK", Convert.ToDateTime("01-May-2021"), "This is a message"),
                 new Reconciliation(2, "OK", Convert.ToDateTime("05-May-2021"), "This is a message"),
-                new Reconciliation(3, "DISABLED", Convert.ToDateTime("01-May-2021"), "This is a message"),
+                new Reconciliation(3, "FAILED", Convert.ToDateTime("01-May-2021"), "This is a message"),
                 new Reconciliation(4, "OK", Convert.ToDateTime("10-May-2021"), "This is a message"),
             }),
             new Manager_test(2, "RustyManager", Convert.ToDateTime("05-May-2021"), new List<Error>() {new Error(1, "INFO", Convert.ToDateTime("01-May-2021"), "This is a message"),

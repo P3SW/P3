@@ -224,7 +224,7 @@ else{
         };
         _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
         
-        pieconfig_dataset_reconciliations = new PieDataset<int>(new[] {5, 10, 15, 661})
+        pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
         {
             BackgroundColor = new[] // Color for the pies
             {
@@ -325,7 +325,7 @@ else{
             LineTension = 0,
         };
 
-        lineconfig_dataset_memory = new LineDataset<int>(new[] {2, 5, 8, 2, 6, 47, 32, 5, 9, 12, 20, 30}) // need data From healdata cpu class, Like the data above
+        lineconfig_dataset_memory = new LineDataset<int>(new[] {2, 5, 8, 2, 6, 47, 32, 5, 9, 12, 20, 30}) // need data From healdata memeory class, Like the data above
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
@@ -413,7 +413,7 @@ else{
     private int[] TotalErrorsSeverityCounter(List<Manager_test> managers)
     {
         int[] Total_Errors = {0, 0, 0, 0};
-            int[] test; //= {0,0,0,0};
+            int[] test = {0,0,0,0};
 
             foreach (var party in managers)
             {
@@ -423,11 +423,11 @@ else{
                     Total_Errors[i] += test[i];
                 }
             }
-            Console.WriteLine(Total_Errors[1]);
+            //Console.WriteLine(Total_Errors[0]);
         return Total_Errors;
     }
 
-    private int[] ReconSeverityCounter(List<Reconciliation> recons)
+    private int[] ReconTypeCounter(List<Reconciliation> recons)
     {
         int[] counter = {0, 0, 0, 0};
 
@@ -458,11 +458,31 @@ else{
 
         return counter;
     }
+
+    private int[] TotalReconTypeCounter(List<Manager_test> managers)
+    {
+        
+        int[] Total_Recons = {0, 0, 0, 0};
+        int[] test = {0,0,0,0};
+
+        foreach (var party in managers)
+        {
+            test = ReconTypeCounter(party._recons);
+            for (int i = 0; i < 4; i++)
+            {
+                Total_Recons[i] += test[i];
+            }
+        }
+        //Console.WriteLine(Total_Recons[0]);
+        return Total_Recons;
+        
+    }
+    
     
     private string ManagerCircleColour(Manager_test manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager._errors);
-        int[] recons = ReconSeverityCounter(manager._recons);
+        int[] recons = ReconTypeCounter(manager._recons);
 
 		if(errors[0] > 0 || recons[0] > 0){
 		return "background-red";
@@ -490,7 +510,7 @@ else{
 	    mousePositionX = e.ClientX;
 	    mousePositionY = e.ClientY;
 	    hoveredManagerErrors = ErrorSeverityCounter(manager._errors);
-	    hoveredManagerRecons = ReconSeverityCounter(manager._recons);
+	    hoveredManagerRecons = ReconTypeCounter(manager._recons);
 	}
 
 
