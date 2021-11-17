@@ -67,7 +67,7 @@ a, .btn-link {
     ::-webkit-scrollbar-thumb {
         background: #384561 !important;
         border-radius: 10px !important;
-        border: 2px solid rgba(140, 140, 140, 1) !important;
+        border: 1px solid rgba(140, 140, 140, 1) !important;
     }
     
     /* Handle on hover */
