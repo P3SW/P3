@@ -37,7 +37,6 @@ namespace BlazorApp.Data
                 }
                 else
                 {
-                    
                     NewMemory.Add(new HealthData(reader));
                 }
 

@@ -50,7 +50,7 @@ namespace BlazorApp.Data
         }
 
         //Starts the tablestreamers and assigns the start time of the manager
-        public async void WatchManager()
+        public void WatchManager()
         {
             Console.WriteLine($"Manager {Name} started");
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
@@ -66,11 +66,9 @@ namespace BlazorApp.Data
                 GetSelectStringsForTableStreamer("reconciliation"), 
                 ReconciliationHandler, "RECONCILIATION");
             
-            Console.WriteLine("Streamers has been created");
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
-            Console.WriteLine("Listening started");
         }
 
         //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
@@ -84,6 +82,7 @@ namespace BlazorApp.Data
             
             AssignEndTime();
             AssignManagerTrackingData();
+            CalculateEfficiencyScore();
         }
 
         //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
@@ -103,7 +102,7 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    if (reader.Read())
                     {
                         Status = (string) reader["STATUS"];
                         RunTime = (int) reader["RUNTIME"];
@@ -113,7 +112,6 @@ namespace BlazorApp.Data
                     reader.Close();
                 }
             }
-            CalculateEfficiencyScore();
         }
 
         //Queries the end time from the ENGINE_PROPERTIES table
@@ -123,11 +121,9 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    Console.WriteLine(reader.HasRows);
-                    while (reader.Read())
+                    if (reader.Read())
                     {
                         EndTime = (DateTime) reader[0];
-                        Console.WriteLine(EndTime);
                     }
                     reader.Close();
                 }
@@ -151,7 +147,7 @@ namespace BlazorApp.Data
                 case "startTime":
                     return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'START_TIME'");
                 case "runtime":
-                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{name}' AND [KEY] = 'runtimeOverall'");
+                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{name}' AND [KEY] = 'runtimeOverall' ORDER BY [TIMESTAMP] DESC");
                 default:
                     throw new ArgumentException($"{s} is an invalid argument");
             }
