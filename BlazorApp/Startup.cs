@@ -31,6 +31,7 @@ namespace BlazorApp
             services.AddServerSideBlazor();
             services.AddScoped<Test>(); 
             services.AddScoped<AnotherTest>();
+			services.AddScoped<QueueTest>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -59,7 +60,6 @@ namespace BlazorApp
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
-            
             ConversionDataAssigner conversionDataAssigner = new ConversionDataAssigner();
             conversionDataAssigner.Start();
         }

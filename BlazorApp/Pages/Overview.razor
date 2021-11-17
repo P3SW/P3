@@ -3,13 +3,21 @@
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using System.Reflection.Emit
+@using System.Text.Json
+@using BlazorApp.Data
+@using Microsoft.JSInterop
+@inject Test dataList;
+@inject QueueTest managerList;
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-
+@if (managers == null || managers.Count == 0)
+{
+    <p>Loading ....</p>
+}
+else{
 <div class="summary_container">
-    
     @* Summary text + runtime *@
     <div class="summary_caption_container" style="text-align: center;">Summary</div>
     
@@ -41,34 +49,76 @@
     
     @* Manager queue *@
     <div class="manager-queue-container">
-        <div class="queue-finished-text">Finished: <b>8</b></div>
-        <div class="queue-inqueue-text">In queue: <b>4</b></div>
+        <div class="queue-text">
+            <span class="queue-finished-text">Finished: <b>8</b></span>
+            <span class="queue-inqueue-text">In queue: <b>4</b></span>
+        </div>
+        <div class="manager-queue-circle">
+			@foreach(Manager_test manager in managers)
+			{
+				<div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@((e) => GetHoveredManager(manager._id, e, manager))">
+				    @if(hoveredManager == manager._id && hoveredManagerErrors != null)
+				    {
+				        <div class="hovered-manager" style="position: absolute; left: @(mousePositionX + "px"); top: @(mousePositionY + "px"); transform: translateY(-12rem);">
+                            <div class="hoverbox-info">
+                                <div>Manager: @manager._name</div>
+                                <div>Runtime: </div>
+                                <div>Status: </div>
+                            </div>
+                            <div class="hoverbox-errors-recons">
+                                <div class="hoverbox-erros">
+                                    <div>Errors</div>
+                                    <ul class="error-reconciliation-formatting">
+                                        <div class="circle background-red"></div><li>Fatal: @hoveredManagerErrors[0]</li>
+                                        <div class="circle background-lightred"></div><li>Error: @hoveredManagerErrors[1]</li>
+                                        <div class="circle background-yellow"></div><li>Warning: @hoveredManagerErrors[2]</li>
+                                        <div class="circle background-green"></div><li>Info: @hoveredManagerErrors[3]</li>    
+                                    </ul>
+                                </div>
+                                <div class="hoverbox-recons">
+                                    <div>Reconciliations</div>
+                                    <ul class="error-reconciliation-formatting">
+                                        <div class="circle background-red"></div><li>Mismatch: @hoveredManagerRecons[0]</li>
+                                        <div class="circle background-lightred"></div><li>Failed: @hoveredManagerRecons[1]</li>
+                                        <div class="circle background-yellow"></div><li>Disabled: @hoveredManagerRecons[2]</li>
+                                        <div class="circle background-green"></div><li>OK: @hoveredManagerRecons[3]</li>    
+                                    </ul>
+                                    
+                                </div>
+                                
+                            </div>
+                        </div>
+				    }
+				</div>
+			}
+        </div>
     </div>
+
     
     @* Total manager info *@
     <div class="Total_errors_and_reconciliations_container">
-        <div class="info_total_errors">Total Errors: @pieconfigTotalErrorsData.Sum()
+        <div class="info_total_errors">Total Errors: @pieconfig_dataset_errors.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle background-red"></div><li>Fatal:  @pieconfigTotalErrorsData[0]</li>
-                <div class="circle background-lightred"></div><li>Error: @pieconfigTotalErrorsData[1]</li>
-                <div class="circle background-yellow"></div><li>Warning:  @pieconfigTotalErrorsData[2]</li>
-                <div class="circle background-green"></div><li>Info:  @pieconfigTotalErrorsData[3]</li>
+                <div class="circle background-red"></div><li>Fatal:  @pieconfig_dataset_errors[0]</li>
+                <div class="circle background-lightred"></div><li>Error: @pieconfig_dataset_errors[1]</li>
+                <div class="circle background-yellow"></div><li>Warning:  @pieconfig_dataset_errors[2]</li>
+                <div class="circle background-green"></div><li>Info:  @pieconfig_dataset_errors[3]</li>
             </ul>
         </div>
         <div class="PieConfigTotalErrors">
-            <Chart Config="_pieconfigTotalErrors" Height="50" Width="50"></Chart>
+            <Chart Config="_pieconfig_errors" Height="50" Width="50"></Chart>
         </div>
 
-        <div class="info_total_reconciliations">Total Reconciliations: @pieconfigTotalReconciliationsData.Sum()
+        <div class="info_total_reconciliations">Total Reconciliations: @pieconfig_dataset_reconciliations.Sum()
             <ul class="error-reconciliation-formatting">
-                <div class="circle background-red"></div><li>Mismatch: @pieconfigTotalReconciliationsData[0]</li>
-                <div class="circle background-lightred"></div><li>Failed: @pieconfigTotalReconciliationsData[1]</li>
-                <div class="circle background-yellow"></div><li>Disabled: @pieconfigTotalReconciliationsData[2]</li>
-                <div class="circle background-green"></div><li>OK: @pieconfigTotalReconciliationsData[3]</li>
+                <div class="circle background-red"></div><li>Mismatch: @pieconfig_dataset_reconciliations[0]</li>
+                <div class="circle background-lightred"></div><li>Failed: @pieconfig_dataset_reconciliations[1]</li>
+                <div class="circle background-yellow"></div><li>Disabled: @pieconfig_dataset_reconciliations[2]</li>
+                <div class="circle background-green"></div><li>OK: @pieconfig_dataset_reconciliations[3]</li>
             </ul>
         </div>
         <div class="pieConfigTotalReconciliations">
-            <Chart Config="_pieconfigTotalReconciliations" Height="50" Width="50"></Chart>
+            <Chart Config="_pieconfig_reconciliations" Height="50" Width="50"></Chart>
         </div>
     </div>
     
@@ -80,15 +130,16 @@
     </div>
 </div>
 
+
 <div class="Overview-right">
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="@managers[selectedManager]">@(selectedManager + "-" + managers[selectedManager])</b>
+                <b class="selected-manager-name" title="">@(selectedManager + "-" + managers[selectedManager]._name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
-                    @for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                   	@for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
                         int managerID = i;
                         if (i == selectedManager)
@@ -98,10 +149,10 @@
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@managers[managerID]" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID])</div>
+                            <div class="dropdown-content-first" title="@managers[managerID]._name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID]._name)</div>
                             continue;
                         }
-                        <div title="@managers[managerID]" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID])</div>
+                        <div title="@managers[managerID]._name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID]._name)</div>
                     }
                 </div>
             </div>
@@ -121,22 +172,83 @@
         
     </div>
 </div>
+}
+
 
 @code{
     private LineConfig _lineconfig;
-    private PieConfig _pieconfigTotalErrors;
-    private PieConfig _pieconfigTotalReconciliations;
-    PieDataset<int> pieconfigTotalErrorsData;
-    PieDataset<int> pieconfigTotalReconciliationsData;
-    
-    
+    LineDataset<int> lineconfig_dataset_cpu;
+    LineDataset<int> lineconfig_dataset_memory;
 
-    protected override void OnInitialized()
+    private PieConfig _pieconfig_errors;
+    private PieConfig _pieconfig_reconciliations;
+    PieDataset<int> pieconfig_dataset_errors;
+    PieDataset<int> pieconfig_dataset_reconciliations;
+
+    List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
+    List<Manager_test> managers = new List<Manager_test>();
+    
+    protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
         ConfigurePieConfig();
-    }
+        healthdatatests = await Task.Run(() => dataList.DataList());
+        managers = await Task.Run(() => managerList.ManagerList());
+        string[] separtors = new string[] {" "};
 
+    //Takes data from test and stores in list
+        foreach (var data in healthdatatests)
+        {
+            if (data._ReportType == "CPU")
+            {
+                lineconfig_dataset_cpu.Add(data._NumericValue);
+            }
+            else if (data._ReportType =="MEMORY")
+            {
+                lineconfig_dataset_memory.Add(data._NumericValue);
+            }
+        }
+        foreach (var party in healthdatatests)
+        {
+            if (party._ReportType == "CPU")
+            {
+                _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            }
+        }
+        
+        _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
+        _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
+        
+        pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
+        {
+            BackgroundColor = new[] // Color for the pies 
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
+                ColorUtil.ColorHexString(227, 95, 82), //Error
+                ColorUtil.ColorHexString(221, 155, 43), //Warning
+                ColorUtil.ColorHexString(92, 188, 169) //Info
+            },
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+            BorderWidth = 0
+        };
+        _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
+        
+        pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
+        {
+            BackgroundColor = new[] // Color for the pies
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
+                ColorUtil.ColorHexString(227, 95, 82), //Failed
+                ColorUtil.ColorHexString(221, 155, 43), //Disabled
+                ColorUtil.ColorHexString(92, 188, 169) //OK
+            },
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+            BorderWidth = 0,
+        };
+        
+        _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
+    }
+    
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
@@ -180,7 +292,7 @@
                         GridLines = new GridLines
                         {
                             Color = ColorUtil.ColorHexString(142, 142, 142),
-                        },
+                        }
                     },
                 },
                 YAxes = new List<CartesianAxis> // scale for the y axes
@@ -193,64 +305,61 @@
     //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
+
                         },
                         Ticks = new LinearCartesianTicks
                         {
                             FontSize = 13,
                             Padding = 10,
                             FontColor = "#FFFFFF", // Color for ticks, values on y axies
+                            BeginAtZero = true,
+                            StepSize = 10,
+                            Max = 100,
                         },
                         GridLines = new GridLines
                         {
                             Color = ColorUtil.ColorHexString(142, 142, 142),
                             DrawBorder = false, // removes the border in the y axies
 
-                        }
+                        },
                     }
                 }
             }
         };
-        
-        var lineconfigdataset1 = new LineDataset<int>(new[]{70,90,87,100,87,100,70,40,70,43, 20, 10})
+        lineconfig_dataset_cpu = new LineDataset<int>
         {
             Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227,95,82),
-            BackgroundColor = ColorUtil.ColorString(0,0,0,0.0),
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
-
         };
-        var lineconfigdataset2 = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })
+
+        lineconfig_dataset_memory = new LineDataset<int> // need data From healdata memeory class, Like the data above
         {
             Label = ("Memory usage"),
-            BorderColor = ColorUtil.ColorString(92,188,169,1),
-            BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
-            
-
         };
-        foreach (var party in new[]{"01:02","","01:05","","01:05","","01:12","","01:17", "01:25", "01:30"})
-        {
-            _lineconfig.Data.Labels.Add(party);
-        }
-        _lineconfig.Data.Datasets.Add(lineconfigdataset1);
-        _lineconfig.Data.Datasets.Add(lineconfigdataset2);
+
     }
+
     private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
     {
         foreach (var label in labels)
         {
             config.Data.Labels.Add(label);
         }
-        
+
         return config;
     }
 
     private void ConfigurePieConfig()
     {
-        _pieconfigTotalErrors = new PieConfig();
-        _pieconfigTotalReconciliations = new PieConfig();
+        _pieconfig_errors = new PieConfig();
+        _pieconfig_reconciliations = new PieConfig();
 
-        _pieconfigTotalErrors.Options = new PieOptions
+        _pieconfig_errors.Options = new PieOptions
         {
             Responsive = true,
             Title = new OptionsTitle
@@ -260,77 +369,159 @@
                 FontColor = "#FFFFFF",
             },
             CutoutPercentage = 45,
-            Legend =new Legend
+            Legend = new Legend
             {
                 Display = false,
             },
         };
-        _pieconfigTotalReconciliations.Options = _pieconfigTotalErrors.Options;
-        
-        _pieconfigTotalErrors = SetUpPieLabels(_pieconfigTotalErrors, new[] {"Fatal error","Error","Warning","Info"});
-        _pieconfigTotalReconciliations = SetUpPieLabels(_pieconfigTotalReconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
-        
-        pieconfigTotalErrorsData = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
-        {
-            BackgroundColor = new[]   // Color for the pies
-            {
-                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
-                ColorUtil.ColorHexString(227, 95, 82), //Error
-                ColorUtil.ColorHexString(221, 155, 43), //Warning
-                ColorUtil.ColorHexString(92, 188, 169)  //Info
-            },
-            BorderColor = ColorUtil.ColorHexString(0,0,0), 
-            BorderWidth = 0,
-            
-        };
-        pieconfigTotalReconciliationsData = new PieDataset<int>(new[] {5, 10, 15, 661})
-        {
-            BackgroundColor = new[] // Color for the pies
-            {
-                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
-                ColorUtil.ColorHexString(227, 95, 82), //Failed
-                ColorUtil.ColorHexString(221, 155, 43), //Disabled
-                ColorUtil.ColorHexString(92, 188, 169) //OK
-            },
-            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-            BorderWidth = 0,
-        };
-        _pieconfigTotalErrors.Data.Datasets.Add(pieconfigTotalErrorsData);
-        _pieconfigTotalReconciliations.Data.Datasets.Add(pieconfigTotalReconciliationsData);
+        _pieconfig_reconciliations.Options = _pieconfig_errors.Options;
+
+        _pieconfig_errors = SetUpPieLabels(_pieconfig_errors, new[] {"Fatal error", "Error", "Warning", "Info"});
+        _pieconfig_reconciliations = SetUpPieLabels(_pieconfig_reconciliations, new[] {"Mismatch", "Failed", "Disabled", "OK"});
     }
-}
-
-
-@code{
-    //private string[] managers = {"manager1", "manager2", "manager3", "manager4"};
-    static List<string> CreateList()
-    {
-        List<string> managers = new List<string>();
-        managers = GetManagerNames(managers);
-
-        List<string> GetManagerNames(List<string> managers)
-        {
-            string managerName = default;
-        
-            for (int i = 0; i < 20; i++)
-            {
-                managerName += (string)"M";
-                managers.Add(managerName);
-            }
-            return managers;
-        }
-
-        return managers;
-    }
-
-    List<string> managers = CreateList();
-
     
-
     int selectedManager { get; set; }
     
-    public void GetSelectedManagerID(int selectedID)
+    private void GetSelectedManagerID(int selectedID)
     {
+        
         selectedManager = selectedID;
     }
+    
+    private int[] ErrorSeverityCounter(List<Error> errors)
+	{
+		int[] counter = {0, 0, 0, 0};
+
+		foreach(Error error in errors)
+		{
+			switch(error._severity)
+			{
+				case "FATAL":
+					counter[0]++;
+				break;
+
+				case "ERROR":
+					counter[1]++;
+				break;
+
+				case "WARNING":
+					counter[2]++;
+				break;
+
+				case "INFO":
+				    counter[3]++;
+				break;
+
+				default:
+					throw new ArgumentException($"{error} is not a valid argument");
+			}
+		}
+	    return counter;
+	}
+
+    private int[] TotalErrorsSeverityCounter(List<Manager_test> managers)
+    {
+        int[] Total_Errors = {0, 0, 0, 0};
+            int[] test = {0,0,0,0};
+
+            foreach (var party in managers)
+            {
+                test = ErrorSeverityCounter(party._errors);
+                for (int i = 0; i < 4; i++)
+                {
+                    Total_Errors[i] += test[i];
+                }
+            }
+            //Console.WriteLine(Total_Errors[0]);
+        return Total_Errors;
+    }
+
+    private int[] ReconTypeCounter(List<Reconciliation> recons)
+    {
+        int[] counter = {0, 0, 0, 0};
+
+        foreach(Reconciliation recon in recons)
+        {
+            switch(recon._result)
+            {
+                case "MISMATCH":
+                    counter[0]++;
+                    break;
+
+                case "FAILED":
+                    counter[1]++;
+                    break;
+
+                case "DISABLED":
+                    counter[2]++;
+                    break;
+
+                case "OK":
+                    counter[3]++;
+                    break;
+
+                default:
+                    throw new ArgumentException($"{recon} is not a valid argument");
+            }
+        }
+
+        return counter;
+    }
+
+    private int[] TotalReconTypeCounter(List<Manager_test> managers)
+    {
+        
+        int[] Total_Recons = {0, 0, 0, 0};
+        int[] test = {0,0,0,0};
+
+        foreach (var party in managers)
+        {
+            test = ReconTypeCounter(party._recons);
+            for (int i = 0; i < 4; i++)
+            {
+                Total_Recons[i] += test[i];
+            }
+        }
+        //Console.WriteLine(Total_Recons[0]);
+        return Total_Recons;
+        
+    }
+    
+    
+    private string ManagerCircleColour(Manager_test manager)
+	{
+		int[] errors = ErrorSeverityCounter(manager._errors);
+        int[] recons = ReconTypeCounter(manager._recons);
+
+		if(errors[0] > 0 || recons[0] > 0){
+		return "background-red";
+		}
+		else if(errors[1] > 0 || recons[1] > 0){
+		return "background-lightred";
+		}
+		else if(errors[2] > 0 || recons[2] > 0){
+		return "background-yellow";
+		}
+		else return "background-green";
+	}
+  	
+	int hoveredManager {get; set;}
+    int[] hoveredManagerErrors { get; set; }
+    int[] hoveredManagerRecons { get; set; }
+	
+    double mousePositionX { get; set; }
+    double mousePositionY { get; set; }
+
+    
+	private void GetHoveredManager(int hovered, MouseEventArgs e, Manager_test manager)
+	{
+		hoveredManager = hovered;
+	    mousePositionX = e.ClientX;
+	    mousePositionY = e.ClientY;
+	    hoveredManagerErrors = ErrorSeverityCounter(manager._errors);
+	    hoveredManagerRecons = ReconTypeCounter(manager._recons);
+	}
+
+
+
 }
