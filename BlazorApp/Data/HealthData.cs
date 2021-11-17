@@ -8,13 +8,13 @@ namespace BlazorApp.Data
     public class HealthData
     {
         public string ReportType { get; set; }
-        public int NumericValue { get; set; }
+        public long NumericValue { get; set; }
         public DateTime LogTime { get; set; }
 
         public HealthData(SqlDataReader reader)
         {
             ReportType = (string) reader[0];
-            NumericValue = (int) reader[1];
+            NumericValue = (long) reader[1];
             LogTime = (DateTime) reader[2];
         }
     }
