@@ -124,11 +124,11 @@ namespace BlazorApp.Data
         //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
         private void ManagerTrackingListener()
         {
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimes, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
             {
                 
                 command.CommandType = CommandType.Text;
-                command.CommandText = DatabaseListenerQueryStrings.ManagerStartTimes;
+                command.CommandText = DatabaseListenerQueryStrings.ManagerStartTimesSelect;
                     
                 SqlDependency dependency = new SqlDependency(command);
                 dependency.OnChange += ManagerStartTracking;
@@ -147,7 +147,7 @@ namespace BlazorApp.Data
                     eventArgs.Type);
             }
 
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimes, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
