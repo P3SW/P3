@@ -190,7 +190,6 @@ else
 
 }
 
-
 @code {
     IEnumerable<Reconciliation> reconciliation;
     
@@ -206,3 +205,29 @@ else
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
     }
 }
+
+@* @code *@
+@* { *@
+@*     HealthDataEventsArgs _updateHealthData; *@
+@* *@
+@*     protected override async Task OnInitializedAsync() *@
+@*     { *@
+@*         HealthUpdateTriggered += async (o, args) => *@
+@*         { *@
+@*             _updateHealthData = args; *@
+@*             await InvokeAsync(StateHasChanged); *@
+@*         }; *@
+@* *@
+@*         HealthUpdateResseted += async (a, args) => *@
+@*         { *@
+@*             _updateHealthData = null; *@
+@*             await  InvokeAsync(StateHasChanged); *@
+@*         }; *@
+@*     } *@
+@*      *@
+@*     //When rendering the cells, change the background color and remove the border. *@
+@*     void CellRender(DataGridCellRenderEventArgs<Reconciliation> dataGridCellRenderEventArgs) *@
+@*     { *@
+@*         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;"); *@
+@*     } *@
+@* } *@

@@ -8,20 +8,19 @@ namespace BlazorApp.DataStreaming.Events
 {
     public class EventBase : ComponentBase
     {
-        public static event EventHandler<HealthDataEventsArgs> UpdateTriggered;
-        public static event EventHandler UpdateResseted;
+        public static event EventHandler<HealthDataEventsArgs> HealthUpdateTriggered;
+        public static event EventHandler HealthUpdateResseted;
         
-        public void TriggerUpdate(List<HealthData> cpu, 
-                                  List<HealthData> memory)
+        public void HealthTriggerUpdate(List<HealthData> cpu, List<HealthData> memory)
         {
-            UpdateTriggered?.Invoke(this, new HealthDataEventsArgs 
+            HealthUpdateTriggered?.Invoke(this, new HealthDataEventsArgs 
             { Cpu = cpu, 
               Memory = memory
             });
         }
-        public void ResetUpdate(string message)
+        public void HealthResetUpdate(string message)
         {
-            UpdateResseted?.Invoke(this, null);
+            HealthUpdateResseted?.Invoke(this, null);
         }
         
         public static event EventHandler<LogDataEventArgs> LogUpdateTriggered;

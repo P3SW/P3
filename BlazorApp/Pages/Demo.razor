@@ -45,7 +45,7 @@
     {
         reset = "Resat";
         trigger = "TriggerUpdate";
-        ResetUpdate("Resat");
+        HealthResetUpdate("Resat");
     }
 
     void ManuelTrigger()
@@ -64,13 +64,13 @@
     
     protected override async Task OnInitializedAsync()
     {
-        UpdateTriggered += async (o, args) =>
+        HealthUpdateTriggered += async (o, args) =>
         {
             _updateHealthData = args;
             await InvokeAsync(StateHasChanged);
         };
 
-        UpdateResseted += async (a, args) =>
+        HealthUpdateResseted += async (a, args) =>
         {
             _updateHealthData = null;
             await  InvokeAsync(StateHasChanged);
