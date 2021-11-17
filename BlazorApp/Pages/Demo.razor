@@ -16,13 +16,24 @@
 </div>
 
 <div>
-    <H1>EVENT: @if (_update != null)
-               {
-                   <div>
-                       @_update.Date @_update.Message
-                   </div>
-               }
-    </H1>
+    <H1>HealthData:</H1> @if (_updateHealthData != null)
+                    {
+                        <h3>
+                            CPU Count: @_updateHealthData.Cpu.Count <br>
+                            Memory Count: @_updateHealthData.Memory.Count
+                        </h3>
+                    }
+    
+    <H1>LogData:</H1> @if (_updateLogData != null)
+                   {
+                       <h3>
+                           LogDatalist Count: @_updateLogData.LogDataList.Count <br>
+                           Manager name: @_updateLogData.LogDataList.OrderByDescending(data => data.Timestamp).First().ManagerName <br>
+                           Description: @_updateLogData.LogDataList.OrderByDescending(data => data.Timestamp).First().Description <br>
+                           Grade: @_updateLogData.LogDataList.OrderByDescending(data => data.Timestamp).First().Grade <br>
+                           Timestamp: @_updateLogData.LogDataList.OrderByDescending(data => data.Timestamp).First().Timestamp
+                       </h3>
+                   }
 </div>
 
 @code{
@@ -41,30 +52,44 @@
     {
         trigger = "Triggered";
         reset = "ResetUpdate";
-        TriggerUpdate("Triggered");
+        //TriggerUpdate("Triggered");
     }
 }
 
 @* ------------- Event subscriber ------------- *@
 @code
 {
-    UpdateEventArgs _update;
+    HealthDataEventsArgs _updateHealthData;
+    LogDataEventArgs _updateLogData;
+    
     protected override async Task OnInitializedAsync()
     {
         UpdateTriggered += async (o, args) =>
         {
-            _update = args;
-            _update.Message = "Display Time";
-            await InvokeAsync( StateHasChanged);
+            _updateHealthData = args;
+            await InvokeAsync(StateHasChanged);
         };
-        
+
         UpdateResseted += async (a, args) =>
         {
-            _update = null;
+            _updateHealthData = null;
             await  InvokeAsync(StateHasChanged);
         };
+        
+        LogUpdateTriggered += async (o, args) =>
+        {
+            _updateLogData = args;
+            await InvokeAsync(StateHasChanged);
+        };
+
+        LogUpdateResseted += async (o, args) =>
+        {
+            _updateLogData = null;
+            await InvokeAsync(StateHasChanged);
+        };
     }
-    
+
+
     protected override Task OnAfterRenderAsync(bool firstRender)
     {
         return base.OnAfterRenderAsync(firstRender);
