@@ -38,13 +38,12 @@ namespace BlazorApp.Data
             try
             {
                 conn.Open();
-                
                 SqlDependency.Stop(_connectionString);
                 SqlDependency.Start(_connectionString);
                 ManagerStatusHandler.Connection = new SqlConnection(_connectionString);
-                TableStreamer.Connection = new SqlConnection(_connectionString);
+                SQLDependencyListener.Connection = new SqlConnection(_connectionString);
 
-                TableStreamer.Connection.Open();
+                SQLDependencyListener.Connection.Open();
                 ManagerStatusHandler.Connection.Open();
                 
                 _connection = conn;
@@ -91,7 +90,7 @@ namespace BlazorApp.Data
                 SqlDependency dependency = new SqlDependency(command);
                 dependency.OnChange +=  ContinueSetup;
                     
-                TableStreamer.CloseReader(command);
+                SQLDependencyListener.CloseReader(command);
 
             }            
         }
@@ -143,7 +142,7 @@ namespace BlazorApp.Data
                 dependency.OnChange += ManagerStartTracking;
                 
                 
-                TableStreamer.CloseReader(command);
+                SQLDependencyListener.CloseReader(command);
             }
         }
 

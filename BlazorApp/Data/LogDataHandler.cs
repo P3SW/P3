@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
 namespace BlazorApp.Data
 {
     //Class containing lists of reconciliation data. Implements IData which ensures the class contains necessary methods.
-    public class LogDataHandler : IDataHandler
+    public class LogDataHandler : EventBase, IDataHandler
     {
         public List<LogData> LogDataList { get; private set; }
         public List<LogData> newLogDataList { get; private set; }
@@ -29,7 +30,12 @@ namespace BlazorApp.Data
 
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
+            
+            //Event
+            LogTriggerUpdate(LogDataList);
+            
             PrintLogData(newLogDataList);
+            
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.

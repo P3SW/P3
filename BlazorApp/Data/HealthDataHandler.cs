@@ -2,12 +2,14 @@ using System;
 using System.Collections.Generic;
 using System.Drawing.Printing;
 using System.Threading.Tasks;
+using BlazorApp.DataStreaming.Events;
+using BlazorApp.DataStreaming.Events.CustomEventArgs;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
 namespace BlazorApp.Data
 {
-    public class HealthDataHandler : IDataHandler
+    public class HealthDataHandler : EventBase, IDataHandler
     {
         public List<HealthData> Cpu { get; private set; }
         public List<HealthData> Memory { get; private set; }
@@ -44,6 +46,9 @@ namespace BlazorApp.Data
             PrintCPUAndMemory(NewCpu, NewMemory);
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
+            
+            // EVENT ***************************************************************************************************
+            TriggerUpdate(Cpu, Memory);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
