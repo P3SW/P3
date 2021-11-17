@@ -13,15 +13,18 @@ namespace BlazorApp.Data
         private ManagerStatusHandler _currentManager;
         private SqlConnection _connection;
         private string _connectionString;
-        private Queue<ManagerStatusHandler> _managerQueue;
+        // private Queue<ManagerStatusHandler> _managerQueue;
+        private int _managerQueue;
+        private int _managerId;
 
 
         //Constructor initialising the some of the fields in the class
         public ConversionDataAssigner()
         {
             _connectionString = ConfigReader.ReadSetupFile();
-            _managerQueue = new Queue<ManagerStatusHandler>();
+            _managerQueue = 0;
             FinishedManagers = new List<ManagerStatusHandler>();
+            _managerId = 1;
         }
 
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
@@ -38,9 +41,12 @@ namespace BlazorApp.Data
                 
                 SqlDependency.Stop(_connectionString);
                 SqlDependency.Start(_connectionString);
-                ManagerStatusHandler.Connection = conn;
-                SQLDependencyListener.Connection = conn;
+                ManagerStatusHandler.Connection = new SqlConnection(_connectionString);
+                TableStreamer.Connection = new SqlConnection(_connectionString);
 
+                TableStreamer.Connection.Open();
+                ManagerStatusHandler.Connection.Open();
+                
                 _connection = conn;
 
                 using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
@@ -52,11 +58,12 @@ namespace BlazorApp.Data
                             while (reader.Read())
                             {
                                 Console.WriteLine("READING MANAGER");
-                                AddManagerToQueue((string) reader[0], (int) reader[1]);
+                                _managerQueue++;
+                                //AddManagerToQueue((string) reader[0], (int) reader[1]);
                             }
                             reader.Close();
-                            ManagerTrackingListener();
-                            WatchNextManager();
+                            ManagerTrackingListener(DateTime.MinValue);
+                            //WatchNextManager();
                         }
                         else //The program will wait for rows to be inserted into the table if the table is empty
                         {
@@ -84,7 +91,7 @@ namespace BlazorApp.Data
                 SqlDependency dependency = new SqlDependency(command);
                 dependency.OnChange +=  ContinueSetup;
                     
-                SQLDependencyListener.CloseReader(command);
+                TableStreamer.CloseReader(command);
 
             }            
         }
@@ -107,52 +114,99 @@ namespace BlazorApp.Data
                     while (reader.Read())
                     {
                         Console.WriteLine("READING MANAGER");
-                        AddManagerToQueue((string) reader[0], (int) reader[1]);
+                        _managerQueue++;
+                        //AddManagerToQueue((string) reader[0], (int) reader[1]);
                     }
                     reader.Close();
                 }
             }
-            ManagerTrackingListener();
-            WatchNextManager();
+            ManagerTrackingListener(DateTime.MinValue);
+            //WatchNextManager();
         }
 
         //Creates a manager from a string and an int and enqueues it.
-        public void AddManagerToQueue(string name, int id)
-        {
-            _managerQueue.Enqueue(new ManagerStatusHandler(name, id));
-        }
+        // public void AddManagerToQueue(string name, int id)
+        // {
+        //     _managerQueue.Enqueue(new ManagerStatusHandler(name, id));
+        // }
         
         //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
-        private void ManagerTrackingListener()
+        private void ManagerTrackingListener(DateTime time)
         {
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerTrackingSelect, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerDependencyTimes(time), _connection))
             {
                 Console.WriteLine("Sker det her?");
                 command.CommandType = CommandType.Text;
-                command.CommandText = DatabaseListenerQueryStrings.ManagerTrackingSelect;
+                command.CommandText = DatabaseListenerQueryStrings.ManagerDependencyTimes(time);
                     
                 SqlDependency dependency = new SqlDependency(command);
-                dependency.OnChange += ManagerTrackingChange;
+                dependency.OnChange += ManagerStartTracking;
                 
                 
-                SQLDependencyListener.CloseReader(command);
+                TableStreamer.CloseReader(command);
             }
         }
 
         //Method handling the event. Calls the next manager and creates a new SqlDependency to track the table again
-        private void ManagerTrackingChange(object sender, SqlNotificationEventArgs eventArgs)
+        private void ManagerStartTracking(object sender, SqlNotificationEventArgs eventArgs)
         {
             if (eventArgs.Info == SqlNotificationInfo.Invalid)
             {
                 Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source,
                     eventArgs.Type);
             }
+
+            Console.WriteLine("NEW START TIME");
+            if (_currentManager != null) //Checks if a manager is running
+            {
+                Console.WriteLine("Finishing manager");
+                _currentManager.FinishManager();
+                FinishedManagers.Add(_currentManager);
+                PrintFinishedManager();
+            }
+
+            Console.WriteLine("et");
+            if (_managerQueue == 0) //If the last manager has run the method will stop
+            {
+                Console.WriteLine("Er vi her?");
+                _currentManager = null;
+                return;
+            }
+            Console.WriteLine("to");
+            DateTime datetime;
+            if (FinishedManagers.Count == 0)
+            {
+                datetime = DateTime.MinValue;
+            }
             else
             {
-                Console.WriteLine("Changing manager!");
-                WatchNextManager();
+                datetime = FinishedManagers[FinishedManagers.Count - 1].StartTime.AddSeconds(1);
             }
-            ManagerTrackingListener();
+            
+            
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimes(datetime), _connection))
+            {
+                Console.WriteLine("tre");
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    
+                    Console.WriteLine("Can it read a manager starttime? " + reader.HasRows);
+                    if (reader.Read())
+                    {
+                        Console.WriteLine("STARTING MANAGER");
+                        _currentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1]);
+                        //AddManagerToQueue((string) reader[0], (int) reader[1]);
+                    }
+                    reader.Close();
+                }
+            }
+            _currentManager.WatchManager();
+            ManagerTrackingListener(_currentManager.StartTime.AddSeconds(1));
+            
+
+                // Console.WriteLine("Changing manager!");
+                // WatchNextManager();
+            
         }
 
         //Stops the current manager and starts the next one. This does nothing if the queue is empty
@@ -166,13 +220,13 @@ namespace BlazorApp.Data
                 PrintFinishedManager();
             }
 
-            if (_managerQueue.Count == 0) //If the last manager has run the method will stop
+            if (_managerQueue == 0) //If the last manager has run the method will stop
             {
                 _currentManager = null;
                 return;
             }
 
-            _currentManager = _managerQueue.Dequeue();
+            //_currentManager = _managerQueue.Dequeue();
             _currentManager.WatchManager();
 
             //Send status of finished manager here

@@ -47,7 +47,7 @@ namespace DataStreamingSimulation
                     queryString = $@"SELECT * FROM MANAGER_TRACKING
                                      WHERE [MGR] = (SELECT [MANAGER] FROM ENGINE_PROPERTIES WHERE 
                                      [TIMESTAMP] = (SELECT [TIMESTAMP] FROM ENGINE_PROPERTIES WHERE [TIMESTAMP] 
-                                     BETWEEN '{startTime}' and '{nextTime}' AND [KEY] = 'END_TIME'));";
+                                     BETWEEN '{startTime}' and '{nextTime}' AND [KEY] = 'WRITE [TOTAL]'));";
                     break;
                 default:
                     break;
