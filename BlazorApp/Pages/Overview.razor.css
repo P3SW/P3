@@ -84,7 +84,7 @@
 
 .Total_read_written_container{
     border: none !important;
-    margin: none !important;
+    margin: 0 !important;
 }
 
 
@@ -117,12 +117,22 @@
 
 .PieConfigTotalErrors {
     position: relative;
+    background-color: rgba(15, 33, 71, 0.2);
+    border-radius: 50%;
     width: 80%;
+    aspect-ratio: 1;
+    align-self: center;
+    padding: 0.3rem;
 }
 
 .pieConfigTotalReconciliations {
     position: relative;
+    background-color: rgba(15, 33, 71, 0.2);
+    border-radius: 50%;
     width: 80%;
+    aspect-ratio: 1;
+    align-self: center;
+    padding: 0.3rem;
 }
 
 .error-reconciliation-formatting {
@@ -136,6 +146,7 @@
 }
 
 .Overview-right{
+    max-height: 100vh;
     display: grid;
     grid-template-rows: 1fr 1fr;
     gap: 1rem;
@@ -152,18 +163,18 @@
     height: 1.1em;
     background-color: #4B5772;
     font-family: inherit;
-    font-size: 0.6em;
+    font-size: 0.5em;
     color: #e3e3e3;
-    padding: 0;
+    padding: 0.3em;
     cursor: pointer;
     border: 1px solid #384561;
     border-bottom: 1px solid #8E8E8E;
-    align-self: end;
+    align-self: center;
 }
 
 .selected-manager-name{
     position: absolute;
-    width: 95%;
+    width: 90%;
     overflow: hidden;
     white-space: nowrap;
     text-overflow: ellipsis;
@@ -171,26 +182,28 @@
 
 .dropdown-arrow{
     position: absolute;
-    left: 94%;
+    top: 25%;
+    right: 3%;
     height: 1em;
-    width: 5%;
+    width: 6%;
 }
 
 .dropup-arrow{
     display: none;
     position: absolute;
-    left: 94%;
+    top: 25%;
+    right: 3%;
     height: 1em;
-    width: 5%;
+    width: 6%;
 }
 
 .dropdown-content {
     display: none;
     position: absolute;
     width: 100%;
-    height: 10em;
+    max-height: 10em;
     font-size: 1em;
-    transform: translate(0,11%);
+    transform: translate(-0.3em,1.4em);
     overflow-x: hidden;
     overflow-y: auto;
     border-top: 1px solid #8E8E8E;
@@ -213,6 +226,7 @@
 .dropdown-content > div{
     display: block;
     color: #e3e3e3;
+    padding: 0.5em;
     user-select: none;
     text-decoration: none;
     overflow: hidden;
@@ -252,17 +266,78 @@
 /* Manager queue */
 .manager-queue-container > div {
     font-size: 0.6em;
+    margin: 0.5rem;
 }
-.queue-finished-text {
-    float: left;
+    .manager-queue-container{
+        display: grid;
+        grid-template-rows: 0.6em 1fr;
+        align-items: center;
+    }
+
+    .manager-circle {
+        height: 80px;
+        width: 80px;
+        border-radius: 50%;
+        display: inline-block;
+    }
+
+    .manager-queue-circle {
+        display: block;
+        background: rgba(83, 96, 122, 0.27);
+        overflow-y: visible;
+        overflow-x: auto;
+        white-space: nowrap;        
+    }
+    
+    .hovered-manager{
+        display: none;
+        position: absolute;
+        height: 12rem;
+        width: 20rem;
+        text-align: left;
+        font-size: 0.8em;
+        background-color: #0F2147;
+        z-index: 2;
+        top: 100%;
+    }
+    
+    .manager-circle:hover > .hovered-manager{
+        display: grid;
+        grid-template-rows: 2fr 3fr;
+    }
+    
+    .queue-finished-text {
+        float: left;
+    }
+    
+    .queue-inqueue-text {
+        float: right;
+    }
+
+.hoverbox-errors-recons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 2px solid #8E8E8E;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    font-size: 1em;
 }
 
-.queue-inqueue-text {
-    float: right;
+.hoverbox-info{
+    padding-left: 0.5em;
 }
 
+.hoverbox-errors-recons  ul{
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.9em;
+}
 
-/* Efficiency table */
+.hoverbox-recons{
+    padding-left: 2em;
+}
+    
+/* Efficiency table */    
 .efficiency-container {
     line-height: 80%;
     border-bottom: none !important;
