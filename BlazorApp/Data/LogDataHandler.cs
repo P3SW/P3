@@ -31,7 +31,7 @@ namespace BlazorApp.Data
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
             
-            //Event
+            //Event ****************************************************************************************************
             LogTriggerUpdate(LogDataList);
             
             PrintLogData(newLogDataList);
