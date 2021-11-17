@@ -16,18 +16,18 @@ else
     <RadzenTabs id="errorlog-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@errors" TItem="Error" ColumnWidth="200px"
+            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                            AllowPaging="false" AllowSorting="true" Data="@errors" TItem="Error"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="false"
-                                          Title="Manager name" Frozen="true" Width="200px" TextAlign="TextAlign.Center">
+                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="true"
+                                          Title="Manager name" Frozen="true" Width="400px">
                         <Template Context="data">
                             <span style="color: #FFFFFF">@data._id</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_severity" Title="Severity" Width="100px">
+                    <RadzenDataGridColumn TItem="Error" Property="_severity" Filterable="false" Title="Severity" Width="200px" >
                         <Template Context="data">
                             @if(data._severity == "INFO")
                             {
@@ -47,14 +47,14 @@ else
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Title="Timestamp" Width="150px">
+                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Filterable="false" Title="Timestamp" Width="300px">
                         <Template Context="data">
                             <span style="color: #FFFFFF">@data._timestamp</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_message" Title="Message" Width="350px">
+                    <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="true" Title="Message" Width="800px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._severity</span>
+                            <span style="color: #FFFFFF">@data._message</span>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
