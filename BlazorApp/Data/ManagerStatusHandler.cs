@@ -29,30 +29,42 @@ namespace BlazorApp.Data
         private TableStreamer _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
+        public string NameWithoutRandomNumber;
 
-        public ManagerStatusHandler(string name, int id)
+        public ManagerStatusHandler(string name, int id, DateTime startTime)
         {
-            Health = new HealthDataHandler();
-            ReconciliationHandler = new LogDataHandler();
-            ErrorHandler = new LogDataHandler();
-            Name = name;
+            Health = new HealthDataHandler(startTime);
+            ReconciliationHandler = new LogDataHandler(startTime);
+            ErrorHandler = new LogDataHandler(startTime);
+            if (name.Contains(","))
+            {
+                Name = name;
+                NameWithoutRandomNumber = name.Split(",")[0];
+            }
+            else
+            {
+                Name = name;
+            }
             Id = id;
+            StartTime = startTime;
         }
 
         //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {
-            Console.WriteLine("Looking for manager!");
             Console.WriteLine($"Manager {Name} started");
-            AssignStartTime();
-        }
-
-        public async void SetupDataPoints()
-        {
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
-            _healthStreamer = new TableStreamer(DatabaseListenerQueryStrings.HealthSelect,GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
-            _errorStreamer = new TableStreamer(DatabaseListenerQueryStrings.ErrorSelect,GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
-            _reconciliationStreamer = new TableStreamer(DatabaseListenerQueryStrings.ReconciliationSelect,GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
+            
+            _healthStreamer = new TableStreamer(DatabaseListenerQueryStrings.HealthSelect,
+                GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
+            
+            _errorStreamer = new TableStreamer(DatabaseListenerQueryStrings.ErrorSelect,
+                GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
+            
+            _reconciliationStreamer = new TableStreamer(
+                DatabaseListenerQueryStrings.ReconciliationSelect,
+                GetSelectStringsForTableStreamer("reconciliation"), 
+                ReconciliationHandler, "RECONCILIATION");
             
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
@@ -62,18 +74,14 @@ namespace BlazorApp.Data
         //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
         public void FinishManager()
         {
-            Console.WriteLine(Health.Cpu.Count);
-            Console.WriteLine(Health.Memory.Count);
-            Console.WriteLine(ReconciliationHandler.LogDataList.Count);
-            Console.WriteLine(ErrorHandler.LogDataList.Count);
             Console.WriteLine("Stopping the data from listening");
             _healthStreamer.StopListening();
             _errorStreamer.StopListening();
             _reconciliationStreamer.StopListening();
             Console.WriteLine("Listening stopped");
-            AssignManagerTrackingData();
-            AssignEndTime();
             
+            AssignEndTime();
+            AssignManagerTrackingData();
             CalculateEfficiencyScore();
         }
 
@@ -87,54 +95,6 @@ namespace BlazorApp.Data
             EfficiencyScore = Convert.ToInt32(result);
         }
 
-        //Calculates the average CPU usage logged in the HEALTH_REPORT table
-        // private double CalculateAverageCpuUsage()
-        // {
-        //     double result = 0.0;
-        //     if (Health.Cpu.Count == 0)
-        //     {
-        //         return result;
-        //     }
-        //     foreach (Data value in Health.Cpu )
-        //     {
-        //         result += (double) value.NumericValue / Health.Cpu.Count;
-        //     }
-        //
-        //     return result;
-        // }
-        
-        private async void AssignStartTime()
-        {
-            Console.WriteLine("Finder Manager Start Time....");
-            using (command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("startTime"), Connection))
-            {
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    Console.WriteLine(reader.HasRows);
-                    if (!reader.HasRows)
-                    {
-                        reader.Close();
-                        Console.WriteLine("reader closed...");
-                        await Task.Delay(1000);
-                        AssignStartTime();
-                    }
-                    else
-                    {
-                        while (reader.Read())
-                        {
-                            Console.WriteLine("found starttime!");
-                            StartTime = DateTime.Parse((string)reader[0]);
-                            //Console.WriteLine("reader almost closed...");
-                        } 
-                        reader.Close();
-                        Console.WriteLine("reader closed...");
-                        SetupDataPoints();
-                    }
-                    
-                }
-            }
-        }
-
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.
         private void AssignManagerTrackingData()
         {
@@ -142,12 +102,13 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    Console.WriteLine("Assigning manager tracking data");
-                    reader.Read();
-                    Status = (string) reader["STATUS"];
-                    RunTime = (int) reader["RUNTIME"];
-                    RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
-                    RowsWritten = (int) reader["PERFORMANCECOUNTROWSWRITTEN"];
+                    if (reader.Read())
+                    {
+                        Status = (string) reader["STATUS"];
+                        RunTime = (int) reader["RUNTIME"];
+                        RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
+                        RowsWritten = (int) reader["PERFORMANCECOUNTROWSWRITTEN"];
+                    }
                     reader.Close();
                 }
             }
@@ -160,24 +121,33 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    while (reader.Read())
+                    if (reader.Read())
                     {
-                        EndTime = (DateTime) reader[0]; 
+                        EndTime = (DateTime) reader[0];
                     }
                     reader.Close();
                 }
             }
         }
         
-        //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES
+        //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES, if name has a random number, the runtimeOverall is found using the name without randomnumber
         private string ObtainEnginePropertiesQueryStringByInteger(string s)
         {
+            string name;
+            if (NameWithoutRandomNumber == null)
+            {
+                name = Name;
+            }
+            else
+            {
+                name = NameWithoutRandomNumber;
+            }
             switch (s)
             {
                 case "startTime":
                     return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'START_TIME'");
                 case "runtime":
-                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'runtimeOverall'");
+                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{name}' AND [KEY] = 'runtimeOverall' ORDER BY [TIMESTAMP] DESC");
                 default:
                     throw new ArgumentException($"{s} is an invalid argument");
             }
@@ -186,7 +156,7 @@ namespace BlazorApp.Data
         //Queries data from the MANAGER_TRACKING table
         private string GetManagerTrackingQueryString()
         {
-            return string.Format($"SELECT STATUS, RUNTIME, PERFORMANCECOUNTROWSREAD, PERFORMANCECOUNTROWSWRITTEN FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}%'");
+            return string.Format($"SELECT [STATUS], RUNTIME, PERFORMANCECOUNTROWSREAD, PERFORMANCECOUNTROWSWRITTEN FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
         }
 
         //Returns the select string for the table streamers
@@ -196,11 +166,11 @@ namespace BlazorApp.Data
             {
                 case "health":
                     return string.Format($"SELECT REPORT_TYPE, REPORT_NUMERIC_VALUE, LOG_TIME FROM dbo.HEALTH_REPORT " +
-                                         $"WHERE REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY'" +
+                                         $"WHERE (REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY')" +
                                          $"AND LOG_TIME > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          "ORDER BY LOG_TIME");
                 case "logging":
-                    return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
+                    return string.Format($"SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
                                          $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          $"FROM [dbo].[LOGGING] " +
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +

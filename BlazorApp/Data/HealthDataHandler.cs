@@ -15,10 +15,11 @@ namespace BlazorApp.Data
         public List<HealthData> NewMemory { get; private set; }
         public static DateTime LastRowTimeStamp { get; private set; }
 
-        public HealthDataHandler()
+        public HealthDataHandler(DateTime managerStartTime)
         {
             Cpu = new List<HealthData>();
             Memory = new List<HealthData>();
+            LastRowTimeStamp = managerStartTime;
         }
 
         //Inserts data from the reader into temporary lists and adds these to the full list of data.
@@ -50,9 +51,7 @@ namespace BlazorApp.Data
         public string GetNewestDataQueryString(string type)
         {
             return string.Format($"SELECT REPORT_TYPE, REPORT_NUMERIC_VALUE, LOG_TIME FROM dbo.HEALTH_REPORT " +
-                                 "WHERE REPORT_TYPE = 'CPU'" + 
-                                 $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'"+
-                                 "OR REPORT_TYPE = 'MEMORY'" +
+                                 "WHERE (REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY')" +
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
         }
