@@ -336,7 +336,16 @@
 .hoverbox-recons{
     padding-left: 2em;
 }
-    
+
+.hoverbox-arrow{
+    display: none;
+    height: 1rem;
+}
+
+.manager-circle:hover > .hoverbox-arrow{
+    display: block;
+}
+
 /* Efficiency table */    
 .efficiency-container {
     line-height: 80%;

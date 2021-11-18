@@ -56,10 +56,11 @@ else{
         <div class="manager-queue-circle">
 			@foreach(Manager_test manager in managers)
 			{
-				<div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@((e) => GetHoveredManager(manager._id, e, manager))">
+				<div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager._id, e, manager))">
 				    @if(hoveredManager == manager._id && hoveredManagerErrors != null)
 				    {
-				        <div class="hovered-manager" style="position: absolute; left: @(mousePositionX + "px"); top: @(mousePositionY + "px"); transform: translateY(-12rem);">
+						<img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(mousePositionX + "px"); top: @(mousePositionY + "px"); transform: translate(-50%,-100%);">
+				        <div class="hovered-manager" style="position: absolute; left: @(mousePositionX + "px"); top: @(mousePositionY + "px"); transform: translate(-50%,-13rem);">
                             <div class="hoverbox-info">
                                 <div>Manager: @manager._name</div>
                                 <div>Runtime: </div>
