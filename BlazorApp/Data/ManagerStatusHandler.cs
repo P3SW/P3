@@ -147,7 +147,7 @@ namespace BlazorApp.Data
                 case "startTime":
                     return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'START_TIME'");
                 case "runtime":
-                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{name}' AND [KEY] = 'runtimeOverall' ORDER BY [TIMESTAMP] DESC");
+                    return string.Format($"SELECT [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE [MGR] = '{name}'");
                 default:
                     throw new ArgumentException($"{s} is an invalid argument");
             }
