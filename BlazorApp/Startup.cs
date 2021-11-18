@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorApp.Data;
+using Blazored.SessionStorage;
 
 
 namespace BlazorApp
@@ -32,6 +33,7 @@ namespace BlazorApp
             services.AddScoped<Test>(); 
             services.AddScoped<AnotherTest>();
 			services.AddScoped<QueueTest>();
+            services.AddBlazoredSessionStorage();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

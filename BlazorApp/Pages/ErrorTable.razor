@@ -1,17 +1,23 @@
 @using BlazorApp.Data
 @using System.Reflection.Metadata
 @using System.Net.Sockets
+@inject Blazored.SessionStorage.ISessionStorageService session
 
 @code
 {
     //LogDataEventArgs _update;
     List<LogData> _dataStorageList = new();
-
+    private int currentCount = 0;
     protected override async Task OnInitializedAsync()
     {
         ErrorUpdateTriggered += async (o, args) =>
         {
             //_update = args;
+
+            await session.SetItemAsync("SessionList", args);
+
+            await session.GetItemAsync<List<LogData>>("SessionList");
+            
             _dataStorageList.AddRange(args.LogDataList);
             await InvokeAsync(StateHasChanged);
         };
