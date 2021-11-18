@@ -50,6 +50,11 @@ a, .btn-link {
         top: 0.5rem;
     }
 
+.error_reconciliation_table_formatting {
+    margin: 1%;
+    align-items: center;
+}
+    
 /* Scrollbar CSS */ 
     /* width */
     ::-webkit-scrollbar {
