@@ -29,22 +29,13 @@ namespace BlazorApp.Data
         private TableStreamer _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
-        public string NameWithoutRandomNumber;
 
         public ManagerStatusHandler(string name, int id, DateTime startTime)
         {
             Health = new HealthDataHandler(startTime);
             ReconciliationHandler = new LogDataHandler(startTime);
             ErrorHandler = new LogDataHandler(startTime);
-            if (name.Contains(","))
-            {
-                Name = name;
-                NameWithoutRandomNumber = name.Split(",")[0];
-            }
-            else
-            {
-                Name = name;
-            }
+            Name = name;
             Id = id;
             StartTime = startTime;
         }
@@ -117,7 +108,7 @@ namespace BlazorApp.Data
         //Queries the end time from the ENGINE_PROPERTIES table
         private void AssignEndTime()
         {
-            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger(), Connection))
+            using (SqlCommand command = new SqlCommand(ObtainManagerEndTime(), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -131,7 +122,7 @@ namespace BlazorApp.Data
         }
         
         //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES, if name has a random number, the runtimeOverall is found using the name without randomnumber
-        private string ObtainEnginePropertiesQueryStringByInteger()
+        private string ObtainManagerEndTime()
         {
             return string.Format($"SELECT [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE [MGR] = '{Name}'");
         }
