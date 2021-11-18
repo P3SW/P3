@@ -13,13 +13,14 @@ namespace BlazorApp.Data
         public List<LogData> LogDataList { get; private set; }
         public List<LogData> newLogDataList { get; private set; }
         public DateTime LastRowTimeStamp { get; private set; }
-        private Action<List<LogData>> TriggerUpdate { get; }
+        private Action<List<LogData>> TriggerUpdate { get; set; }
         
         public LogDataHandler(DateTime managerStartTime, Action<List<LogData>> triggerUpdate)
         {
             LogDataList = new List<LogData>();
             LastRowTimeStamp = managerStartTime;
             TriggerUpdate = triggerUpdate;
+            Console.WriteLine("******************************************************************************************************************************************");
         }
         
         //Inserts data from the reader into temporary list and adds these to the full list of data.
@@ -36,8 +37,10 @@ namespace BlazorApp.Data
             
             //Event ****************************************************************************************************
             //LogTriggerUpdate(LogDataList);
-            TriggerUpdate(LogDataList);
             
+            TriggerUpdate(LogDataList);
+
+            //Console.WriteLine($"Count: {LogDataList.Count} *************************************************************");
             PrintLogData(newLogDataList);
             
         }

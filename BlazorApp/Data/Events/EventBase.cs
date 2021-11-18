@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using BlazorApp.Data;
 using BlazorApp.DataStreaming.Events.CustomEventArgs;
 using Microsoft.AspNetCore.Components;
@@ -27,7 +28,7 @@ namespace BlazorApp.DataStreaming.Events
         // Error *********************************************************************
         public static event EventHandler<LogDataEventArgs> ErrorUpdateTriggered;
         public static event EventHandler ErrorUpdateResseted;
-
+        
         public void ErrorTriggerUpdate(List<LogData> logDatalist)
         {
             ErrorUpdateTriggered?.Invoke(this, new LogDataEventArgs
@@ -42,14 +43,14 @@ namespace BlazorApp.DataStreaming.Events
         }
         
         // Reconciliation ************************************************************
-        public static event EventHandler<LogDataEventArgs> ReconUpdateTriggered;
+        public static event EventHandler<ReconDataEventArgs> ReconUpdateTriggered;
         public static event EventHandler ReconUpdateResseted;
         
         public void ReconTriggerUpdate(List<LogData> logDatalist)
         {
-            ReconUpdateTriggered?.Invoke(this, new LogDataEventArgs
+            ReconUpdateTriggered?.Invoke(this, new ReconDataEventArgs()
             {
-                LogDataList = logDatalist,
+                ReconDataList = logDatalist,
             });
         }
         

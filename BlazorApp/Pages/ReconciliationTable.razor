@@ -1,9 +1,35 @@
 @using BlazorApp.Data
 @using System.Reflection.Metadata
-@inject Test reconList;
+@using System.Net.Sockets
 
+@code
+{
+    //ReconDataEventArgs _update;
+    List<LogData> _dataStorageList = new();
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ReconUpdateTriggered += async (o, args) =>
+        {
+            _dataStorageList.AddRange(args.ReconDataList);
+            await InvokeAsync(StateHasChanged);
+        };
 
-@if (_update == null)
+        ReconUpdateResseted += async (o, args) =>
+        {
+            _dataStorageList = null;
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    //When rendering the cells, change the background color and remove the border.
+    void CellRender(DataGridCellRenderEventArgs<LogData> dataGridCellRenderEventArgs)
+    {
+        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
+    }
+}
+
+@if (_dataStorageList == null)
 {
     <p>Loading ....</p>
 }
@@ -13,12 +39,12 @@ else
     RadzenTabsItem is each tab
     RadzenDataGrid is each data grid 
     Template is configuration of data in each column-->
-    
+    <h1>Count: @_dataStorageList.Count</h1>
     <RadzenTabs id="reconciliation-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -63,7 +89,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Mismatch" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -94,7 +120,7 @@ else
         </RadzenTabsItem>
             <RadzenTabsItem Text="Failed" class="TabElement">
                 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                                AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                                AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -125,7 +151,7 @@ else
             </RadzenTabsItem>
         <RadzenTabsItem Text="Disabled" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -156,7 +182,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Ok" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -188,47 +214,4 @@ else
         </Tabs>
     </RadzenTabs>
 
-}
-
-@* @code { *@
-@*     IEnumerable<Reconciliation> reconciliation; *@
-@* *@
-@*     //When the application starts, get the list of reconciliations *@
-@*     protected override async Task OnInitializedAsync() *@
-@*     { *@
-@*         reconciliation = await Task.Run(() => reconList.ReconList()); *@
-@*     } *@
-@* *@
-@*     //When rendering the cells, change the background color and remove the border. *@
-@*     void CellRender(DataGridCellRenderEventArgs<Reconciliation> dataGridCellRenderEventArgs) *@
-@*     { *@
-@*         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;"); *@
-@*     } *@
-@* } *@
-
-@code
-{
-    //List<Error> errors;
-    LogDataEventArgs _update;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        ReconUpdateTriggered += async (o, args) =>
-        {
-            _update = args;
-            await InvokeAsync(StateHasChanged);
-        };
-
-        ReconUpdateResseted += async (o, args) =>
-        {
-            _update = null;
-            await InvokeAsync(StateHasChanged);
-        };
-    }
-    
-    //When rendering the cells, change the background color and remove the border.
-    void CellRender(DataGridCellRenderEventArgs<LogData> dataGridCellRenderEventArgs)
-    {
-        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
-    }
 }

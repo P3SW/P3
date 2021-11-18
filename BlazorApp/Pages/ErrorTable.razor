@@ -1,9 +1,36 @@
 @using BlazorApp.Data
 @using System.Reflection.Metadata
 @using System.Net.Sockets
-@*@inject AnotherTest errorList;*@
 
-@if (_update == null)
+@code
+{
+    //LogDataEventArgs _update;
+    List<LogData> _dataStorageList = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErrorUpdateTriggered += async (o, args) =>
+        {
+            //_update = args;
+            _dataStorageList.AddRange(args.LogDataList);
+            await InvokeAsync(StateHasChanged);
+        };
+
+        ErrorUpdateResseted += async (o, args) =>
+        {
+            _dataStorageList = null;
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    //When rendering the cells, change the background color and remove the border.
+    void CellRender(DataGridCellRenderEventArgs<LogData> dataGridCellRenderEventArgs)
+    {
+        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
+    }
+}
+
+@if (_dataStorageList == null)
 {
     <p>Loading ....</p>
 }
@@ -13,11 +40,12 @@ else
     RadzenTabsItem is each tab
     RadzenDataGrid is each data grid 
     Template is configuration of data in each column-->
+    <h1>Count: @_dataStorageList.Count</h1>
     <RadzenTabs id="errorlog-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -62,7 +90,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Fatal" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -93,7 +121,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Error" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -124,7 +152,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Warning" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -155,7 +183,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Info" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -187,47 +215,4 @@ else
         </Tabs>
     </RadzenTabs>
     
-}
-
-@*@code {
-    List<Error> errors;
-    
-    //When the application starts, get the list of errors
-    protected override async Task OnInitializedAsync()
-    {
-        errors = await Task.Run(() => errorList.ErrorList());
-    }
-
-    //When rendering the cells, change the background color and remove the border.
-
-    void CellRender(DataGridCellRenderEventArgs<Error> dataGridCellRenderEventArgs)
-    {
-        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
-    }
-}*@
-
-@code
-{
-    LogDataEventArgs _update;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        ErrorUpdateTriggered += async (o, args) =>
-        {
-            _update = args;
-            await InvokeAsync(StateHasChanged);
-        };
-
-        ErrorUpdateResseted += async (o, args) =>
-        {
-            _update = null;
-            await InvokeAsync(StateHasChanged);
-        };
-    }
-    
-    //When rendering the cells, change the background color and remove the border.
-    void CellRender(DataGridCellRenderEventArgs<LogData> dataGridCellRenderEventArgs)
-    {
-        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
-    }
 }
