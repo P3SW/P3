@@ -12,11 +12,14 @@ namespace BlazorApp.Data
     {
         public List<LogData> LogDataList { get; private set; }
         public List<LogData> newLogDataList { get; private set; }
-        public static DateTime LastRowTimeStamp { get; private set; }
-
-        public LogDataHandler()
+        public DateTime LastRowTimeStamp { get; private set; }
+        private Action<List<LogData>> TriggerUpdate { get; }
+        
+        public LogDataHandler(DateTime managerStartTime, Action<List<LogData>> triggerUpdate)
         {
             LogDataList = new List<LogData>();
+            LastRowTimeStamp = managerStartTime;
+            TriggerUpdate = triggerUpdate;
         }
         
         //Inserts data from the reader into temporary list and adds these to the full list of data.
@@ -32,7 +35,8 @@ namespace BlazorApp.Data
             LogDataList.AddRange(newLogDataList);
             
             //Event ****************************************************************************************************
-            LogTriggerUpdate(LogDataList);
+            //LogTriggerUpdate(LogDataList);
+            TriggerUpdate(LogDataList);
             
             PrintLogData(newLogDataList);
             
@@ -44,7 +48,7 @@ namespace BlazorApp.Data
             switch (type)
             {
                 case "ERROR" :
-                    return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
+                    return string.Format($"SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
                                          $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          $"FROM [dbo].[LOGGING] " +
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
@@ -52,7 +56,7 @@ namespace BlazorApp.Data
                                          $"WHERE CREATED > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          $"ORDER BY CREATED");
                 case "RECONCILIATION" :
-                    return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +
+                    return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
                                          $"FROM [dbo].[AFSTEMNING] WHERE AFSTEMTDATO > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
                                          $"ORDER BY AFSTEMTDATO");
                 default:

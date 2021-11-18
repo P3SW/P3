@@ -3,7 +3,7 @@
 @inject Test reconList;
 
 
-@if (reconciliation == null)
+@if (_update == null)
 {
     <p>Loading ....</p>
 }
@@ -18,44 +18,44 @@ else
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@reconciliation" TItem="Reconciliation" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_id" Filterable="false"
+                    <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false"
                                           Title="Manager name" Frozen="true" Width="200px" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
+                            <span style="color: #FFFFFF">@data.ManagerName</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_result" Title="Result" Width="100px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Result" Width="100px">
                         <Template Context="data">
-                            @if(data._result == "OK")
+                            @if(data.Grade == "OK")
                             {
-                                <span style='color:#5CBCA9'>@data._result</span>
+                                <span style='color:#5CBCA9'>@data.Grade</span>
                             }
-                            else if (data._result == "DISABLED")
+                            else if (data.Grade == "DISABLED")
                             {
-                                <span style="color:#DD9B2B">@data._result</span>
+                                <span style="color:#DD9B2B">@data.Grade</span>
                             }
-                            else if (data._result == "FAILED")
+                            else if (data.Grade == "FAILED")
                             {
-                                <span style="color:#E35F52">@data._result</span>
+                                <span style="color:#E35F52">@data.Grade</span>
                             }
                             else
                             {
-                                <span style="color:#FF1700">@data._result</span>
+                                <span style="color:#FF1700">@data.Grade</span>
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_timestamp" Title="Timestamp" Width="150px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Title="Timestamp" Width="150px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
+                            <span style="color: #FFFFFF">@data.Timestamp</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_description" Title="Description" Width="350px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Description" Title="Description" Width="350px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._description</span>
+                            <span style="color: #FFFFFF">@data.Description</span>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -63,30 +63,30 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Mismatch" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@reconciliation" TItem="Reconciliation" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_id" Filterable="false" Title="Manager name"
+                    <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                           Frozen="true" Width="200px" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
+                            <span style="color: #FFFFFF">@data.ManagerName</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_result" Title="Result" Width="100px"
+                    <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Result" Width="100px"
                                           FilterValue=@("MISMATCH") FilterOperator="FilterOperator.Equals">
                         <Template Context="data">
-                            <span style='color:#FF1700'>@data._result</span>
+                            <span style='color:#FF1700'>@data.Grade</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_timestamp" Title="Timestamp" Width="150px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Title="Timestamp" Width="150px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
+                            <span style="color: #FFFFFF">@data.Timestamp</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_description" Title="Description" Width="350px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Description" Title="Description" Width="350px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._description</span>
+                            <span style="color: #FFFFFF">@data.Description</span>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -94,30 +94,30 @@ else
         </RadzenTabsItem>
             <RadzenTabsItem Text="Failed" class="TabElement">
                 <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                                AllowPaging="true" AllowSorting="true" Data="@reconciliation" TItem="Reconciliation" ColumnWidth="200px"
+                                AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
-                        <RadzenDataGridColumn TItem="Reconciliation" Property="_id" Filterable="false" Title="Manager name"
+                        <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                               Frozen="true" Width="200px" TextAlign="TextAlign.Center">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data._id</span>
+                                <span style="color: #FFFFFF">@data.ManagerName</span>
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Reconciliation" Property="_result" Title="Result" Width="100px"
+                        <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Result" Width="100px"
                                               FilterValue=@("FAILED") FilterOperator="FilterOperator.Equals">
                             <Template Context="data">
-                                <span style="color:#E35F52">@data._result</span>
+                                <span style="color:#E35F52">@data.Grade</span>
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Reconciliation" Property="_timestamp" Title="Timestamp" Width="150px">
+                        <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Title="Timestamp" Width="150px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data._timestamp</span>
+                                <span style="color: #FFFFFF">@data.Timestamp</span>
                             </Template>
                         </RadzenDataGridColumn>
-                        <RadzenDataGridColumn TItem="Reconciliation" Property="_description" Title="Description" Width="350px">
+                        <RadzenDataGridColumn TItem="LogData" Property="Description" Title="Description" Width="350px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data._description</span>
+                                <span style="color: #FFFFFF">@data.Description</span>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -125,30 +125,30 @@ else
             </RadzenTabsItem>
         <RadzenTabsItem Text="Disabled" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@reconciliation" TItem="Reconciliation" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_id" Filterable="false" Title="Manager name"
+                    <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                           Frozen="true" Width="200px" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
+                            <span style="color: #FFFFFF">@data.ManagerName</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_result" Title="Result" Width="100px"
+                    <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Result" Width="100px"
                                           FilterValue=@("DISABLED") FilterOperator="FilterOperator.Equals">
                         <Template Context="data">
-                            <span style="color:#DD9B2B">@data._result</span>
+                            <span style="color:#DD9B2B">@data.Grade</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_timestamp" Title="Timestamp" Width="150px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Title="Timestamp" Width="150px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
+                            <span style="color: #FFFFFF">@data.Timestamp</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_description" Title="Description" Width="350px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Description" Title="Description" Width="350px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._description</span>
+                            <span style="color: #FFFFFF">@data.Description</span>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -156,30 +156,30 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Ok" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@reconciliation" TItem="Reconciliation" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_id" Filterable="false" Title="Manager name"
+                    <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                           Frozen="true" Width="200px" TextAlign="TextAlign.Center">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
+                            <span style="color: #FFFFFF">@data.ManagerName</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_result" Title="Result" Width="100px"
+                    <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Result" Width="100px"
                                           FilterValue=@("OK") FilterOperator="FilterOperator.Equals">
                         <Template Context="data">
-                            <span style="color:#5CBCA9">@data._result</span>
+                            <span style="color:#5CBCA9">@data.Grade</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_timestamp" Title="Timestamp" Width="150px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Title="Timestamp" Width="150px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
+                            <span style="color: #FFFFFF">@data.Timestamp</span>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Reconciliation" Property="_description" Title="Description" Width="350px">
+                    <RadzenDataGridColumn TItem="LogData" Property="Description" Title="Description" Width="350px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._description</span>
+                            <span style="color: #FFFFFF">@data.Description</span>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -190,44 +190,45 @@ else
 
 }
 
-@code {
-    IEnumerable<Reconciliation> reconciliation;
-    
-    //When the application starts, get the list of reconciliations
-    protected override async Task OnInitializedAsync()
-    {
-        reconciliation = await Task.Run(() => reconList.ReconList());
-    }
-    
-    //When rendering the cells, change the background color and remove the border.
-    void CellRender(DataGridCellRenderEventArgs<Reconciliation> dataGridCellRenderEventArgs)
-    {
-        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
-    }
-}
-
-@* @code *@
-@* { *@
-@*     HealthDataEventsArgs _updateHealthData; *@
+@* @code { *@
+@*     IEnumerable<Reconciliation> reconciliation; *@
 @* *@
+@*     //When the application starts, get the list of reconciliations *@
 @*     protected override async Task OnInitializedAsync() *@
 @*     { *@
-@*         HealthUpdateTriggered += async (o, args) => *@
-@*         { *@
-@*             _updateHealthData = args; *@
-@*             await InvokeAsync(StateHasChanged); *@
-@*         }; *@
-@* *@
-@*         HealthUpdateResseted += async (a, args) => *@
-@*         { *@
-@*             _updateHealthData = null; *@
-@*             await  InvokeAsync(StateHasChanged); *@
-@*         }; *@
+@*         reconciliation = await Task.Run(() => reconList.ReconList()); *@
 @*     } *@
-@*      *@
+@* *@
 @*     //When rendering the cells, change the background color and remove the border. *@
 @*     void CellRender(DataGridCellRenderEventArgs<Reconciliation> dataGridCellRenderEventArgs) *@
 @*     { *@
 @*         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;"); *@
 @*     } *@
 @* } *@
+
+@code
+{
+    //List<Error> errors;
+    LogDataEventArgs _update;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ReconUpdateTriggered += async (o, args) =>
+        {
+            _update = args;
+            await InvokeAsync(StateHasChanged);
+        };
+
+        ReconUpdateResseted += async (o, args) =>
+        {
+            _update = null;
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    //When rendering the cells, change the background color and remove the border.
+    void CellRender(DataGridCellRenderEventArgs<LogData> dataGridCellRenderEventArgs)
+    {
+        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
+    }
+}

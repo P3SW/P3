@@ -76,13 +76,13 @@
             await  InvokeAsync(StateHasChanged);
         };
         
-        LogUpdateTriggered += async (o, args) =>
+        ErrorUpdateTriggered += async (o, args) =>
         {
             _updateLogData = args;
             await InvokeAsync(StateHasChanged);
         };
 
-        LogUpdateResseted += async (o, args) =>
+        ErrorUpdateResseted += async (o, args) =>
         {
             _updateLogData = null;
             await InvokeAsync(StateHasChanged);

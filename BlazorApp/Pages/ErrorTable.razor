@@ -3,7 +3,7 @@
 @using System.Net.Sockets
 @*@inject AnotherTest errorList;*@
 
-@if (_updateLogData == null)
+@if (_update == null)
 {
     <p>Loading ....</p>
 }
@@ -17,7 +17,7 @@ else
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_updateLogData.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -62,7 +62,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Fatal" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_updateLogData.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -93,7 +93,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Error" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_updateLogData.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -124,7 +124,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Warning" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_updateLogData.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -155,7 +155,7 @@ else
         </RadzenTabsItem>
         <RadzenTabsItem Text="Info" class="TabElement">
             <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
-                            AllowPaging="true" AllowSorting="true" Data="@_updateLogData.LogDataList" TItem="LogData" ColumnWidth="200px"
+                            AllowPaging="true" AllowSorting="true" Data="@_update.LogDataList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                 <Columns>
@@ -208,20 +208,19 @@ else
 
 @code
 {
-    //List<Error> errors;
-    LogDataEventArgs _updateLogData;
+    LogDataEventArgs _update;
     
     protected override async Task OnInitializedAsync()
     {
-        LogUpdateTriggered += async (o, args) =>
+        ErrorUpdateTriggered += async (o, args) =>
         {
-            _updateLogData = args;
+            _update = args;
             await InvokeAsync(StateHasChanged);
         };
 
-        LogUpdateResseted += async (o, args) =>
+        ErrorUpdateResseted += async (o, args) =>
         {
-            _updateLogData = null;
+            _update = null;
             await InvokeAsync(StateHasChanged);
         };
     }

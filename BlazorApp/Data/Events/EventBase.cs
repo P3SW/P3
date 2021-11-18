@@ -8,6 +8,7 @@ namespace BlazorApp.DataStreaming.Events
 {
     public class EventBase : ComponentBase
     {
+        // Health *********************************************************************
         public static event EventHandler<HealthDataEventsArgs> HealthUpdateTriggered;
         public static event EventHandler HealthUpdateResseted;
         
@@ -23,12 +24,13 @@ namespace BlazorApp.DataStreaming.Events
             HealthUpdateResseted?.Invoke(this, null);
         }
         
-        public static event EventHandler<LogDataEventArgs> LogUpdateTriggered;
-        public static event EventHandler LogUpdateResseted;
+        // Error *********************************************************************
+        public static event EventHandler<LogDataEventArgs> ErrorUpdateTriggered;
+        public static event EventHandler ErrorUpdateResseted;
 
-        public void LogTriggerUpdate(List<LogData> logDatalist)
+        public void ErrorTriggerUpdate(List<LogData> logDatalist)
         {
-            LogUpdateTriggered?.Invoke(this, new LogDataEventArgs
+            ErrorUpdateTriggered?.Invoke(this, new LogDataEventArgs
             {
                 LogDataList = logDatalist,
             });
@@ -36,7 +38,26 @@ namespace BlazorApp.DataStreaming.Events
 
         public void ResetLogUpdate()
         {
-            LogUpdateResseted?.Invoke(this,null);
+            ErrorUpdateResseted?.Invoke(this,null);
         }
+        
+        // Reconciliation ************************************************************
+        public static event EventHandler<LogDataEventArgs> ReconUpdateTriggered;
+        public static event EventHandler ReconUpdateResseted;
+        
+        public void ReconTriggerUpdate(List<LogData> logDatalist)
+        {
+            ReconUpdateTriggered?.Invoke(this, new LogDataEventArgs
+            {
+                LogDataList = logDatalist,
+            });
+        }
+        
+        public void ResetReconUpdate()
+        {
+            ReconUpdateResseted?.Invoke(this,null);
+        }
+        
+        
     }
 }
