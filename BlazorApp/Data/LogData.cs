@@ -23,8 +23,8 @@ namespace BlazorApp.Data
         {
             Timestamp = (DateTime) reader[0];
             Description = (string) reader[1];
-            ManagerName = (string) reader[2];
-            Grade = (string) reader[3];
+            ManagerName = (string) reader[3];
+            Grade = (string) reader[2];
         }
     }
 }

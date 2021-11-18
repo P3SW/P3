@@ -1,3 +1,4 @@
+
 using System;
 using Microsoft.Data.SqlClient;
 
@@ -10,19 +11,11 @@ namespace BlazorApp.Data
         public long NumericValue { get; set; }
         public DateTime LogTime { get; set; }
 
-        public HealthData(string reportType, long numericValue, DateTime logTime)
-        {
-            ReportType = reportType;
-            NumericValue = numericValue;
-            LogTime = logTime;
-        }
-
         public HealthData(SqlDataReader reader)
         {
             ReportType = (string) reader[0];
             NumericValue = (long) reader[1];
             LogTime = (DateTime) reader[2];
         }
-        
     }
 }

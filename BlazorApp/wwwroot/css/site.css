@@ -2,6 +2,7 @@
 
 html, body {
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
 }
 
 a, .btn-link {
@@ -48,3 +49,42 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
+/* width */
+::-webkit-scrollbar {
+    width: 0.5rem !important;
+    background-color: #384561 !important;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+    background: #8c8c8c !important;
+    border-radius: 10px !important;
+}
+
+/* Handle */
+::-webkit-scrollbar-thumb {
+    background: #384561 !important;
+    border-radius: 10px !important;
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+    background: #0F2147 !important;
+}
+
+/* Colours */
+.background-green {
+    background-color: rgba(92, 188, 169, 1) !important;
+}
+
+.background-yellow {
+    background-color: rgba(221, 155, 43, 1) !important;
+}
+
+.background-lightred {
+    background-color: rgba(227, 95, 82, 1) !important;
+}
+
+.background-red {
+    background-color: rgba(255, 23, 0, 1) !important;
+}

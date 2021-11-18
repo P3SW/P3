@@ -11,11 +11,12 @@ namespace BlazorApp.Data
     {
         public List<LogData> LogDataList { get; private set; }
         public List<LogData> newLogDataList { get; private set; }
-        public static DateTime LastRowTimeStamp { get; private set; }
+        public DateTime LastRowTimeStamp { get; private set; }
 
-        public LogDataHandler()
+        public LogDataHandler(DateTime managerStartTime)
         {
             LogDataList = new List<LogData>();
+            LastRowTimeStamp = managerStartTime;
         }
         
         //Inserts data from the reader into temporary list and adds these to the full list of data.
@@ -38,7 +39,7 @@ namespace BlazorApp.Data
             switch (type)
             {
                 case "ERROR" :
-                    return string.Format($"SELECT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
+                    return string.Format($"SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
                                          $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          $"FROM [dbo].[LOGGING] " +
                                          $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
