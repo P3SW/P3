@@ -43,9 +43,9 @@ namespace DataStreamingSimulation
                     queryString = $@"SELECT * FROM HEALTH_REPORT
                                      WHERE LOG_TIME BETWEEN '{startTime}' and '{nextTime}';";
                     break;
-                case "MANAGER_TRACKING": // 2021-10-28 00:00:00.000
-                    queryString = $@"SELECT * FROM MANAGER_TRACKING
-                                     WHERE STARTTIME BETWEEN '{startTime}' and '{nextTime}';";
+                case "MANAGER_TRACKING": // 2021-10-28 15:07:23.347
+                    queryString = $@"SELECT * FROM MANAGER_TRACKING WHERE [ENDTIME] 
+                                     BETWEEN '{startTime}' AND '{nextTime}';";
                     break;
                 default:
                     break;

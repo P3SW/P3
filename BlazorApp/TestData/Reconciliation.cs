@@ -2,7 +2,7 @@ using System;
 
 namespace BlazorApp.Data
 {
-    public class Reconciliation
+    public class Reconciliation // TEST CLASS FOR RECONCILIATION TABLE
     {
 
         public Reconciliation(int id, string result, DateTime timestamp, string description)

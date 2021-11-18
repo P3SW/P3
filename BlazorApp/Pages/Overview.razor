@@ -5,7 +5,6 @@
 @using System.Reflection.Emit
 @using System.Text.Json
 @using BlazorApp.Data
-@using BlazorApp.DataStreaming
 @using Microsoft.JSInterop
 @inject Test dataList;
 @inject QueueTest managerList;
@@ -180,18 +179,15 @@ else{
     private LineConfig _lineconfig;
     LineDataset<int> lineconfig_dataset_cpu;
     LineDataset<int> lineconfig_dataset_memory;
-    
+
     private PieConfig _pieconfig_errors;
     private PieConfig _pieconfig_reconciliations;
     PieDataset<int> pieconfig_dataset_errors;
     PieDataset<int> pieconfig_dataset_reconciliations;
-    
+
     List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
     List<Manager_test> managers = new List<Manager_test>();
-
-
-
-
+    
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
@@ -199,21 +195,59 @@ else{
         healthdatatests = await Task.Run(() => dataList.DataList());
         managers = await Task.Run(() => managerList.ManagerList());
         string[] separtors = new string[] {" "};
-        
+
     //Takes data from test and stores in list
-        foreach (var cpu_data in healthdatatests)
+        foreach (var data in healthdatatests)
         {
-            lineconfig_dataset_cpu.Add(cpu_data._NumericValue);
+            if (data._ReportType == "CPU")
+            {
+                lineconfig_dataset_cpu.Add(data._NumericValue);
+            }
+            else if (data._ReportType =="MEMORY")
+            {
+                lineconfig_dataset_memory.Add(data._NumericValue);
+            }
         }
         foreach (var party in healthdatatests)
         {
-            _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors,2,StringSplitOptions.RemoveEmptyEntries))[1]);
+            if (party._ReportType == "CPU")
+            {
+                _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            }
         }
+        
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
+        
+        pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
+        {
+            BackgroundColor = new[] // Color for the pies 
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
+                ColorUtil.ColorHexString(227, 95, 82), //Error
+                ColorUtil.ColorHexString(221, 155, 43), //Warning
+                ColorUtil.ColorHexString(92, 188, 169) //Info
+            },
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+            BorderWidth = 0
+        };
+        _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
+        
+        pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
+        {
+            BackgroundColor = new[] // Color for the pies
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
+                ColorUtil.ColorHexString(227, 95, 82), //Failed
+                ColorUtil.ColorHexString(221, 155, 43), //Disabled
+                ColorUtil.ColorHexString(92, 188, 169) //OK
+            },
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+            BorderWidth = 0,
+        };
+        
+        _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
     }
-    
-    
     
     private void ConfigureLineConfig()
     {
@@ -262,7 +296,7 @@ else{
                     },
                 },
                 YAxes = new List<CartesianAxis> // scale for the y axes
-                { 
+                {
                     new LinearCartesianAxis
                     {
                         ScaleLabel = new ScaleLabel
@@ -271,7 +305,7 @@ else{
     //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
-                            
+
                         },
                         Ticks = new LinearCartesianTicks
                         {
@@ -288,34 +322,35 @@ else{
                             DrawBorder = false, // removes the border in the y axies
 
                         },
-                     }
+                    }
                 }
             }
         };
         lineconfig_dataset_cpu = new LineDataset<int>
         {
             Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227,95,82),
-            BackgroundColor = ColorUtil.ColorString(0,0,0,0.0),
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
         };
-        
-        lineconfig_dataset_memory = new LineDataset<int>(new[] {2,5,8,2,6,47,32,5,9,12, 20, 30 })    // need data From healdata cpu class, Like the data above
+
+        lineconfig_dataset_memory = new LineDataset<int> // need data From healdata memeory class, Like the data above
         {
             Label = ("Memory usage"),
-            BorderColor = ColorUtil.ColorString(92,188,169,1),
-            BackgroundColor = ColorUtil.ColorString(92,188,169,0.3),
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
         };
-        
+
     }
+
     private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
     {
         foreach (var label in labels)
         {
             config.Data.Labels.Add(label);
         }
-        
+
         return config;
     }
 
@@ -334,80 +369,26 @@ else{
                 FontColor = "#FFFFFF",
             },
             CutoutPercentage = 45,
-            Legend =new Legend
+            Legend = new Legend
             {
                 Display = false,
             },
         };
         _pieconfig_reconciliations.Options = _pieconfig_errors.Options;
-        
-        _pieconfig_errors = SetUpPieLabels(_pieconfig_errors, new[] {"Fatal error","Error","Warning","Info"});
-        _pieconfig_reconciliations = SetUpPieLabels(_pieconfig_reconciliations, new[] {"Mismatch","Failed","Disabled", "OK"});
-        
-        pieconfig_dataset_errors = new PieDataset<int>(new[] {1,15,20,30 }) //Datapoints
-        {
-            BackgroundColor = new[]   // Color for the pies
-            {
-                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
-                ColorUtil.ColorHexString(227, 95, 82), //Error
-                ColorUtil.ColorHexString(221, 155, 43), //Warning
-                ColorUtil.ColorHexString(92, 188, 169)  //Info
-            },
-            BorderColor = ColorUtil.ColorHexString(0,0,0), 
-            BorderWidth = 0,
-            
-        };
-        pieconfig_dataset_reconciliations = new PieDataset<int>(new[] {5, 10, 15, 661})
-        {
-            BackgroundColor = new[] // Color for the pies
-            {
-                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
-                ColorUtil.ColorHexString(227, 95, 82), //Failed
-                ColorUtil.ColorHexString(221, 155, 43), //Disabled
-                ColorUtil.ColorHexString(92, 188, 169) //OK
-            },
-            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-            BorderWidth = 0,
-        };
-        _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
-        _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
+
+        _pieconfig_errors = SetUpPieLabels(_pieconfig_errors, new[] {"Fatal error", "Error", "Warning", "Info"});
+        _pieconfig_reconciliations = SetUpPieLabels(_pieconfig_reconciliations, new[] {"Mismatch", "Failed", "Disabled", "OK"});
     }
-}
-
-@code{
-    //private string[] managers = {"manager1", "manager2", "manager3", "manager4"};
-    /*static List<string> CreateList()
-    {
-        List<string> managers = new List<string>();
-        managers = GetManagerNames(managers);
-
-        List<string> GetManagerNames(List<string> managers)
-        {
-            string managerName = default;
-
-            for (int i = 0; i < 20; i++)
-            {
-                managerName += (string) "M";
-                managers.Add(managerName);
-            }
-            return managers;
-        }
-
-        return managers;
-    }*/
-
-    //List<string> managers = CreateList();
-
-    	
-
+    
     int selectedManager { get; set; }
     
     private void GetSelectedManagerID(int selectedID)
     {
+        
         selectedManager = selectedID;
     }
-
-	private int[] ErrorSeverityCounter(List<Error> errors)
+    
+    private int[] ErrorSeverityCounter(List<Error> errors)
 	{
 		int[] counter = {0, 0, 0, 0};
 
@@ -428,18 +409,34 @@ else{
 				break;
 
 				case "INFO":
-					counter[3]++;
+				    counter[3]++;
 				break;
 
 				default:
 					throw new ArgumentException($"{error} is not a valid argument");
 			}
 		}
-
-		return counter;
+	    return counter;
 	}
 
-    private int[] ReconSeverityCounter(List<Reconciliation> recons)
+    private int[] TotalErrorsSeverityCounter(List<Manager_test> managers)
+    {
+        int[] Total_Errors = {0, 0, 0, 0};
+            int[] test = {0,0,0,0};
+
+            foreach (var party in managers)
+            {
+                test = ErrorSeverityCounter(party._errors);
+                for (int i = 0; i < 4; i++)
+                {
+                    Total_Errors[i] += test[i];
+                }
+            }
+            //Console.WriteLine(Total_Errors[0]);
+        return Total_Errors;
+    }
+
+    private int[] ReconTypeCounter(List<Reconciliation> recons)
     {
         int[] counter = {0, 0, 0, 0};
 
@@ -470,11 +467,31 @@ else{
 
         return counter;
     }
+
+    private int[] TotalReconTypeCounter(List<Manager_test> managers)
+    {
+        
+        int[] Total_Recons = {0, 0, 0, 0};
+        int[] test = {0,0,0,0};
+
+        foreach (var party in managers)
+        {
+            test = ReconTypeCounter(party._recons);
+            for (int i = 0; i < 4; i++)
+            {
+                Total_Recons[i] += test[i];
+            }
+        }
+        //Console.WriteLine(Total_Recons[0]);
+        return Total_Recons;
+        
+    }
+    
     
     private string ManagerCircleColour(Manager_test manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager._errors);
-        int[] recons = ReconSeverityCounter(manager._recons);
+        int[] recons = ReconTypeCounter(manager._recons);
 
 		if(errors[0] > 0 || recons[0] > 0){
 		return "background-red";
@@ -486,8 +503,8 @@ else{
 		return "background-yellow";
 		}
 		else return "background-green";
-	}  
-	
+	}
+  	
 	int hoveredManager {get; set;}
     int[] hoveredManagerErrors { get; set; }
     int[] hoveredManagerRecons { get; set; }
@@ -502,7 +519,7 @@ else{
 	    mousePositionX = e.ClientX;
 	    mousePositionY = e.ClientY;
 	    hoveredManagerErrors = ErrorSeverityCounter(manager._errors);
-	    hoveredManagerRecons = ReconSeverityCounter(manager._recons);
+	    hoveredManagerRecons = ReconTypeCounter(manager._recons);
 	}
 
 

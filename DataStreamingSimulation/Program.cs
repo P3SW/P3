@@ -12,10 +12,10 @@ namespace DataStreamingSimulation
     {
         static void Main(string[] args)
         {
-            const int INCREASE_IN_SEC = 5;
+            const int INCREASE_IN_SEC = 1;
             const bool CONSOLE_PRINT = false;
-            const string STREAM_START_DATE = "2021-10-28 15:04:42.693"; 
-            string[] tablesToStream = {"AFSTEMNING", "LOGGING", "ENGINE_PROPERTIES", "HEALTH_REPORT", "MANAGER_TRACKING"};
+            const string STREAM_START_DATE = "2021-10-28 15:07:10.347"; 
+            string[] tablesToStream = {"AFSTEMNING", "LOGGING", "ENGINE_PROPERTIES", "MANAGER_TRACKING", "HEALTH_REPORT"};
             
             try
             {
@@ -23,10 +23,13 @@ namespace DataStreamingSimulation
                 DateTime nextTime = startTime.AddSeconds(INCREASE_IN_SEC);
                 DatabaseConnect sqlConnection = new DatabaseConnect();
                 string setupFile = sqlConnection.ReadSetupFile();
-                string queryString = new QuerySetup().MakeOneTimeQueryString("LOGGING_CONTEXT");
+                
+                string queryString = new QuerySetup().MakeOneTimeQueryString("MANAGERS");
                 sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
-                queryString = new QuerySetup().MakeOneTimeQueryString("MANAGERS");
+                
+                queryString = new QuerySetup().MakeOneTimeQueryString("LOGGING_CONTEXT");
                 sqlConnection.SqlConnect(queryString,setupFile, CONSOLE_PRINT);
+                
                 while (true)
                 {
                     for (int i = 0; i < tablesToStream.Length; i++)

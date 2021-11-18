@@ -1,21 +1,27 @@
 ﻿using System;
-using System.Collections.Generic;
+using Microsoft.Data.SqlClient;
 
 namespace BlazorApp.Data
 {
-    public class HealthDataTest
+    //Class containing the CPU and memory data read from the HEALTH_REPORT. Class contains properties to store this data and constructors.
+    public class HealthData
     {
-
-        public HealthDataTest(string ReportType, int NumericValue, DateTime Date)
+        public string ReportType { get; set; }
+        public int NumericValue { get; set; }
+        public DateTime LogTime { get; set; }
+        
+        public Data(string reportType, int numericValue, DateTime logTime)
         {
-            _ReportType = ReportType;
-            _NumericValue = NumericValue;
-            _Date = Date;
+            ReportType = reportType;
+            NumericValue = numericValue;
+            LogTime = logTime;
         }
-        
-        public string _ReportType { get; private set; }
-        public int _NumericValue { get; private set; }
-        public DateTime _Date { get; private set; }
-        
+
+        public Data(SqlDataReader reader)
+        {
+            ReportType = (string) reader[0];
+            NumericValue = (int) reader[1];
+            LogTime = (DateTime) reader[2];
+        }
     }
 }
