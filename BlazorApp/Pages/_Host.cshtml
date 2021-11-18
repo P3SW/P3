@@ -17,8 +17,8 @@
     <style>
        #errorlog-tab > .rz-tabview-panels, #reconciliation-tab > .rz-tabview-panels{
            background-color: #384561 !important;
-           border: none !important;
-           overflow: hidden !important;
+           border: none;
+           overflow: hidden;
            text-align: left;
            border-radius: 0;
        }
@@ -33,6 +33,10 @@
            display: block;
        }
        
+       thead{
+           display: inline-block;
+       }
+       
        thead tr {
            display: block;
            width: 100% !important;
@@ -40,7 +44,6 @@
            padding: 0 !important;
            margin: 0 !important;
            top: 0;
-           border-bottom: #8E8E8E 2px;
        }
        
        tbody{ 
@@ -50,12 +53,8 @@
        
        .rz-grid-table { /* Size of table */
             width: 100%;
-            height: 75vh;
-            max-height: 75vh;
-       }
-       
-       thead{
-           display: inline-block;
+            height: 85vh;
+            max-height: 85vh;
        }
        
        .rz-tabview-panel {
