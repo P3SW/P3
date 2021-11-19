@@ -14,9 +14,9 @@
         {
             //_update = args;
 
-            await session.SetItemAsync("SessionList", args);
+            //await session.SetItemAsync("SessionList", args);
 
-            await session.GetItemAsync<List<LogData>>("SessionList");
+            //await session.GetItemAsync<List<LogData>>("SessionList");
             
             _dataStorageList.AddRange(args.LogDataList);
             await InvokeAsync(StateHasChanged);
