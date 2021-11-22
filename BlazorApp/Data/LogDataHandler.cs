@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Threading.Tasks;
 using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
@@ -38,10 +37,10 @@ namespace BlazorApp.Data
             //Event ****************************************************************************************************
             //LogTriggerUpdate(LogDataList);
             
-            TriggerUpdate(LogDataList);
+            TriggerUpdate(newLogDataList);
 
             //Console.WriteLine($"Count: {LogDataList.Count} *************************************************************");
-            PrintLogData(newLogDataList);
+            //PrintLogData(newLogDataList);
             
         }
 

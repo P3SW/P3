@@ -1,9 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Threading.Tasks;
 using BlazorApp.DataStreaming.Events;
-using BlazorApp.DataStreaming.Events.CustomEventArgs;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 

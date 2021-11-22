@@ -3,13 +3,17 @@
 @using System.Net.Sockets
 @inject Blazored.SessionStorage.ISessionStorageService session
 
+
 @code
 {
     //LogDataEventArgs _update;
-    List<LogData> _dataStorageList = new();
+    List<LogData> _dataStorageList;
     private int currentCount = 0;
     protected override async Task OnInitializedAsync()
     {
+        _dataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
+        StateHasChanged();
+        
         ErrorUpdateTriggered += async (o, args) =>
         {
             //_update = args;

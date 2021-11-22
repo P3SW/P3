@@ -1,9 +1,6 @@
 using System;
-using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
 using BlazorApp.DataStreaming.Events;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 

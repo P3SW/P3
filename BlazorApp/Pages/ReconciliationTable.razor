@@ -10,6 +10,8 @@
     
     protected override async Task OnInitializedAsync()
     {
+        _dataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
+        
         ReconUpdateTriggered += async (o, args) =>
         {
             _dataStorageList.AddRange(args.ReconDataList);
@@ -40,7 +42,6 @@ else
     RadzenTabsItem is each tab
     RadzenDataGrid is each data grid 
     Template is configuration of data in each column-->
-    <h1>Count: @_dataStorageList.Count</h1>
     <RadzenTabs id="reconciliation-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
