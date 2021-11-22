@@ -54,7 +54,24 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="true" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
+                            <div class="messageContainer" style="display: grid; grid-template-columns: auto 25px">
+                                <span style="
+                                    align-self: center;
+                                    color: #FFFFFF; 
+                                    overflow-x: hidden;
+                                    text-overflow: ellipsis;
+                                        background-attachment: local;
+                                ">@data._message    
+                                </span>
+                                <div style="position: absolute; right: 1%; align-self: center;">
+                                    <RadzenButton Icon="expand_more" Style="
+                                        width: 24px;
+                                        height: 24px;
+                                        background: rgb(83, 96, 122);
+                                        border-radius: 0;
+                                    "/>
+                                </div>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -191,8 +208,13 @@ else
 
 
 @code {
-    List<Error> errors;
+    /*EventConsole console;*/
     
+    List<Error> errors;
+    void OnClick(string buttonName)
+    {
+        /*console.Log($"{buttonName} clicked");*/
+    }
     //When the application starts, get the list of errors
     protected override async Task OnInitializedAsync()
     {
