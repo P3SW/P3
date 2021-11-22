@@ -17,11 +17,6 @@
         ErrorUpdateTriggered += async (o, args) =>
         {
             //_update = args;
-
-            //await session.SetItemAsync("SessionList", args);
-
-            //await session.GetItemAsync<List<LogData>>("SessionList");
-            
             _dataStorageList.AddRange(args.LogDataList);
             await InvokeAsync(StateHasChanged);
         };
