@@ -17,15 +17,33 @@
     <p>Loading ....</p>
 }
 else{
-    <div class="overview_container">
-        <div class="summary_container">
-        @* Summary text + runtime *@
-        <div class="summary_caption_container" style="text-align: center;">Summary</div>
-        
-        @* Current running manager info *@
-        <div class="Current_manager_info_container">
-            <div>Current manager: DepartmentManager</div><br>
-            <div>Manager Runtime: 00:06:51</div>
+<div class="overview_container">
+<div class="summary_container">
+    @* Summary text + runtime *@
+    <div class="summary_caption_container" style="text-align: center;">Summary</div>
+    
+    @* Current running manager info *@
+    <div class="Current_manager_info_container">
+        <div>Current manager: DepartmentManager</div><br>
+        <div>Current manager Runtime: 00:06:51</div>
+    </div>
+    
+    <div class="Current_manager_container">
+        <div class="Current_manager_errors">Current manager errors: @CurrentManagerErrorCounter(managers).Sum()
+            <ul class="error-reconciliation-formatting">
+                <div class="circle background-red"></div><li>Fatal: @CurrentManagerErrorCounter(managers)[0]</li>
+                <div class="circle background-lightred"></div><li>Error: @CurrentManagerErrorCounter(managers)[1]</li>
+                <div class="circle background-yellow"></div><li>Warning: @CurrentManagerErrorCounter(managers)[2]</li>
+                <div class="circle background-green"></div><li>Info: @CurrentManagerErrorCounter(managers)[3]</li>
+            </ul>
+        </div>
+        <div class="Current_manager_reconciliations">Current manager reconciliations: @CurrentManagerReconCounter(managers).Sum()
+            <ul class="error-reconciliation-formatting">
+                <div class="circle background-red"></div><li> Mismatch: @CurrentManagerReconCounter(managers)[0]</li>
+                <div class="circle background-lightred"></div><li>Failed: @CurrentManagerReconCounter(managers)[1]</li>
+                <div class="circle background-yellow"></div><li>Disabled: @CurrentManagerReconCounter(managers)[2]</li>
+                <div class="circle background-green"></div><li>OK: @CurrentManagerReconCounter(managers)[3]</li>
+            </ul>
         </div>
         
         <div class="Current_manager_container">
@@ -86,7 +104,6 @@ else{
                                         </ul>
                                         
                                     </div>
-                                    
                                 </div>
                             </div>
 				        }
@@ -177,6 +194,7 @@ else{
 }
 
 
+
 @code{
     private LineConfig _lineconfig;
     LineDataset<int> lineconfig_dataset_cpu;
@@ -189,7 +207,7 @@ else{
 
     List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
     List<Manager_test> managers = new List<Manager_test>();
-    
+
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
@@ -205,7 +223,7 @@ else{
             {
                 lineconfig_dataset_cpu.Add(data._NumericValue);
             }
-            else if (data._ReportType =="MEMORY")
+            else if (data._ReportType == "MEMORY")
             {
                 lineconfig_dataset_memory.Add(data._NumericValue);
             }
@@ -217,10 +235,10 @@ else{
                 _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
             }
         }
-        
+
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
-        
+
         pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
         {
             BackgroundColor = new[] // Color for the pies 
@@ -234,7 +252,7 @@ else{
             BorderWidth = 0
         };
         _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
-        
+
         pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
         {
             BackgroundColor = new[] // Color for the pies
@@ -247,10 +265,15 @@ else{
             BorderColor = ColorUtil.ColorHexString(0, 0, 0),
             BorderWidth = 0,
         };
-        
+
         _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
     }
-    
+
+}
+
+
+@code{
+
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
@@ -356,6 +379,10 @@ else{
         return config;
     }
 
+}
+
+@code{
+
     private void ConfigurePieConfig()
     {
         _pieconfig_errors = new PieConfig();
@@ -381,7 +408,11 @@ else{
         _pieconfig_errors = SetUpPieLabels(_pieconfig_errors, new[] {"Fatal error", "Error", "Warning", "Info"});
         _pieconfig_reconciliations = SetUpPieLabels(_pieconfig_reconciliations, new[] {"Mismatch", "Failed", "Disabled", "OK"});
     }
-    
+
+}
+
+@code
+{
     int selectedManager { get; set; }
     
     private void GetSelectedManagerID(int selectedID)
@@ -399,8 +430,8 @@ else{
 			switch(error._severity)
 			{
 				case "FATAL":
-					counter[0]++;
-				break;
+					counter[0]++;;
+				    break;
 
 				case "ERROR":
 					counter[1]++;
@@ -438,6 +469,16 @@ else{
         return Total_Errors;
     }
 
+    private int[] CurrentManagerErrorCounter(List<Manager_test> managers)
+    {
+        int[] CurrentManagerError = {0,0,0,0};
+        foreach (var party in managers)
+        {
+            CurrentManagerError = ErrorSeverityCounter(party._errors);
+        }
+        return CurrentManagerError;
+    }
+    
     private int[] ReconTypeCounter(List<Reconciliation> recons)
     {
         int[] counter = {0, 0, 0, 0};
@@ -484,12 +525,19 @@ else{
                 Total_Recons[i] += test[i];
             }
         }
-        //Console.WriteLine(Total_Recons[0]);
         return Total_Recons;
-        
     }
     
-    
+    private int[] CurrentManagerReconCounter(List<Manager_test> managers)
+    {
+        int[] CurrentManagerRecons = {0,0,0,0};
+        foreach (var party in managers)
+        {
+            CurrentManagerRecons = ReconTypeCounter(party._recons);
+        }
+        return CurrentManagerRecons;
+    }
+
     private string ManagerCircleColour(Manager_test manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager._errors);
@@ -507,6 +555,7 @@ else{
 		else return "background-green";
 	}
   	
+    
 	int hoveredManager {get; set;}
     int[] hoveredManagerErrors { get; set; }
     int[] hoveredManagerRecons { get; set; }
@@ -523,7 +572,5 @@ else{
 	    hoveredManagerErrors = ErrorSeverityCounter(manager._errors);
 	    hoveredManagerRecons = ReconTypeCounter(manager._recons);
 	}
-
-
-
+    
 }
