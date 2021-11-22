@@ -88,7 +88,9 @@ else
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="true" Title="Message" Frozen="true" Width="800px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.Description</span>
+                                <div style="display: grid;">
+                                    <span style="align-self: center; color: #FFFFFF; overflow-x: auto;">@data.Description</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -119,7 +121,9 @@ else
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.Description</span>
+                                <div style="display: grid;">
+                                    <span style="align-self: center; color: #FFFFFF; overflow-x: auto;">@data.Description</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -150,7 +154,9 @@ else
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.Description</span>
+                                <div style="display: grid;">
+                                    <span style="align-self: center; color: #FFFFFF; overflow-x: auto;">@data.Description</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -181,7 +187,9 @@ else
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.Description</span>
+                                <div style="display: grid;">
+                                    <span style="align-self: center; color: #FFFFFF; overflow-x: auto;">@data.Description</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -212,7 +220,9 @@ else
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.Description</span>
+                                <div style="display: grid;">
+                                    <span style="align-self: center; color: #FFFFFF; overflow-x: auto;">@data.Description</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
@@ -220,5 +230,4 @@ else
             </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
-    
 }
