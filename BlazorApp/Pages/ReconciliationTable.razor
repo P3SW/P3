@@ -7,7 +7,8 @@
 {
     //ReconDataEventArgs _update;
     List<LogData> _dataStorageList = new();
-    
+    RadzenDataGrid<LogData> ReconciliationDataGrid;
+
     protected override async Task OnInitializedAsync()
     {
         _dataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
@@ -15,12 +16,14 @@
         ReconUpdateTriggered += async (o, args) =>
         {
             _dataStorageList.AddRange(args.ReconDataList);
+            await InvokeAsync(ReconciliationDataGrid.Reload);
             await InvokeAsync(StateHasChanged);
         };
 
         ReconUpdateResseted += async (o, args) =>
         {
             _dataStorageList = null;
+            await InvokeAsync(ReconciliationDataGrid.Reload);
             await InvokeAsync(StateHasChanged);
         };
     }
@@ -45,7 +48,7 @@ else
     <RadzenTabs id="reconciliation-tab">
     <Tabs>
         <RadzenTabsItem Text="All" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
+            <RadzenDataGrid @ref="ReconciliationDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
                             AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
@@ -90,7 +93,7 @@ else
             </RadzenDataGrid>
         </RadzenTabsItem>
         <RadzenTabsItem Text="Mismatch" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
+            <RadzenDataGrid @ref="ReconciliationDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
                             AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
@@ -121,7 +124,7 @@ else
             </RadzenDataGrid>
         </RadzenTabsItem>
             <RadzenTabsItem Text="Failed" class="TabElement">
-                <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
+                <RadzenDataGrid @ref="ReconciliationDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
                                 AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
@@ -152,7 +155,7 @@ else
                 </RadzenDataGrid>
             </RadzenTabsItem>
         <RadzenTabsItem Text="Disabled" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
+            <RadzenDataGrid @ref="ReconciliationDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
                             AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
@@ -183,7 +186,7 @@ else
             </RadzenDataGrid>
         </RadzenTabsItem>
         <RadzenTabsItem Text="Ok" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
+            <RadzenDataGrid @ref="ReconciliationDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="1000"
                             AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData" ColumnWidth="200px"
                             FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                             LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
