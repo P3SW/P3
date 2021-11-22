@@ -29,5 +29,8 @@ namespace BlazorApp.Data
                 default         : return "failColor";
             }
         }
+        
+
+
     }
 }
