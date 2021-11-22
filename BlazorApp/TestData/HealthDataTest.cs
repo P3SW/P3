@@ -18,4 +18,7 @@ namespace BlazorApp.Data
         public DateTime _Date { get; private set; }
         
     }
+    
+    
+    
 }
