@@ -3,10 +3,10 @@ using System.Collections.Generic;
 
 namespace BlazorApp.Data
 {
-    public class HealthDataTest_cpu
+    public class HealthDataTest
     {
 
-        public HealthDataTest_cpu(string ReportType, int NumericValue, DateTime Date)
+        public HealthDataTest(string ReportType, int NumericValue, DateTime Date)
         {
             _ReportType = ReportType;
             _NumericValue = NumericValue;
