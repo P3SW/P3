@@ -38,10 +38,11 @@ namespace BlazorApp.Data
             //LogTriggerUpdate(LogDataList);
             
             TriggerUpdate(newLogDataList);
-
+            OverviewTriggerUpdate();
+            
             //Console.WriteLine($"Count: {LogDataList.Count} *************************************************************");
             //PrintLogData(newLogDataList);
-            
+
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.

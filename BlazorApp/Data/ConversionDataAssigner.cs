@@ -15,8 +15,21 @@ namespace BlazorApp.Data
         private static string _connectionString;
         private static int _managerQueue;
         private static int _managerId;
+
+        private static List<LogData> errorDataStorageList = new ();
+        private static List<LogData> reconDataStorageList = new ();
+        private static List<LogData> ErrorDataStorageList
+        {
+            get => errorDataStorageList;
+            set => errorDataStorageList.AddRange(value);
+        }
         
-        
+        private static List<LogData> ReconDataStorageList
+        {
+            get => reconDataStorageList;
+            set => reconDataStorageList.AddRange(value);
+        }
+
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
         public static void Start()
@@ -209,21 +222,44 @@ namespace BlazorApp.Data
             {
                 foreach (var finishedManager in FinishedManagers)
                 {
-                    if (type == "error") 
-                        list.AddRange(finishedManager.ErrorHandler.LogDataList);
-                    else 
-                        list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
+                    if (type == "error")
+                        ErrorDataStorageList = finishedManager.ErrorHandler.LogDataList;
+                    //ErrorDataStorageList.AddRange(finishedManager.ErrorHandler.LogDataList);
+                    //list.AddRange(finishedManager.ErrorHandler.LogDataList);
+                    else
+                        ReconDataStorageList = finishedManager.ReconciliationHandler.LogDataList;
+                        //ReconDataStorageList.AddRange(finishedManager.ReconciliationHandler.LogDataList);
+                        //list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
                 }
-                
             }
             
-            if (type == "error") 
-                list.AddRange(_currentManager.ErrorHandler.LogDataList);
-            else 
-                list.AddRange(_currentManager.ReconciliationHandler.LogDataList);
+            if (type == "error")
+                ErrorDataStorageList = _currentManager.ErrorHandler.LogDataList;
+                //ErrorDataStorageList.AddRange(_currentManager.ErrorHandler.LogDataList);
+                //list.AddRange(_currentManager.ErrorHandler.LogDataList);
+            else
+                ReconDataStorageList = _currentManager.ErrorHandler.LogDataList;
+                //ReconDataStorageList.AddRange(_currentManager.ReconciliationHandler.LogDataList);
+                //list.AddRange(_currentManager.ReconciliationHandler.LogDataList);
             
             Console.WriteLine("Sending list with errors");
-            return await Task.FromResult(list);
+
+            //return await GetDataStorageList(type);
+            
+            if (type == "error")
+                return await Task.FromResult(ErrorDataStorageList);
+            else 
+                return await Task.FromResult(ReconDataStorageList);
+        }
+
+        public static async Task<List<LogData>> GetDataStorageList(string type)
+        {
+            switch (type)
+            {
+                case "error" : return await Task.FromResult(ErrorDataStorageList); break;
+                case "reconciliations" : return await Task.FromResult(ReconDataStorageList); break;
+                default: return null;
+            }
         }
         
 
