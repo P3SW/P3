@@ -1,0 +1,6 @@
+﻿.demos {
+    white-space: nowrap;
+    overflow: hidden;
+    width: 120px;
+    border: 3px solid black;
+}
