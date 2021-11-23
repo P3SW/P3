@@ -77,7 +77,7 @@ namespace SQLDatabaseRead
             StartListening();
         }
         
-        internal void AddQueryToObject(string queryString)
+        private void AddQueryToObject(string queryString)
         {
             using (SqlCommand command = new SqlCommand(queryString, Connection))
             {
