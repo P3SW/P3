@@ -55,23 +55,8 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="true" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
-                            <div class="messageContainer" style="display: grid; grid-template-columns: auto 25px">
-                                <span class="overflowCheck" style="
-                                    align-self: center;
-                                    color: #FFFFFF; 
-                                    overflow-x: hidden;
-                                    white-space: nowrap;
-                                    text-overflow: ellipsis;
-                                ">@data._message    
-                                </span>
-                                <div style="position: absolute; right: 1%; align-self: center; display: none;">
-                                    <RadzenButton Icon="expand_more" Style="
-                                        width: 24px;
-                                        height: 24px;
-                                        background: rgb(83, 96, 122);
-                                        border-radius: 0;
-                                    "/>
-                                </div>
+                            <div class="messageContainer" style="display: grid;">
+                                <span style="align-self: center; color: #FFFFFF; overflow-x: auto; white-space: nowrap;">@data._message</span>
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
@@ -103,7 +88,9 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
+                            <div class="messageContainer" style="display: grid;">
+                                <span style="align-self: center; color: #FFFFFF; overflow-x: auto; white-space: nowrap;">@data._message</span>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -134,7 +121,9 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
+                            <div class="messageContainer" style="display: grid;">
+                                <span style="align-self: center; color: #FFFFFF; overflow-x: auto; white-space: nowrap;">@data._message</span>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -165,7 +154,9 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
+                            <div class="messageContainer" style="display: grid;">
+                                <span style="align-self: center; color: #FFFFFF; overflow-x: auto; white-space: nowrap;">@data._message</span>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -196,7 +187,9 @@ else
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
+                            <div class="messageContainer" style="display: grid;">
+                                <span style="align-self: center; color: #FFFFFF; overflow-x: auto; white-space: nowrap;">@data._message</span>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -229,13 +222,4 @@ else
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
     }
     
-    /* Imports the OverflowChecker.js file when page gets loaded */
-    JSObjectReference module;
-    protected override async Task OnAfterRenderAsync(bool firstRender)
-    {
-        if (firstRender)
-        {
-            module = (JSObjectReference) await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./OverflowChecker.js");
-        }
-    }
 }
