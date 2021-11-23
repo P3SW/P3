@@ -8,6 +8,7 @@ namespace BlazorApp.Data
 {
     public class ManagerStatusHandler : EventBase
     {
+        private int ExecutionID;
         public string Name { get; private set; }
         public int Id { get; private set; }
         public string Status { get; private set; }
@@ -140,13 +141,13 @@ namespace BlazorApp.Data
                                          $"AND LOG_TIME > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          "ORDER BY LOG_TIME");
                 case "logging":
-                    return string.Format($"SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
-                                         $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
-                                         $"FROM [dbo].[LOGGING] " +
-                                         $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
-                                         $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
+                    return string.Format("SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
+                                         "[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
+                                         "FROM [dbo].[LOGGING] " +
+                                         "INNER JOIN [dbo].[LOGGING_CONTEXT] " +
+                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
-                                         $"ORDER BY CREATED");
+                                         "ORDER BY CREATED");
                 case "reconciliation":
                     return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
                                          $"FROM dbo.AFSTEMNING WHERE AFSTEMTDATO > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +

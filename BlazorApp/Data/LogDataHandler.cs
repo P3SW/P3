@@ -33,7 +33,7 @@ namespace BlazorApp.Data
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
                         
-            TriggerUpdate(newLogDataList);            
+            TriggerUpdate(newLogDataList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
@@ -42,17 +42,17 @@ namespace BlazorApp.Data
             switch (type)
             {
                 case "ERROR" :
-                    return string.Format($"SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
-                                         $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
-                                         $"FROM [dbo].[LOGGING] " +
-                                         $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
-                                         $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
+                    return string.Format("SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL],  " +
+                                         "[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
+                                         "FROM [dbo].[LOGGING] " +
+                                         "INNER JOIN [dbo].[LOGGING_CONTEXT] " +
+                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " + 
                                          $"WHERE CREATED > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
-                                         $"ORDER BY CREATED");
+                                         "ORDER BY CREATED");
                 case "RECONCILIATION" :
-                    return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
+                    return string.Format("SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
                                          $"FROM [dbo].[AFSTEMNING] WHERE AFSTEMTDATO > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
-                                         $"ORDER BY AFSTEMTDATO");
+                                         "ORDER BY AFSTEMTDATO");
                 default:
                     throw new Exception("Type not okay");
             }
