@@ -59,6 +59,7 @@ a, .btn-link {
     /* width */
     ::-webkit-scrollbar {
         width: 0.5rem !important;
+        height: 0.75rem !important;
         background-color: #384561 !important;
     }
     
