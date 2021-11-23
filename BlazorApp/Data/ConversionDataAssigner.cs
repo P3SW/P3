@@ -7,30 +7,26 @@ using SQLDatabaseRead;
 
 namespace BlazorApp.Data
 {
-    public class ConversionDataAssigner
+    public static class ConversionDataAssigner
     {
-        public List<ManagerStatusHandler> FinishedManagers { get; private set; }
-        private ManagerStatusHandler _currentManager;
-        private SqlConnection _connection;
-        private string _connectionString;
-        private int _managerQueue;
-        private int _managerId;
-
-
-        //Constructor initialising the some of the fields in the class
-        public ConversionDataAssigner()
+        public static List<ManagerStatusHandler> FinishedManagers { get; private set; }
+        private static ManagerStatusHandler _currentManager;
+        private static SqlConnection _connection;
+        private static string _connectionString;
+        private static int _managerQueue;
+        private static int _managerId;
+        
+        
+        //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
+        //The program will wait for data if the table is empty
+        public static void Start()
         {
             _connectionString = ConfigReader.ReadSetupFile();
             _managerQueue = 0;
             FinishedManagers = new List<ManagerStatusHandler>();
             _managerId = 1;
             _currentManager = null;
-        }
-
-        //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
-        //The program will wait for data if the table is empty
-        public void Start()
-        {
+            
             Console.WriteLine("Engine started");
 
             SqlConnection conn = new SqlConnection(_connectionString);
@@ -42,9 +38,9 @@ namespace BlazorApp.Data
                 SqlDependency.Stop(_connectionString);
                 SqlDependency.Start(_connectionString);
                 ManagerStatusHandler.Connection = new SqlConnection(_connectionString);
-                TableStreamer.Connection = new SqlConnection(_connectionString);
+                SQLDependencyListener.Connection = new SqlConnection(_connectionString);
 
-                TableStreamer.Connection.Open();
+                SQLDependencyListener.Connection.Open();
                 ManagerStatusHandler.Connection.Open();
                 
                 _connection = conn;
@@ -79,7 +75,7 @@ namespace BlazorApp.Data
         }
 
         //Creates a SqlDependency with an eventhandler which is called when data is inserted in the table
-        private void WaitForStart()
+        private static void WaitForStart()
         {
             using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
             {
@@ -89,14 +85,14 @@ namespace BlazorApp.Data
                 SqlDependency dependency = new SqlDependency(command);
                 dependency.OnChange +=  ContinueSetup;
                     
-                TableStreamer.CloseReader(command);
+                SQLDependencyListener.CloseReader(command);
 
             }            
         }
         
         //Continues the setup by adding managers to the queue when rows are inserted into the MANAGERS table
         //The MANAGER_TRACKING table will be watched and the first manager will be started after the rows in MANAGERS are read
-        private async void ContinueSetup(object sender, SqlNotificationEventArgs eventArgs)
+        private static async void ContinueSetup(object sender, SqlNotificationEventArgs eventArgs)
         {
             if (eventArgs.Info == SqlNotificationInfo.Invalid)
             {
@@ -122,7 +118,7 @@ namespace BlazorApp.Data
         }
 
         //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
-        private void ManagerTrackingListener()
+        private static void ManagerTrackingListener()
         {
             using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
             {
@@ -132,14 +128,14 @@ namespace BlazorApp.Data
                     
                 SqlDependency dependency = new SqlDependency(command);
                 dependency.OnChange += ManagerStartTracking;
+                Console.WriteLine("Manager start dependency created");
                 
-                Console.WriteLine("Dependency created");
-                TableStreamer.CloseReader(command);
+                SQLDependencyListener.CloseReader(command);
             }
         }
 
         //Method handling the event. Calls the next manager and creates a new SqlDependency to track the table again
-        private void ManagerStartTracking(object sender, SqlNotificationEventArgs eventArgs)
+        private static void ManagerStartTracking(object sender, SqlNotificationEventArgs eventArgs)
         {
             if (eventArgs.Info == SqlNotificationInfo.Invalid)
             {
@@ -183,7 +179,7 @@ namespace BlazorApp.Data
             ManagerTrackingListener();
         }
 
-        private void PrintFinishedManager()
+        private static void PrintFinishedManager()
         {
             Console.WriteLine($"Name: {_currentManager.Name}\n" +
                               $"Status: {_currentManager.Status}\n" +
@@ -198,5 +194,42 @@ namespace BlazorApp.Data
                               $"Efficiency score: {_currentManager.EfficiencyScore}");
         }
         
+        public static async Task<List<LogData>> GetErrorLogList(string type)
+        {
+            if (_currentManager == null)
+            {
+                Console.WriteLine(_currentManager);
+                Console.WriteLine("Sending new list");
+                return new List<LogData>();
+            }
+
+            List<LogData> list = new List<LogData>();
+
+            if (FinishedManagers.Count > 0)
+            {
+                foreach (var finishedManager in FinishedManagers)
+                {
+                    if (type == "error") 
+                        list.AddRange(finishedManager.ErrorHandler.LogDataList);
+                    else 
+                        list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
+                }
+                
+            }
+            
+            if (type == "error") 
+                list.AddRange(_currentManager.ErrorHandler.LogDataList);
+            else 
+                list.AddRange(_currentManager.ReconciliationHandler.LogDataList);
+            
+            Console.WriteLine("Sending list with errors");
+            return await Task.FromResult(list);
+        }
+        
+
+
+
+
+
     }
 }

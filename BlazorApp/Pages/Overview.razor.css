@@ -1,4 +1,10 @@
 /* Summary root */
+.overview_container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
 .summary_container{
     background-color: #384561;
     padding: 0;
@@ -268,52 +274,54 @@
     font-size: 0.6em;
     margin: 0.5rem;
 }
-    .manager-queue-container{
-        display: grid;
-        grid-template-rows: 0.6em 1fr;
-        align-items: center;
-    }
 
-    .manager-circle {
-        height: 80px;
-        width: 80px;
-        border-radius: 50%;
-        display: inline-block;
-    }
+.manager-queue-container{
+    display: grid;
+    grid-template-rows: 0.6em 1fr;
+    align-items: center;
+}
 
-    .manager-queue-circle {
-        display: block;
-        background: rgba(83, 96, 122, 0.27);
-        overflow-y: visible;
-        overflow-x: auto;
-        white-space: nowrap;        
-    }
+.manager-circle {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0.3rem;
+}
+
+.manager-queue-circle {
+    display: block;
+    background: rgba(83, 96, 122, 0.27);
+    overflow-y: visible;
+    overflow-x: auto;
+    white-space: nowrap;        
+}
+
+.hovered-manager{
+    display: none;
+    position: absolute;
+    height: 12rem;
+    width: 20rem;
+    text-align: left;
+    font-size: 0.8em;
+    background-color: #0F2147;
+    z-index: 2;
+    top: 100%;
+    box-shadow: 0 0 0.1rem black;
+}
+
+.manager-circle:hover > .hovered-manager{
+    display: grid;
+    grid-template-rows: 2fr 3fr;
+}
+
+.queue-finished-text {
+    float: left;
+}
     
-    .hovered-manager{
-        display: none;
-        position: absolute;
-        height: 12rem;
-        width: 20rem;
-        text-align: left;
-        font-size: 0.8em;
-        background-color: #0F2147;
-        z-index: 2;
-        top: 100%;
-        box-shadow: 0 0 0.1rem black;
-    }
-    
-    .manager-circle:hover > .hovered-manager{
-        display: grid;
-        grid-template-rows: 2fr 3fr;
-    }
-    
-    .queue-finished-text {
-        float: left;
-    }
-    
-    .queue-inqueue-text {
-        float: right;
-    }
+.queue-inqueue-text {
+    float: right;
+}
 
 .hoverbox-errors-recons{
     display: grid;
