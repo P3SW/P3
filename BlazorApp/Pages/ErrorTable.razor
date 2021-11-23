@@ -1,7 +1,6 @@
 @using BlazorApp.Data
 @using System.Reflection.Metadata
 @using System.Net.Sockets
-@inject Blazored.SessionStorage.ISessionStorageService session
 @using Radzen.Blazor
 
 @code
@@ -18,12 +17,6 @@
         
         ErrorUpdateTriggered += async (o, args) =>
         {
-            //_update = args;
-
-            //await session.SetItemAsync("SessionList", args);
-
-            //await session.GetItemAsync<List<LogData>>("SessionList");
-            
             _dataStorageList.AddRange(args.LogDataList);
             await InvokeAsync(ErrorLogDataGrid.Reload);
             await InvokeAsync(StateHasChanged);

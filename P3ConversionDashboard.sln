@@ -6,8 +6,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStreamingSimulation", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp", "BlazorApp\BlazorApp.csproj", "{844161E6-3075-46CC-AA3E-521BA5320E5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SQLDatabaseRead.Test", "SQLDatabaseRead.Test\SQLDatabaseRead.Test.csproj", "{1C4C8A7F-95BD-4DCD-B4C1-D002504C6EE6}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -26,9 +24,5 @@ Global
 		{844161E6-3075-46CC-AA3E-521BA5320E5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{844161E6-3075-46CC-AA3E-521BA5320E5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{844161E6-3075-46CC-AA3E-521BA5320E5B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{1C4C8A7F-95BD-4DCD-B4C1-D002504C6EE6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{1C4C8A7F-95BD-4DCD-B4C1-D002504C6EE6}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{1C4C8A7F-95BD-4DCD-B4C1-D002504C6EE6}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{1C4C8A7F-95BD-4DCD-B4C1-D002504C6EE6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
