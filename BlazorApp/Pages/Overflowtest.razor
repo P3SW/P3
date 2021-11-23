@@ -1,22 +1,17 @@
 ﻿@page "/overflow"
-@using System.Security.Principal
-@using Microsoft.AspNetCore.SignalR
-@inject IJSRuntime JSRuntime; 
+@inject IJSRuntime jsRuntime; 
 
-<div class="demos">This is some text inside the div which we are testing</div>
-<div class="demos">This is text.</div>
+<div class="overflowCheck">This is some text inside the div which we are testing</div>
+<div class="overflowCheck">This is text.</div>
 
 @code {
+    JSObjectReference module;
 
-    public partial class OverflowChecker
+    protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        [Inject]
-        IJSRuntime JSRuntime { get; set; }
-    
-        protected async Task MyFunction()
+        if (firstRender) /* Imports the OverflowChecker.js file when page gets loaded */
         {
-            await JSRuntime.InvokeVoidAsync("console.log('test')");
+            module = (JSObjectReference) await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./OverflowChecker.js");
         }
     }
-
 }

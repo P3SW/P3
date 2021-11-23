@@ -2,6 +2,7 @@
 @using System.Reflection.Metadata
 @using System.Net.Sockets
 @inject AnotherTest errorList;
+@inject IJSRuntime jsRuntime; 
 
 @if (errors == null)
 {
@@ -55,15 +56,15 @@ else
                     <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="true" Title="Message" Frozen="true" Width="800px">
                         <Template Context="data">
                             <div class="messageContainer" style="display: grid; grid-template-columns: auto 25px">
-                                <span style="
+                                <span class="overflowCheck" style="
                                     align-self: center;
                                     color: #FFFFFF; 
                                     overflow-x: hidden;
+                                    white-space: nowrap;
                                     text-overflow: ellipsis;
-                                        background-attachment: local;
                                 ">@data._message    
                                 </span>
-                                <div style="position: absolute; right: 1%; align-self: center;">
+                                <div style="position: absolute; right: 1%; align-self: center; display: none;">
                                     <RadzenButton Icon="expand_more" Style="
                                         width: 24px;
                                         height: 24px;
@@ -226,5 +227,15 @@ else
     void CellRender(DataGridCellRenderEventArgs<Error> dataGridCellRenderEventArgs)
     {
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
+    }
+    
+    /* Imports the OverflowChecker.js file when page gets loaded */
+    JSObjectReference module;
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            module = (JSObjectReference) await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./OverflowChecker.js");
+        }
     }
 }
