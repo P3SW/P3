@@ -7,6 +7,15 @@ export function isOverflown(element) {
 var elements = document.getElementsByClassName('overflowCheck');
 for (var i = 0; i < elements.length; i++) {
     var element = elements[i];
-    element.style.color = (isOverflown(element) ? 'red' : 'green');
     console.log("Element #" + i + " is " + (isOverflown(element) ? '' : 'not ') + "overflown.");
 }
+
+/*** PASTE THIS IN @Code OF A .razor COMPONONENT YOU WANT TO CHECK FOR OVERFLOW ***
+JSObjectReference module;
+protected override async Task OnAfterRenderAsync(bool firstRender)
+{
+    if (firstRender)
+    {
+        module = (JSObjectReference) await jsRuntime.InvokeAsync<IJSObjectReference>("import", "./OverflowChecker.js");
+    }
+}*/
