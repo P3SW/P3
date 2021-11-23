@@ -1,14 +1,12 @@
 using System;
-using System.Data;
 using System.Linq;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Builder;
+using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
 namespace BlazorApp.Data
 {
-    public class ManagerStatusHandler
+    public class ManagerStatusHandler : EventBase
     {
         public string Name { get; private set; }
         public int Id { get; private set; }
@@ -24,17 +22,17 @@ namespace BlazorApp.Data
         public int Cpu { get; set; }
         public int EfficiencyScore { get; private set; }
         public static SqlConnection Connection { get; set; }
-        private TableStreamer _healthStreamer;
-        private TableStreamer _errorStreamer;
-        private TableStreamer _reconciliationStreamer;
+        private SQLDependencyListener _healthStreamer;
+        private SQLDependencyListener _errorStreamer;
+        private SQLDependencyListener _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
 
         public ManagerStatusHandler(string name, int id, DateTime startTime)
         {
             Health = new HealthDataHandler(startTime);
-            ReconciliationHandler = new LogDataHandler(startTime);
-            ErrorHandler = new LogDataHandler(startTime);
+            ReconciliationHandler = new LogDataHandler(startTime, ReconTriggerUpdate);
+            ErrorHandler = new LogDataHandler(startTime, ErrorTriggerUpdate);
             Name = name;
             Id = id;
             StartTime = startTime;
@@ -46,16 +44,14 @@ namespace BlazorApp.Data
             Console.WriteLine($"Manager {Name} started");
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
             
-            _healthStreamer = new TableStreamer(DatabaseListenerQueryStrings.HealthSelect,
+            _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,
                 GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
             
-            _errorStreamer = new TableStreamer(DatabaseListenerQueryStrings.ErrorSelect,
+            _errorStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ErrorSelect,
                 GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
             
-            _reconciliationStreamer = new TableStreamer(
-                DatabaseListenerQueryStrings.ReconciliationSelect,
-                GetSelectStringsForTableStreamer("reconciliation"), 
-                ReconciliationHandler, "RECONCILIATION");
+            _reconciliationStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ReconciliationSelect,
+                GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
             
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
@@ -152,7 +148,7 @@ namespace BlazorApp.Data
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          $"ORDER BY CREATED");
                 case "reconciliation":
-                    return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[MANAGER],[AFSTEMRESULTAT]" +
+                    return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
                                          $"FROM dbo.AFSTEMNING WHERE AFSTEMTDATO > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
                                          $"ORDER BY AFSTEMTDATO");
                 default:
