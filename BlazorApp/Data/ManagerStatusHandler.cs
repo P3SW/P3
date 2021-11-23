@@ -52,11 +52,9 @@ namespace BlazorApp.Data
             
             _reconciliationStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ReconciliationSelect,
                 GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
-            Console.WriteLine("STREAMERS CREATED");
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
-            Console.WriteLine("LISTENING STARTED");
         }
 
         //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
