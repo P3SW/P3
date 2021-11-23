@@ -5,7 +5,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-      <PackageReference Include="Blazored.SessionStorage" Version="2.2.0" />
       <PackageReference Include="ChartJs.Blazor.Fork" Version="2.0.2" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="5.0.11" />
       <PackageReference Include="Microsoft.Data.SqlClient" Version="4.0.0-preview3.21293.2" />
