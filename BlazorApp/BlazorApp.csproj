@@ -27,5 +27,8 @@
     <ItemGroup>
       <ProjectReference Include="..\SQLDatabaseRead\SQLDatabaseRead.csproj" />
     </ItemGroup>
+    <ItemGroup>
+      <None Include="wwwroot\OverflowChecker.js" />
+    </ItemGroup>
 
 </Project>
