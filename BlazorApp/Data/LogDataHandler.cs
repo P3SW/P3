@@ -24,6 +24,7 @@ namespace BlazorApp.Data
         //Inserts data from the reader into temporary list and adds these to the full list of data.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
+            Console.WriteLine("ASSIGNING LOGS TO DATA LIST");
             newLogDataList = new List<LogData>();
             while (reader.Read())
             {
@@ -33,7 +34,8 @@ namespace BlazorApp.Data
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
                         
-            TriggerUpdate(newLogDataList);            
+            TriggerUpdate(newLogDataList); 
+            PrintLogData(newLogDataList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
