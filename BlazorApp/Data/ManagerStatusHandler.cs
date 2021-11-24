@@ -29,7 +29,7 @@ namespace BlazorApp.Data
         private SqlCommand command;
         private int run_number = 0;
 
-        public ManagerStatusHandler(string name, int id, DateTime startTime)
+        public ManagerStatusHandler(string name, int id, DateTime startTime/*, int executionId*/)
         {
             Health = new HealthDataHandler(startTime);
             ReconciliationHandler = new LogDataHandler(startTime, ReconTriggerUpdate);
@@ -37,6 +37,7 @@ namespace BlazorApp.Data
             Name = name;
             Id = id;
             StartTime = startTime;
+            //ExecutionID = executionId;
         }
 
         //Starts the tablestreamers and assigns the start time of the manager

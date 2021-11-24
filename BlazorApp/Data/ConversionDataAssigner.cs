@@ -11,10 +11,12 @@ namespace BlazorApp.Data
     {
         public static List<ManagerStatusHandler> FinishedManagers { get; private set; }
         private static ManagerStatusHandler _currentManager;
-        private static SqlConnection _connection;
+        private static SqlConnection _managerStartConnection;
+        private static SqlConnection _executionIDConnection;
         private static string _connectionString;
         private static int _managerQueue;
         private static int _managerId;
+        private static int _executionID;
         
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
@@ -26,6 +28,7 @@ namespace BlazorApp.Data
             FinishedManagers = new List<ManagerStatusHandler>();
             _managerId = 1;
             _currentManager = null;
+            _executionID = 1;
             
             Console.WriteLine("Engine started");
 
@@ -39,13 +42,15 @@ namespace BlazorApp.Data
                 SqlDependency.Start(_connectionString);
                 ManagerStatusHandler.Connection = new SqlConnection(_connectionString);
                 SQLDependencyListener.Connection = new SqlConnection(_connectionString);
-
+                _executionIDConnection = new SqlConnection(_connectionString);
+                
                 SQLDependencyListener.Connection.Open();
                 ManagerStatusHandler.Connection.Open();
+                _executionIDConnection.Open();
                 
-                _connection = conn;
+                _managerStartConnection = conn;
 
-                using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
+                using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _managerStartConnection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
                     {
@@ -57,6 +62,7 @@ namespace BlazorApp.Data
                                 _managerQueue++;
                             }
                             reader.Close();
+                            ExecutionIDListener();
                             ManagerTrackingListener();
                         }
                         else //The program will wait for rows to be inserted into the table if the table is empty
@@ -77,7 +83,7 @@ namespace BlazorApp.Data
         //Creates a SqlDependency with an eventhandler which is called when data is inserted in the table
         private static void WaitForStart()
         {
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _managerStartConnection))
             {
                 command.CommandType = CommandType.Text;
                 command.CommandText = DatabaseListenerQueryStrings.ManagersSelect;
@@ -101,7 +107,7 @@ namespace BlazorApp.Data
             
             await Task.Delay(1000);
             
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _managerStartConnection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -113,14 +119,50 @@ namespace BlazorApp.Data
                     reader.Close();
                 }
             }
+            ExecutionIDListener();
             ManagerTrackingListener();
-            //WatchNextManager();
+        }
+
+        private static void ExecutionIDListener()
+        {
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ExecutionIDSelect, _managerStartConnection))
+            {
+                
+                command.CommandType = CommandType.Text;
+                command.CommandText = DatabaseListenerQueryStrings.ExecutionIDSelect;
+                    
+                SqlDependency dependency = new SqlDependency(command);
+                dependency.OnChange += GetExecutionID;
+                Console.WriteLine("ExecutionID dependency created");
+                
+                SQLDependencyListener.CloseReader(command);
+            }
+        }
+
+        private static void GetExecutionID(object sender, SqlNotificationEventArgs eventArgs)
+        {
+            if (eventArgs.Info == SqlNotificationInfo.Invalid)
+            {
+                Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source,
+                    eventArgs.Type);
+            }
+
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ExecutionIDSelect))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        _executionID = (int)reader[0];
+                    }
+                }
+            }
         }
 
         //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
         private static void ManagerTrackingListener()
         {
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _managerStartConnection))
             {
                 
                 command.CommandType = CommandType.Text;
@@ -143,7 +185,7 @@ namespace BlazorApp.Data
                     eventArgs.Type);
             }
 
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _managerStartConnection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
