@@ -52,7 +52,6 @@ namespace BlazorApp.Data
             
             _reconciliationStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ReconciliationSelect,
                 GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
-            
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();

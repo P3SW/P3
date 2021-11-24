@@ -307,6 +307,7 @@
     background-color: #0F2147;
     z-index: 2;
     top: 100%;
+    box-shadow: 0 0 0.1rem black;
 }
 
 .manager-circle:hover > .hovered-manager{
@@ -317,7 +318,7 @@
 .queue-finished-text {
     float: left;
 }
-
+    
 .queue-inqueue-text {
     float: right;
 }
@@ -344,7 +345,28 @@
 .hoverbox-recons{
     padding-left: 2em;
 }
-    
+
+.hoverbox-arrow{
+    display: none;
+    height: 1rem;
+    filter: drop-shadow(0 0 0.1rem black);
+    pointer-events: none;
+}
+
+.manager-circle:hover > .hoverbox-arrow{
+    display: block;
+}
+
+.current-manager-loader{
+    display: block;
+    height: 80%;
+    width: 80%;
+    position: relative; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+}
+
 /* Efficiency table */    
 .efficiency-container {
     line-height: 80%;
