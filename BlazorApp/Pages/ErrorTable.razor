@@ -58,7 +58,9 @@ else
                         <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="true"
                                               Title="Manager name" Frozen="true" Width="400px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                                <div style="display: grid; width: 400px; max-width: 400px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
+                                    <span style="color: #FFFFFF; ">@data.ManagerName</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="false" Title="Severity" Frozen="true" Width="200px">
@@ -105,7 +107,9 @@ else
                         <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                               Frozen="true" Width="400px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                                <div style="display: grid; width: 400px; max-width: 400px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
+                                    <span style="color: #FFFFFF">@data.ManagerName</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Severity" Frozen="true" Width="200px"
@@ -138,7 +142,9 @@ else
                         <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                               Frozen="true" Width="400px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                                <div style="display: grid; width: 400px; max-width: 400px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
+                                    <span style="color: #FFFFFF">@data.ManagerName</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="true" Title="Severity" Frozen="true" Width="200px"
@@ -171,7 +177,9 @@ else
                         <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                               Frozen="true" Width="400px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                                <div style="display: grid; width: 400px; max-width: 400px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
+                                    <span style="color: #FFFFFF">@data.ManagerName</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="true" Title="Severity" Frozen="true" Width="200px"
@@ -204,7 +212,9 @@ else
                         <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
                                               Frozen="true" Width="400px">
                             <Template Context="data">
-                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                                <div style="display: grid; width: 400px; max-width: 400px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
+                                    <span style="color: #FFFFFF">@data.ManagerName</span>
+                                </div>
                             </Template>
                         </RadzenDataGridColumn>
                         <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="true" Title="Severity" Frozen="true" Width="200px"
