@@ -33,7 +33,8 @@ namespace BlazorApp.Data
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
                         
-            TriggerUpdate(newLogDataList);            
+            TriggerUpdate(newLogDataList); 
+            PrintLogData(newLogDataList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
