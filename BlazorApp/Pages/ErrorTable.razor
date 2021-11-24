@@ -1,9 +1,43 @@
 @using BlazorApp.Data
 @using System.Reflection.Metadata
 @using System.Net.Sockets
-@inject AnotherTest errorList;
+@using Radzen.Blazor
 
-@if (errors == null)
+@code
+{
+    //LogDataEventArgs _update;
+    List<LogData> _dataStorageList;
+    private int currentCount = 0;
+    RadzenDataGrid<LogData> ErrorLogDataGrid;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        _dataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
+        StateHasChanged();
+        
+        ErrorUpdateTriggered += async (o, args) =>
+        {
+            _dataStorageList.AddRange(args.LogDataList);
+            await InvokeAsync(ErrorLogDataGrid.Reload);
+            await InvokeAsync(StateHasChanged);
+        };
+
+        ErrorUpdateResseted += async (o, args) =>
+        {
+            _dataStorageList = null;
+            await InvokeAsync(ErrorLogDataGrid.Reload);
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    //When rendering the cells, change the background color and remove the border.
+    void CellRender(DataGridCellRenderEventArgs<LogData> dataGridCellRenderEventArgs)
+    {
+        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
+    }
+}
+
+@if (_dataStorageList == null)
 {
     <p>Loading ....</p>
 }
@@ -14,195 +48,177 @@ else
     RadzenDataGrid is each data grid 
     Template is configuration of data in each column-->
     <RadzenTabs id="errorlog-tab">
-    <Tabs>
-        <RadzenTabsItem Text="All" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                            AllowPaging="false" AllowSorting="true" Data="@errors" TItem="Error"
-                            FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                            LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="true"
-                                          Title="Manager name" Frozen="true" Width="400px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_severity" Filterable="false" Title="Severity" Frozen="true" Width="200px" >
-                        <Template Context="data">
-                            @if(data._severity == "INFO")
-                            {
-                                <span style='color:#5CBCA9'>@data._severity</span>
-                            }
-                            else if (data._severity == "WARNING")
-                            {
-                                <span style="color:#DD9B2B">@data._severity</span>
-                            }
-                            else if (data._severity == "ERROR")
-                            {
-                                <span style="color:#E35F52">@data._severity</span>
-                            }
-                            else
-                            {
-                                <span style="color:#FF1700">@data._severity</span>
-                            }
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="true" Title="Message" Frozen="true" Width="800px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Fatal" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                        AllowPaging="false" AllowSorting="true" Data="@errors" TItem="Error"
-                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="false" Title="Manager name"
-                                          Frozen="true" Width="400px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_severity" Filterable="true" Title="Severity" Frozen="true" Width="200px"
-                                          FilterValue=@("FATAL") FilterOperator="FilterOperator.Equals">
-                        <Template Context="data">
-                            <span style='color:#FF1700'>@data._severity</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Error" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                        AllowPaging="false" AllowSorting="true" Data="@errors" TItem="Error"
-                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="false" Title="Manager name"
-                                          Frozen="true" Width="400px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_severity" Filterable="true" Title="Severity" Frozen="true" Width="200px"
-                                          FilterValue=@("ERROR") FilterOperator="FilterOperator.Equals">
-                        <Template Context="data">
-                            <span style='color:#E35F52'>@data._severity</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Warning" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                        AllowPaging="false" AllowSorting="true" Data="@errors" TItem="Error"
-                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="false" Title="Manager name"
-                                          Frozen="true" Width="400px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_severity" Filterable="true" Title="Severity" Frozen="true" Width="200px"
-                                          FilterValue=@("WARNING") FilterOperator="FilterOperator.Equals">
-                        <Template Context="data">
-                            <span style='color:#DD9B2B'>@data._severity</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenTabsItem>
-        <RadzenTabsItem Text="Info" class="TabElement">
-            <RadzenDataGrid AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                        AllowPaging="false" AllowSorting="true" Data="@errors" TItem="Error"
-                                        FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
-                                        LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
-                <Columns>
-                    <RadzenDataGridColumn TItem="Error" Property="_id" Filterable="false" Title="Manager name"
-                                          Frozen="true" Width="400px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._id</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_severity" Filterable="true" Title="Severity" Frozen="true" Width="200px"
-                                          FilterValue=@("INFO") FilterOperator="FilterOperator.Equals">
-                        <Template Context="data">
-                            <span style='color:#5CBCA9'>@data._severity</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._timestamp</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                    <RadzenDataGridColumn TItem="Error" Property="_message" Filterable="false" Title="Message" Frozen="true" Width="800px">
-                        <Template Context="data">
-                            <span style="color: #FFFFFF">@data._message</span>
-                        </Template>
-                    </RadzenDataGridColumn>
-                </Columns>
-            </RadzenDataGrid>
-        </RadzenTabsItem>
+        <Tabs>
+            <RadzenTabsItem Text="All" class="TabElement">
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="true"
+                                              Title="Manager name" Frozen="true" Width="400px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="false" Title="Severity" Frozen="true" Width="200px">
+                            <Template Context="data">
+                                @if (data.Grade == "INFO")
+                                {
+                                    <span style='color:#5CBCA9'>@data.Grade</span>
+                                }
+                                else if (data.Grade == "WARN")
+                                {
+                                    <span style="color:#DD9B2B">@data.Grade</span>
+                                }
+                                else if (data.Grade == "ERROR")
+                                {
+                                    <span style="color:#E35F52">@data.Grade</span>
+                                }
+                                else
+                                {
+                                    <span style="color:#FF1700">@data.Grade</span>
+                                }
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Title="Timestamp" Frozen="true" Width="300px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Timestamp</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="true" Title="Message" Frozen="true" Width="800px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Description</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Fatal" class="TabElement">
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
+                                              Frozen="true" Width="400px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Grade" Title="Severity" Frozen="true" Width="200px"
+                                              FilterValue=@("FATAL") FilterOperator="FilterOperator.Equals">
+                            <Template Context="data">
+                                <span style='color:#FF1700'>@data.Grade</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Timestamp</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Description</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Error" class="TabElement">
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
+                                              Frozen="true" Width="400px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="true" Title="Severity" Frozen="true" Width="200px"
+                                              FilterValue=@("ERROR") FilterOperator="FilterOperator.Equals">
+                            <Template Context="data">
+                                <span style='color:#E35F52'>@data.Grade</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Timestamp</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Description</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Warning" class="TabElement">
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
+                                              Frozen="true" Width="400px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="true" Title="Severity" Frozen="true" Width="200px"
+                                              FilterValue=@("WARN") FilterOperator="FilterOperator.Equals">
+                            <Template Context="data">
+                                <span style='color:#DD9B2B'>@data.Grade</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Timestamp</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Description</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
+            <RadzenTabsItem Text="Info" class="TabElement">
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                                FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                                LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
+                    <Columns>
+                        <RadzenDataGridColumn TItem="LogData" Property="ManagerName" Filterable="false" Title="Manager name"
+                                              Frozen="true" Width="400px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.ManagerName</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Grade" Filterable="true" Title="Severity" Frozen="true" Width="200px"
+                                              FilterValue=@("INFO") FilterOperator="FilterOperator.Equals">
+                            <Template Context="data">
+                                <span style='color:#5CBCA9'>@data.Grade</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Timestamp" Filterable="false" Title="Timestamp" Frozen="true" Width="300px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Timestamp</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                        <RadzenDataGridColumn TItem="LogData" Property="Description" Filterable="false" Title="Message" Frozen="true" Width="800px">
+                            <Template Context="data">
+                                <span style="color: #FFFFFF">@data.Description</span>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenTabsItem>
         </Tabs>
     </RadzenTabs>
     
-}
-
-
-@code {
-    List<Error> errors;
-    
-    //When the application starts, get the list of errors
-    protected override async Task OnInitializedAsync()
-    {
-        errors = await Task.Run(() => errorList.ErrorList());
-    }
-
-    //When rendering the cells, change the background color and remove the border.
-
-    void CellRender(DataGridCellRenderEventArgs<Error> dataGridCellRenderEventArgs)
-    {
-        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561; border: none !important;");
-    }
 }

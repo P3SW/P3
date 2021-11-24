@@ -1,13 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Drawing.Printing;
-using System.Threading.Tasks;
+using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
 namespace BlazorApp.Data
 {
-    public class HealthDataHandler : IDataHandler
+    public class HealthDataHandler : EventBase, IDataHandler
     {
         public List<HealthData> Cpu { get; private set; }
         public List<HealthData> Memory { get; private set; }

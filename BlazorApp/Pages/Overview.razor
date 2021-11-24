@@ -2,10 +2,7 @@
 @page "/overview"
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
-@using System.Reflection.Emit
-@using System.Text.Json
 @using BlazorApp.Data
-@using Microsoft.JSInterop
 @inject Test dataList;
 @inject QueueTest managerList;
 
@@ -21,72 +18,74 @@ else{
         <div class="summary_container">
             @* Summary text + runtime *@
             <div class="summary_caption_container" style="text-align: center;">Summary</div>
-
+        
             @* Current running manager info *@
             <div class="Current_manager_info_container">
-                <div>Current manager: DepartmentManager</div><br>
-                <div>Current manager Runtime: 00:06:51</div>
+                <div>Current manager: @CurrentManagerDetails("managerName")</div><br>
+                <div>Manager Runtime: @CurrentManagerDetails("runtime")</div>
             </div>
-
+        
             <div class="Current_manager_container">
-                <div class="Current_manager_errors">
-                    Current manager errors: @CurrentManagerErrorCounter(managers).Sum()
+                <div class="Current_manager_errors">Current manager errors: @CurrentManagerDetails("totalErrors")
                     <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Fatal: @CurrentManagerErrorCounter(managers)[0]</li>
-                        <div class="circle background-lightred"></div><li>Error: @CurrentManagerErrorCounter(managers)[1]</li>
-                        <div class="circle background-yellow"></div><li>Warning: @CurrentManagerErrorCounter(managers)[2]</li>
-                        <div class="circle background-green"></div><li>Info: @CurrentManagerErrorCounter(managers)[3]</li>
+                        <div class="circle background-red"></div><li>Fatal: @CurrentManagerDetails("FATAL")</li>
+                        <div class="circle background-lightred"></div><li>Error: @CurrentManagerDetails("ERROR")</li>
+                        <div class="circle background-yellow"></div><li>Warning: @CurrentManagerDetails("WARNING")</li>
+                        <div class="circle background-green"></div><li>Info: @CurrentManagerDetails("INFO")</li>
                     </ul>
                 </div>
-                <div class="Current_manager_reconciliations">
-                    Current manager reconciliations: @CurrentManagerReconCounter(managers).Sum()
+                <div class="Current_manager_reconciliations">Current manager reconciliations: @CurrentManagerDetails("totalRecons")
                     <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li> Mismatch: @CurrentManagerReconCounter(managers)[0]</li>
-                        <div class="circle background-lightred"></div><li>Failed: @CurrentManagerReconCounter(managers)[1]</li>
-                        <div class="circle background-yellow"></div><li>Disabled: @CurrentManagerReconCounter(managers)[2]</li>
-                        <div class="circle background-green"></div><li>OK: @CurrentManagerReconCounter(managers)[3]</li>
+                        <div class="circle background-red"></div><li>Mismatch: @CurrentManagerDetails("MISMATCH")</li>
+                        <div class="circle background-lightred"></div><li>Failed: @CurrentManagerDetails("FAILED")</li>
+                        <div class="circle background-yellow"></div><li>Disabled: @CurrentManagerDetails("DISABLED")</li>
+                        <div class="circle background-green"></div><li>OK: @CurrentManagerDetails("OK")</li>
                     </ul>
                 </div>
             </div>
             <div class="mind-the-gap">&nbsp;</div>
-
+        
             @* Manager queue *@
             <div class="manager-queue-container">
                 <div class="queue-text">
-                    <span class="queue-finished-text">Finished: <b>8</b></span>
-                    <span class="queue-inqueue-text">In queue: <b>4</b></span>
+                    <span class="queue-finished-text">Finished: <b>@ManagerQueueCounterWriter("FINISHED")</b></span>
+                    <span class="queue-inqueue-text">In queue: <b>@ManagerQueueCounterWriter("QUEUED")</b></span>
                 </div>
                 <div class="manager-queue-circle">
-                    @foreach (Manager_test manager in managers)
+                    @foreach(Manager_test manager in managers)
                     {
-                        <div class="manager-circle @ManagerCircleColour(manager)" @onmouseover="@((e) => GetHoveredManager(manager._id, e, manager))">
-                            @if (hoveredManager == manager._id && hoveredManagerErrors != null)
+                        <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager._id, e, manager))">
+                            @if (manager._status == "RUNNING")
                             {
-                                <div class="hovered-manager" style="position: absolute; left: @(mousePositionX + "px"); top: @(mousePositionY + "px"); transform: translateY(-12rem);">
+                                <img  src="Icons/current-manager-loader.svg" alt="loader" class="current-manager-loader">
+                            }
+                            @if(HoveredManager == manager._id && HoveredManagerErrors != null)
+                            {
+                                <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(MousePositionX + "px"); top: @(MousePositionY + "px"); transform: translate(-50%,-100%);">
+                                <div class="hovered-manager" style="position: absolute; left: @(MousePositionX + "px"); top: @(MousePositionY + "px"); transform: translate(-50%,-13rem);">
                                     <div class="hoverbox-info">
                                         <div>Manager: @manager._name</div>
-                                        <div>Runtime: </div>
-                                        <div>Status: </div>
+                                        <div>Runtime: @CalculateRuntime(manager)</div>
+                                        <div>Status: @manager._status</div>
                                     </div>
                                     <div class="hoverbox-errors-recons">
                                         <div class="hoverbox-erros">
                                             <div>Errors</div>
                                             <ul class="error-reconciliation-formatting">
-                                                <div class="circle background-red"></div><li>Fatal: @hoveredManagerErrors[0]</li>
-                                                <div class="circle background-lightred"></div><li>Error: @hoveredManagerErrors[1]</li>
-                                                <div class="circle background-yellow"></div><li>Warning: @hoveredManagerErrors[2]</li>
-                                                <div class="circle background-green"></div><li>Info: @hoveredManagerErrors[3]</li>
+                                                <div class="circle background-red"></div><li>Fatal: @HoveredManagerErrors[0]</li>
+                                                <div class="circle background-lightred"></div><li>Error: @HoveredManagerErrors[1]</li>
+                                                <div class="circle background-yellow"></div><li>Warning: @HoveredManagerErrors[2]</li>
+                                                <div class="circle background-green"></div><li>Info: @HoveredManagerErrors[3]</li>    
                                             </ul>
                                         </div>
                                         <div class="hoverbox-recons">
                                             <div>Reconciliations</div>
                                             <ul class="error-reconciliation-formatting">
-                                                <div class="circle background-red"></div><li>Mismatch: @hoveredManagerRecons[0]</li>
-                                                <div class="circle background-lightred"></div><li>Failed: @hoveredManagerRecons[1]</li>
-                                                <div class="circle background-yellow"></div><li>Disabled: @hoveredManagerRecons[2]</li>
-                                                <div class="circle background-green"></div><li>OK: @hoveredManagerRecons[3]</li>
+                                                <div class="circle background-red"></div><li>Mismatch: @HoveredManagerRecons[0]</li>
+                                                <div class="circle background-lightred"></div><li>Failed: @HoveredManagerRecons[1]</li>
+                                                <div class="circle background-yellow"></div><li>Disabled: @HoveredManagerRecons[2]</li>
+                                                <div class="circle background-green"></div><li>OK: @HoveredManagerRecons[3]</li>    
                                             </ul>
-
                                         </div>
                                     </div>
                                 </div>
@@ -95,8 +94,7 @@ else{
                     }
                 </div>
             </div>
-
-
+            
             @* Total manager info *@
             <div class="Total_errors_and_reconciliations_container">
                 <div class="info_total_errors">
@@ -138,14 +136,14 @@ else{
             <div class="cpu_usage">
                 <div class="chart-header">
                     <div class="dropdown">
-                        <b class="selected-manager-name" title="">@(selectedManager + "-" + managers[selectedManager]._name)</b>
+                        <b class="selected-manager-name" title="">@(SelectedManager + "-" + managers[SelectedManager]._name)</b>
                         <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                         <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                         <div class="dropdown-content">
                             @for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                             {
                                 int managerID = i;
-                                if (i == selectedManager)
+                                if (i == SelectedManager)
                                 {
                                     continue;
                                 }
@@ -178,10 +176,7 @@ else{
             </div>
         </div>
     </div>
-    
 }
-
-
 
 @code{
     private LineConfig _lineconfig;
@@ -261,7 +256,6 @@ else{
 
 
 @code{
-
     private void ConfigureLineConfig()
     {
         _lineconfig = new LineConfig();
@@ -401,12 +395,12 @@ else{
 
 @code
 {
-    int selectedManager { get; set; }
+    int SelectedManager { get; set; }
     
     private void GetSelectedManagerID(int selectedID)
     {
         
-        selectedManager = selectedID;
+        SelectedManager = selectedID;
     }
     
     private int[] ErrorSeverityCounter(List<Error> errors)
@@ -442,7 +436,7 @@ else{
 
     private int[] TotalErrorsSeverityCounter(List<Manager_test> managers)
     {
-        int[] Total_Errors = {0, 0, 0, 0};
+        int[] totalErrors = {0, 0, 0, 0};
             int[] test = {0,0,0,0};
 
             foreach (var party in managers)
@@ -450,21 +444,21 @@ else{
                 test = ErrorSeverityCounter(party._errors);
                 for (int i = 0; i < 4; i++)
                 {
-                    Total_Errors[i] += test[i];
+                    totalErrors[i] += test[i];
                 }
             }
             //Console.WriteLine(Total_Errors[0]);
-        return Total_Errors;
+        return totalErrors;
     }
 
     private int[] CurrentManagerErrorCounter(List<Manager_test> managers)
     {
-        int[] CurrentManagerError = {0,0,0,0};
+        int[] currentManagerError = {0,0,0,0};
         foreach (var party in managers)
         {
-            CurrentManagerError = ErrorSeverityCounter(party._errors);
+            currentManagerError = ErrorSeverityCounter(party._errors);
         }
-        return CurrentManagerError;
+        return currentManagerError;
     }
     
     private int[] ReconTypeCounter(List<Reconciliation> recons)
@@ -501,64 +495,184 @@ else{
 
     private int[] TotalReconTypeCounter(List<Manager_test> managers)
     {
-        
-        int[] Total_Recons = {0, 0, 0, 0};
-        int[] test = {0,0,0,0};
+
+        int[] totalRecons = {0, 0, 0, 0};
+        int[] test = {0, 0, 0, 0};
 
         foreach (var party in managers)
         {
             test = ReconTypeCounter(party._recons);
             for (int i = 0; i < 4; i++)
             {
-                Total_Recons[i] += test[i];
+                totalRecons[i] += test[i];
             }
         }
-        return Total_Recons;
+        return totalRecons;
     }
-    
-    private int[] CurrentManagerReconCounter(List<Manager_test> managers)
-    {
-        int[] CurrentManagerRecons = {0,0,0,0};
-        foreach (var party in managers)
-        {
-            CurrentManagerRecons = ReconTypeCounter(party._recons);
-        }
-        return CurrentManagerRecons;
-    }
+
 
     private string ManagerCircleColour(Manager_test manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager._errors);
         int[] recons = ReconTypeCounter(manager._recons);
+        
+        ManagerQueueCounterFixer();
 
-		if(errors[0] > 0 || recons[0] > 0){
-		return "background-red";
-		}
-		else if(errors[1] > 0 || recons[1] > 0){
-		return "background-lightred";
-		}
-		else if(errors[2] > 0 || recons[2] > 0){
-		return "background-yellow";
-		}
-		else return "background-green";
+        switch (manager._status)
+        {
+           case "FINISHED":
+               ManagerQueueCounter[0]++;
+               if(errors[0] > 0 || recons[0] > 0){
+                   return "background-red";
+               }
+               else if(errors[1] > 0 || recons[1] > 0){
+                   return "background-lightred";
+               }
+               else if(errors[2] > 0 || recons[2] > 0){
+                   return "background-yellow";
+               }
+               else return "background-green";
+               
+            case "RUNNING":
+                CurrentManager = manager;
+                return "background-running";
+            
+            case "QUEUED":
+                ManagerQueueCounter[1]++;
+                return "background-queued";
+            default:
+                throw new ArgumentException($"{manager._status} is not a valid manager status");
+        }
+		
 	}
   	
+	int HoveredManager {get; set;}
+    int[] HoveredManagerErrors { get; set; }
+    int[] HoveredManagerRecons { get; set; }
+    double MousePositionX { get; set; }
+    double MousePositionY { get; set; }
+    Manager_test CurrentManager { get; set; }
+    int[] ManagerQueueCounter { get; set; }
     
-	int hoveredManager {get; set;}
-    int[] hoveredManagerErrors { get; set; }
-    int[] hoveredManagerRecons { get; set; }
-	
-    double mousePositionX { get; set; }
-    double mousePositionY { get; set; }
-
     
 	private void GetHoveredManager(int hovered, MouseEventArgs e, Manager_test manager)
 	{
-		hoveredManager = hovered;
-	    mousePositionX = e.ClientX;
-	    mousePositionY = e.ClientY;
-	    hoveredManagerErrors = ErrorSeverityCounter(manager._errors);
-	    hoveredManagerRecons = ReconTypeCounter(manager._recons);
+		HoveredManager = hovered;
+	    MousePositionX = e.ClientX;
+	    MousePositionY = e.ClientY;
+	    HoveredManagerErrors = ErrorSeverityCounter(manager._errors);
+	    HoveredManagerRecons = ReconTypeCounter(manager._recons);
 	}
+
+    private void ManagerQueueCounterFixer()
+    {
+        int total = 0;
+        if (ManagerQueueCounter == null)
+        {
+            ManagerQueueCounter = new[] {0, 0};
+        }
+        for (int i = 0; i < 2; i++)
+        {
+            total += ManagerQueueCounter[i];
+        }
+        if (total == managers.Count - 1)
+        {
+            ManagerQueueCounter = new[] {0, 0};
+        }
+    }
+
+    private int ManagerQueueCounterWriter(string status)
+    {
+        if (ManagerQueueCounter == null)
+        {
+            ManagerQueueCounterFixer();
+        }
+        if (status == "FINISHED")
+        {
+            return ManagerQueueCounter[0];
+        }
+        else if (status == "QUEUED")
+        {
+            return ManagerQueueCounter[1];
+        }
+        else
+        {
+            throw new ArgumentException($"{status} is not a valid argument");
+        }
+    }
+
+    private string CalculateRuntime(Manager_test manager)
+    {
+        string seconds = (manager._runtime / 1000 % 60).ToString();
+        
+        string minutes = (((manager._runtime / 1000) / 60) % 60).ToString();
+        
+        string hours = ((manager._runtime / 1000) / 3600).ToString();
+
+        if (seconds.Length < 2)
+        {
+            seconds = "0" + seconds;
+        }
+        if (minutes.Length < 2)
+        {
+            minutes = "0" + minutes;
+        }
+        if (hours.Length < 2)
+        {
+            hours = "0" + hours;
+        }
+        
+        return hours + ':' + minutes + ':' + seconds;
+    }
+
+    private string CurrentManagerDetails(string wantedInfo)
+    {
+        if (CurrentManager == null)
+        {
+            return "0";
+        }
+        switch (wantedInfo)
+        {
+            case "managerName":
+                return CurrentManager._name;
+            case "runtime":
+                return CalculateRuntime(CurrentManager); 
+            case "totalErrors":
+                return CurrentManager._errors.Count.ToString();
+            case "FATAL":
+                return ErrorSeverityCounter(CurrentManager._errors)[0].ToString();
+            case "ERROR":
+                return ErrorSeverityCounter(CurrentManager._errors)[1].ToString();
+            case "WARNING":
+                return ErrorSeverityCounter(CurrentManager._errors)[2].ToString();
+            case "INFO":
+                return ErrorSeverityCounter(CurrentManager._errors)[3].ToString();
+            case "totalRecons":
+                return CurrentManager._recons.Count.ToString();
+            case "MISMATCH":
+                return ReconTypeCounter(CurrentManager._recons)[0].ToString();
+            case "FAILED":
+                return ReconTypeCounter(CurrentManager._recons)[1].ToString();
+            case "DISABLED":
+                return ReconTypeCounter(CurrentManager._recons)[2].ToString();
+            case "OK":
+                return ReconTypeCounter(CurrentManager._recons)[3].ToString();
+            default:
+                throw new ArgumentException($"{wantedInfo} is not a valid argument");
+        }
+    }
     
+    private int[] CurrentManagerReconCounter(List<Manager_test> managers)
+    {
+        int[] currentManagerRecons = {0,0,0,0};
+        foreach (var party in managers)
+        {
+            currentManagerRecons = ReconTypeCounter(party._recons);
+        }
+        return currentManagerRecons;
+    }
+
+
 }
+
+
