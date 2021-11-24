@@ -27,22 +27,13 @@ namespace BlazorApp.Data
         private SQLDependencyListener _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
-        public string NameWithoutRandomNumber;
 
         public ManagerStatusHandler(string name, int id, DateTime startTime)
         {
             Health = new HealthDataHandler(startTime);
             ReconciliationHandler = new LogDataHandler(startTime, ReconTriggerUpdate);
             ErrorHandler = new LogDataHandler(startTime, ErrorTriggerUpdate);
-            if (name.Contains(","))
-            {
-                Name = name;
-                NameWithoutRandomNumber = name.Split(",")[0];
-            }
-            else
-            {
-                Name = name;
-            }
+            Name = name;
             Id = id;
             StartTime = startTime;
         }
@@ -61,7 +52,6 @@ namespace BlazorApp.Data
             
             _reconciliationStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ReconciliationSelect,
                 GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
-            
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
@@ -79,6 +69,7 @@ namespace BlazorApp.Data
             AssignEndTime();
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
+            OverviewTriggerUpdate(); // ***********************************EVENT TRIGGER ********************************
         }
 
         //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
@@ -113,7 +104,7 @@ namespace BlazorApp.Data
         //Queries the end time from the ENGINE_PROPERTIES table
         private void AssignEndTime()
         {
-            using (SqlCommand command = new SqlCommand(ObtainEnginePropertiesQueryStringByInteger("runtime"), Connection))
+            using (SqlCommand command = new SqlCommand(ObtainManagerEndTime(), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
@@ -127,26 +118,9 @@ namespace BlazorApp.Data
         }
         
         //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES, if name has a random number, the runtimeOverall is found using the name without randomnumber
-        private string ObtainEnginePropertiesQueryStringByInteger(string s)
+        private string ObtainManagerEndTime()
         {
-            string name;
-            if (NameWithoutRandomNumber == null)
-            {
-                name = Name;
-            }
-            else
-            {
-                name = NameWithoutRandomNumber;
-            }
-            switch (s)
-            {
-                case "startTime":
-                    return string.Format($"SELECT [VALUE] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{Name}%' AND [KEY] = 'START_TIME'");
-                case "runtime":
-                    return string.Format($"SELECT [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE MANAGER LIKE '{name}' AND [KEY] = 'runtimeOverall' ORDER BY [TIMESTAMP] DESC");
-                default:
-                    throw new ArgumentException($"{s} is an invalid argument");
-            }
+            return string.Format($"SELECT [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE [MGR] = '{Name}'");
         }
 
         //Queries data from the MANAGER_TRACKING table

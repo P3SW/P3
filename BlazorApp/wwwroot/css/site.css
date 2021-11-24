@@ -49,28 +49,36 @@ a, .btn-link {
         right: 0.75rem;
         top: 0.5rem;
     }
-/* width */
-::-webkit-scrollbar {
-    width: 0.5rem !important;
-    background-color: #384561 !important;
-}
 
-/* Track */
-::-webkit-scrollbar-track {
-    background: #8c8c8c !important;
-    border-radius: 10px !important;
+.error_reconciliation_table_formatting {
+    margin: 1%;
+    align-items: center;
 }
-
-/* Handle */
-::-webkit-scrollbar-thumb {
-    background: #384561 !important;
-    border-radius: 10px !important;
-}
-
-/* Handle on hover */
-::-webkit-scrollbar-thumb:hover {
-    background: #0F2147 !important;
-}
+    
+/* Scrollbar CSS */ 
+    /* width */
+    ::-webkit-scrollbar {
+        width: 0.5rem !important;
+        background-color: #384561 !important;
+    }
+    
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #8c8c8c !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #384561 !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(140, 140, 140, 1) !important;
+    }
+    
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #0F2147 !important;
+    }
 
 /* Colours */
 .background-green {
@@ -87,4 +95,12 @@ a, .btn-link {
 
 .background-red {
     background-color: rgba(255, 23, 0, 1) !important;
+}
+
+.background-running {
+    background-color: #0F2147;
+}
+
+.background-queued {
+    background-color: #384561;
 }

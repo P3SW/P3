@@ -19,7 +19,6 @@ namespace BlazorApp.Data
             LogDataList = new List<LogData>();
             LastRowTimeStamp = managerStartTime;
             TriggerUpdate = triggerUpdate;
-            Console.WriteLine("******************************************************************************************************************************************");
         }
         
         //Inserts data from the reader into temporary list and adds these to the full list of data.
@@ -33,16 +32,9 @@ namespace BlazorApp.Data
 
             LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
             LogDataList.AddRange(newLogDataList);
-            
-            //Event ****************************************************************************************************
-            //LogTriggerUpdate(LogDataList);
-            
-            TriggerUpdate(newLogDataList);
-            OverviewTriggerUpdate();
-            
-            //Console.WriteLine($"Count: {LogDataList.Count} *************************************************************");
-            //PrintLogData(newLogDataList);
-
+                        
+            TriggerUpdate(newLogDataList); 
+            PrintLogData(newLogDataList);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.

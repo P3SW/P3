@@ -44,9 +44,6 @@ namespace BlazorApp.Data
             PrintCPUAndMemory(NewCpu, NewMemory);
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
-            
-            // EVENT ***************************************************************************************************
-            //HealthTriggerUpdate(Cpu, Memory);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
