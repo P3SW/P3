@@ -14,6 +14,6 @@ namespace BlazorApp.Data
 
         public const string ManagerStartTimesSelect = "SELECT MANAGER, [TIMESTAMP] FROM dbo.ENGINE_PROPERTIES WHERE [KEY] = 'START_TIME' ORDER BY [TIMESTAMP] DESC";
 
-        public const string ExecutionIDSelect = "SELECT DISTINCT [EXECUTION_ID] FROM LOGGING ORDER BY EXECUTION_ID DESC";
+        public const string ExecutionIDSelect = "SELECT [EXECUTION_ID] FROM dbo.LOGGING ORDER BY [EXECUTION_ID] DESC";
     }
 }
