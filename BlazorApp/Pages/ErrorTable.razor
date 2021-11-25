@@ -50,8 +50,8 @@ else
     <RadzenTabs id="errorlog-tab">
         <Tabs>
             <RadzenTabsItem Text="All" class="TabElement">
-                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
+                                AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -99,8 +99,8 @@ else
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Fatal" class="TabElement">
-                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
+                                AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -134,8 +134,8 @@ else
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Error" class="TabElement">
-                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
+                                AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -169,8 +169,8 @@ else
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Warning" class="TabElement">
-                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
+                                AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -204,8 +204,8 @@ else
                 </RadzenDataGrid>
             </RadzenTabsItem>
             <RadzenTabsItem Text="Info" class="TabElement">
-                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                                AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
+                <RadzenDataGrid @ref="ErrorLogDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
+                                AllowPaging="true" AllowSorting="true" Data="@_dataStorageList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
