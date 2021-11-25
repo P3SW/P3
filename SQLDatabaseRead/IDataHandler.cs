@@ -5,6 +5,6 @@ namespace SQLDatabaseRead
     public interface IDataHandler
     {
         void AddDataFromSqlReader(SqlDataReader reader);
-        string GetNewestDataQueryString(string type);
+        string GetNewestDataQueryString();
     }
 }

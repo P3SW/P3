@@ -59,6 +59,13 @@ namespace BlazorApp.DataStreaming.Events
             ReconUpdateResseted?.Invoke(this,null);
         }
         
-        
+        // Update Overview ********************************************************
+
+        public static event EventHandler UpdateOverviewTriggered;
+
+        public void OverviewTriggerUpdate()
+        {
+            UpdateOverviewTriggered?.Invoke(this,null);
+        }
     }
 }
