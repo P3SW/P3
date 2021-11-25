@@ -3,6 +3,7 @@
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
+@using Microsoft.VisualBasic
 @inject Test dataList;
 @* @inject QueueTest managerList; *@
 
@@ -26,20 +27,20 @@ else{
             </div>
         
             <div class="Current_manager_container">
-                <div class="Current_manager_errors">Current manager errors: @CurrentManagerDetails("totalErrors")
+                <div class="Current_manager_errors">Current manager errors: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count()
                     <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Fatal: @CurrentManagerDetails("FATAL")</li>
-                        <div class="circle background-lightred"></div><li>Error: @CurrentManagerDetails("ERROR")</li>
-                        <div class="circle background-yellow"></div><li>Warning: @CurrentManagerDetails("WARNING")</li>
-                        <div class="circle background-green"></div><li>Info: @CurrentManagerDetails("INFO")</li>
+                        <div class="circle background-red"></div><li>Fatal: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "FATAL")</li>
+                        <div class="circle background-lightred"></div><li>Error: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "ERROR")</li>
+                        <div class="circle background-yellow"></div><li>Warning: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "WARN")</li>
+                        <div class="circle background-green"></div><li>Info: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "INFO")</li>
                     </ul>
                 </div>
-                <div class="Current_manager_reconciliations">Current manager reconciliations: @CurrentManagerDetails("totalRecons")
+                <div class="Current_manager_reconciliations">Current manager reconciliations: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count()
                     <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Mismatch: @CurrentManagerDetails("MISMATCH")</li>
-                        <div class="circle background-lightred"></div><li>Failed: @CurrentManagerDetails("FAILED")</li>
-                        <div class="circle background-yellow"></div><li>Disabled: @CurrentManagerDetails("DISABLED")</li>
-                        <div class="circle background-green"></div><li>OK: @CurrentManagerDetails("OK")</li>
+                        <div class="circle background-red"></div><li>Mismatch: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "MISMATCH")</li>
+                        <div class="circle background-lightred"></div><li>Failed: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "FAILED")</li>
+                        <div class="circle background-yellow"></div><li>Disabled: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "DISABLED")</li>
+                        <div class="circle background-green"></div><li>OK: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "OK")</li>
                     </ul>
                 </div>
             </div>
@@ -48,8 +49,8 @@ else{
             @* Manager queue *@
             <div class="manager-queue-container">
                 <div class="queue-text">
-                    <span class="queue-finished-text">Finished (TODO: CHANGE TO MANAGER COUNT): <b>@ManagerQueueCounterWriter("FINISHED")</b></span>
-                    <span class="queue-inqueue-text">In queue (TODO: CHANGE TO FINISHED COUNT): <b>@ManagerQueueCounterWriter("QUEUED")</b></span>
+                    <span class="queue-finished-text">Finished: <b>@ConversionDataAssigner.FinishedManagers.Count</b></span>
+                    <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner._managerQueue</b></span>
                 </div>
                 <div class="manager-queue-circle">
                     @foreach(ManagerStatusHandler manager in managers)
@@ -179,12 +180,14 @@ else{
 }
 
 @code{
+    int managersCount = 0;
+    bool calledOnce = false;
     private LineConfig _lineconfig;
     LineDataset<int> lineconfig_dataset_cpu;
     LineDataset<int> lineconfig_dataset_memory;
 
-    private PieConfig _pieconfig_errors;
-    private PieConfig _pieconfig_reconciliations;
+    public PieConfig _pieconfig_errors;
+    public PieConfig _pieconfig_reconciliations;
     PieDataset<int> pieconfig_dataset_errors;
     PieDataset<int> pieconfig_dataset_reconciliations;
 
@@ -279,7 +282,14 @@ else{
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
         _ReconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
         managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
+
         StateHasChanged();
+
+        // if (!calledOnce)
+        // {
+        //     calledOnce = true;
+        //     StateHasChanged();
+        // }
         
         ReconUpdateTriggered += async (o, args) =>
         {
@@ -290,11 +300,13 @@ else{
         ErrorUpdateTriggered += async (o, args) =>
         {
             _errorDataStorageList.AddRange(args.LogDataList);
+            //Console.WriteLine("COUNT -------------> " + ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count());
             await InvokeAsync(StateHasChanged);
         };
 
         UpdateOverviewTriggered += async (o, args) =>
         {
+            managersCount++;
             _pieconfig_errors.Data.Datasets.Clear();
             pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
             {
@@ -511,7 +523,7 @@ else{
 			}
 		}
         Console.WriteLine($"{counter[0]}, {counter[1]}, {counter[2]}, {counter[3]}");
-	    return counter;
+        return counter;
 	}
 
     // CHANGED
@@ -520,28 +532,15 @@ else{
         //_finishedManagersList[0].ErrorHandler.LogDataList[0].Grade
         int[] totalErrors = {0, 0, 0, 0};
         int[] counter = {0, 0, 0, 0};
-        Console.WriteLine("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         foreach (var manager in managers)
         {
             counter = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
              for (int i = 0; i < 4; i++)
              {
                  totalErrors[i] += counter[i];
-                 Console.WriteLine("TOTALERRORS "+ i + "= totalErrors[i]" + " 2222222222222222222222222222222222222222222");
              }
-            
-            // foreach (var error in manager.ErrorHandler.LogDataList)
-            // {
-            //     counter = ErrorSeverityCounter(error);
-            //     for (int i = 0; i < 4; i++)
-            //     {
-            //         totalErrors[i] += counter[i];
-            //     }
-            // }
-        Console.WriteLine("3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333");
         }
-            
-            // foreach (var party in managers)
+    // foreach (var party in managers)
             // {
             //     test = ErrorSeverityCounter(party._errors);
             //     for (int i = 0; i < 4; i++)
@@ -550,11 +549,6 @@ else{
             //     }
             // }
             //Console.WriteLine(Total_Errors[0]);
-        Console.WriteLine(("44444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444"));
-        Console.WriteLine(totalErrors[0]);
-        Console.WriteLine(totalErrors[1]);
-        Console.WriteLine(totalErrors[2]);
-        Console.WriteLine(totalErrors[3]);
         return totalErrors;
     }
 
@@ -739,6 +733,8 @@ else{
     //CHANGED
     private string CurrentManagerDetails(string wantedInfo)
     {
+        Console.WriteLine("WANTEDINFO ------------------------------> " + wantedInfo);
+        
         if (CurrentManager == null)
         {
             return "0";

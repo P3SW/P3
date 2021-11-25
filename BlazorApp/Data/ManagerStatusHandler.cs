@@ -41,6 +41,8 @@ namespace BlazorApp.Data
         //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {
+            OverviewTriggerUpdate();
+            
             Console.WriteLine($"Manager {Name} started");
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
             
@@ -69,7 +71,6 @@ namespace BlazorApp.Data
             AssignEndTime();
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
-            OverviewTriggerUpdate(); // ***********************************EVENT TRIGGER ********************************
         }
 
         //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
