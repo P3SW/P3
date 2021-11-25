@@ -2,14 +2,16 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using BlazorApp.Data;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
+
 
 namespace BlazorApp.Data
 {
     public static class ConversionDataAssigner
     {
-        public static List<ManagerStatusHandler> FinishedManagers { get; private set; }
+        public static List<ManagerStatusHandler> FinishedManagers { get; private set; } = new List<ManagerStatusHandler>();
         private static ManagerStatusHandler _currentManager;
         private static SqlConnection _connection;
         private static string _connectionString;
@@ -23,7 +25,6 @@ namespace BlazorApp.Data
         {
             _connectionString = ConfigReader.ReadSetupFile();
             _managerQueue = 0;
-            FinishedManagers = new List<ManagerStatusHandler>();
             _managerId = 1;
             _currentManager = null;
             
@@ -224,8 +225,36 @@ namespace BlazorApp.Data
             
             return await Task.FromResult(list);
         }
-        
 
+        public static async Task<List<EfficiencyData>> GetManagerEfficiencyData(string efficiency)
+        {
+            
+            if (FinishedManagers.Count == 0)
+            {
+                Console.WriteLine(FinishedManagers.Count);
+                Console.WriteLine("Sending new list");
+                return new List<EfficiencyData>();
+            }
+            
+            List<EfficiencyData> list = new List<EfficiencyData>();
+
+            if (FinishedManagers.Count > 0)
+            {
+                foreach (var finishedManager in FinishedManagers)
+                {
+                    list.Add(new EfficiencyData(finishedManager.Name, 
+                        finishedManager.EfficiencyScore,
+                        finishedManager.EndTime, 
+                        finishedManager.RowsRead, 
+                        finishedManager.RowsWritten, 
+                        finishedManager.RunTime, 
+                        finishedManager.Cpu,
+                        finishedManager.Memory));
+
+                }
+            }
+            return await Task.FromResult(list);
+        }
 
 
 

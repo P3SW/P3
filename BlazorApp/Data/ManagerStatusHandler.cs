@@ -20,6 +20,7 @@ namespace BlazorApp.Data
         public int RowsRead { get; private set; }
         public int RowsWritten { get; private set; }
         public int Cpu { get; set; }
+        public int Memory { get; set; }
         public int EfficiencyScore { get; private set; }
         public static SqlConnection Connection { get; set; }
         private SQLDependencyListener _healthStreamer;
@@ -27,6 +28,12 @@ namespace BlazorApp.Data
         private SQLDependencyListener _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
+        public double AvgCpu;
+        public double AvgMemory;
+        public int MemoryPercent;
+        public int AvgMemoryPercent;
+        public long MemoryUsed;
+
 
         public ManagerStatusHandler(string name, int id, DateTime startTime)
         {
@@ -69,16 +76,22 @@ namespace BlazorApp.Data
             AssignEndTime();
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
+            CalculateAverageMemoryUsed();
         }
 
         //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
-            double averageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
-            Cpu = Convert.ToInt32(averageCpu);
-            double result = (double) (RowsRead + RowsWritten) / RunTime * averageCpu;
+            AvgCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
+            Cpu = Convert.ToInt32(AvgCpu);
+            double result = (double) (RowsRead + RowsWritten) / RunTime * AvgCpu;
             EfficiencyScore = Convert.ToInt32(result);
+        }
+        
+        public void CalculateAverageMemoryUsed()
+        {
+            AvgMemoryPercent = (int) (Health.MemoryPercent.Count > 0 ? Health.MemoryPercent.Average() : 0);
         }
 
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.

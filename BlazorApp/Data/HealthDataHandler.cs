@@ -12,12 +12,16 @@ namespace BlazorApp.Data
         public List<HealthData> Memory { get; private set; }
         public List<HealthData> NewCpu { get; private set; }
         public List<HealthData> NewMemory { get; private set; }
+        public List<int> MemoryPercent { get; private set; }
         public static DateTime LastRowTimeStamp { get; private set; }
+        
+        public long MaxMemory = 21473734656; /* Approx 20gb */
 
         public HealthDataHandler(DateTime managerStartTime)
         {
             Cpu = new List<HealthData>();
             Memory = new List<HealthData>();
+            MemoryPercent = new List<int>();
             LastRowTimeStamp = managerStartTime;
         }
 
@@ -37,6 +41,10 @@ namespace BlazorApp.Data
                 else
                 {
                     NewMemory.Add(new HealthData(reader));
+                    
+                    //Used for calculating available memory in bytes to used memory in percent of total memory
+                    MemoryPercent.Add(Convert.ToInt32(((MaxMemory/1000000) - ((MaxMemory/1000000) -  ((long) (reader["REPORT_NUMERIC_VALUE"]) / 1000000)) / (MaxMemory/1000000)) * 100));
+
                 }
 
                 LastRowTimeStamp = (DateTime)reader[2];
