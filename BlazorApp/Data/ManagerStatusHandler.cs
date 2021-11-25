@@ -8,6 +8,7 @@ namespace BlazorApp.Data
 {
     public class ManagerStatusHandler : EventBase
     {
+        private int ExecutionID;
         public string Name { get; private set; }
         public int Id { get; private set; }
         public string Status { get; private set; }
@@ -15,8 +16,8 @@ namespace BlazorApp.Data
         public DateTime EndTime { get; private set; }
         public int RunTime { get; private set; }
         public HealthDataHandler Health { get; set; }
-        public LogDataHandler ErrorHandler { get; set; }
-        public LogDataHandler ReconciliationHandler { get; set; }
+        public ErrorDataHandler ErrorHandler { get; set; }
+        public ReconciliationDataHandler ReconciliationHandler { get; set; }
         public int RowsRead { get; private set; }
         public int RowsWritten { get; private set; }
         public int Cpu { get; set; }
@@ -28,30 +29,30 @@ namespace BlazorApp.Data
         private SqlCommand command;
         private int run_number = 0;
 
-        public ManagerStatusHandler(string name, int id, DateTime startTime)
+        public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
             Health = new HealthDataHandler(startTime);
-            ReconciliationHandler = new LogDataHandler(startTime, ReconTriggerUpdate);
-            ErrorHandler = new LogDataHandler(startTime, ErrorTriggerUpdate);
+            ReconciliationHandler = new ReconciliationDataHandler(startTime, ReconTriggerUpdate);
+            ErrorHandler = new ErrorDataHandler(startTime, ErrorTriggerUpdate, executionId);
             Name = name;
             Id = id;
             StartTime = startTime;
+            ExecutionID = executionId;
         }
 
         //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {
-            Console.WriteLine($"Manager {Name} started");
+            Console.WriteLine($"Manager {Name} started with execution_id " + ExecutionID);
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
             
             _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,
-                GetSelectStringsForTableStreamer("health"), Health, "HEALTH");
-            
+                GetSelectStringsForTableStreamer("health"), Health);
             _errorStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ErrorSelect,
-                GetSelectStringsForTableStreamer("logging"), ErrorHandler, "ERROR");
-            
+                GetSelectStringsForTableStreamer("logging"), ErrorHandler);
             _reconciliationStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ReconciliationSelect,
-                GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler, "RECONCILIATION");
+                GetSelectStringsForTableStreamer("reconciliation"), ReconciliationHandler);
+            
             _healthStreamer.StartListening();
             _errorStreamer.StartListening();
             _reconciliationStreamer.StartListening();
@@ -139,13 +140,14 @@ namespace BlazorApp.Data
                                          $"AND LOG_TIME > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                          "ORDER BY LOG_TIME");
                 case "logging":
-                    return string.Format($"SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
-                                         $"[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
-                                         $"FROM [dbo].[LOGGING] " +
-                                         $"INNER JOIN [dbo].[LOGGING_CONTEXT] " +
-                                         $"ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
-                                         $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
-                                         $"ORDER BY CREATED");
+                    return string.Format("SELECT DISTINCT [CREATED], [LOG_MESSAGE], [LOG_LEVEL]," +
+                                         "[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
+                                         "FROM [dbo].[LOGGING] " +
+                                         "INNER JOIN [dbo].[LOGGING_CONTEXT] " +
+                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
+                                         $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
+                                         $"AND [LOGGING_CONTEXT].[EXECUTION_ID] = '{ExecutionID}' "+
+                                         "ORDER BY CREATED");
                 case "reconciliation":
                     return string.Format($"SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
                                          $"FROM dbo.AFSTEMNING WHERE AFSTEMTDATO > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
