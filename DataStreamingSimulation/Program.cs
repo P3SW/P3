@@ -15,7 +15,7 @@ namespace DataStreamingSimulation
             const int INCREASE_IN_SEC = 1;
             const bool CONSOLE_PRINT = false;
             const string STREAM_START_DATE = "2021-10-28 15:07:10.347"; 
-            string[] tablesToStream = {"AFSTEMNING", "LOGGING", "ENGINE_PROPERTIES", "MANAGER_TRACKING", "HEALTH_REPORT"};
+            string[] tablesToStream = {"AFSTEMNING", "LOGGING", "MANAGER_TRACKING", "HEALTH_REPORT", "ENGINE_PROPERTIES"};
             
             try
             {

@@ -3,7 +3,9 @@
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
-@using Microsoft.VisualBasic
+@using Microsoft.JSInterop
+@using System.Globalization
+
 @inject Test dataList;
 @* @inject QueueTest managerList; *@
 
@@ -369,14 +371,14 @@ else{
             },
             Scales = new Scales
             {
-                XAxes = new List<CartesianAxis> //scale for the x axes
+                XAxes = new List<CartesianAxis> //scale for the x-axis
                 {
                     new CategoryAxis
                     {
                         ScaleLabel = new ScaleLabel
                         {
                             Display = true,
-    //LabelString = "Time",
+                            //LabelString = "Time",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
                         },
@@ -391,14 +393,14 @@ else{
                         }
                     },
                 },
-                YAxes = new List<CartesianAxis> // scale for the y axes
+                YAxes = new List<CartesianAxis> //Scale for the y-axis
                 {
                     new LinearCartesianAxis
                     {
                         ScaleLabel = new ScaleLabel
                         {
                             Display = true,
-    //LabelString = "Usage %",
+                            //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
 
@@ -407,7 +409,7 @@ else{
                         {
                             FontSize = 13,
                             Padding = 10,
-                            FontColor = "#FFFFFF", // Color for ticks, values on y axies
+                            FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
                             BeginAtZero = true,
                             StepSize = 10,
                             Max = 100,
@@ -415,8 +417,7 @@ else{
                         GridLines = new GridLines
                         {
                             Color = ColorUtil.ColorHexString(142, 142, 142),
-                            DrawBorder = false, // removes the border in the y axies
-
+                            DrawBorder = false, //Removes the border in the y-axis
                         },
                     }
                 }
@@ -430,7 +431,7 @@ else{
             LineTension = 0,
         };
 
-        lineconfig_dataset_memory = new LineDataset<int> // need data From healdata memeory class, Like the data above
+        lineconfig_dataset_memory = new LineDataset<int> //Needs data From health data memory class, like the data above
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
@@ -485,7 +486,7 @@ else{
 @code
 {
     int SelectedManager { get; set; }
-    //int[] totalErrors = {0, 0, 0, 0};
+    
     private void GetSelectedManagerID(int selectedID)
     {
         
@@ -529,7 +530,6 @@ else{
     // CHANGED
     private int[] TotalErrorsSeverityCounter(List<ManagerStatusHandler> managers)
     {
-        //_finishedManagersList[0].ErrorHandler.LogDataList[0].Grade
         int[] totalErrors = {0, 0, 0, 0};
         int[] counter = {0, 0, 0, 0};
         foreach (var manager in managers)
