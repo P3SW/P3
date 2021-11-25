@@ -244,7 +244,6 @@ namespace BlazorApp.Data
             else 
                 list.AddRange(_currentManager.ReconciliationHandler.LogDataList);
             
-            Console.WriteLine("Sending list with errors");
             return await Task.FromResult(list);
         }
     }

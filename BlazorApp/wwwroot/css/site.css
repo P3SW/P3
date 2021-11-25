@@ -58,7 +58,8 @@ a, .btn-link {
 /* Scrollbar CSS */ 
     /* width */
     ::-webkit-scrollbar {
-        width: 0.5rem !important;
+        width: 0.75rem !important;
+        height: 0.75rem !important;
         background-color: #384561 !important;
     }
     
@@ -95,4 +96,12 @@ a, .btn-link {
 
 .background-red {
     background-color: rgba(255, 23, 0, 1) !important;
+}
+
+.background-running {
+    background-color: #0F2147;
+}
+
+.background-queued {
+    background-color: #384561;
 }
