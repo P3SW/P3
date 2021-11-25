@@ -1,11 +1,14 @@
 using System;
 using System.Data;
+using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using Microsoft.Data.SqlClient;
+[assembly: InternalsVisibleTo("SQLDatabaseRead.Test")]
+
 
 namespace SQLDatabaseRead
 {
-    public class TableStreamer
+    public class SQLDependencyListener
     {
         private SqlDependency _dependency;
         private string _queryString;
@@ -13,7 +16,7 @@ namespace SQLDatabaseRead
         private IDataHandler _dataHandlerObject;
         private bool run;
         private string dataType;
-        public TableStreamer(string queryString, string currentDataQueryString, IDataHandler dataHandlerObject, string type)
+        public SQLDependencyListener(string queryString, string currentDataQueryString, IDataHandler dataHandlerObject, string type)
         {
             _queryString = queryString;
             _dataHandlerObject = dataHandlerObject;

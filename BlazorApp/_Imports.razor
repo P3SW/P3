@@ -1,11 +1,12 @@
 ﻿@using System.Net.Http
+@using Microsoft.JSInterop.Implementation
+@using Microsoft.JSInterop
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.AspNetCore.Components.Authorization
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
 @using Microsoft.AspNetCore.Components.Web.Virtualization
-@using Microsoft.JSInterop
 @using BlazorApp
 @using BlazorApp.Shared
 @using ChartJs.Blazor;
@@ -20,3 +21,6 @@
 @using Microsoft.AspNetCore.ResponseCompression;
 @using Radzen;
 @using Radzen.Blazor;
+@using BlazorApp.DataStreaming.Events
+@using BlazorApp.DataStreaming.Events.CustomEventArgs
+@inherits EventBase
