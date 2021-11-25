@@ -295,6 +295,7 @@ else{
 
         UpdateOverviewTriggered += async (o, args) =>
         {
+            _pieconfig_errors.Data.Datasets.Clear();
             pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
             {
                 BackgroundColor = new[] // Color for the pies 
@@ -307,8 +308,9 @@ else{
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
-            // _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
-
+            _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
+            
+            _pieconfig_reconciliations.Data.Datasets.Clear();
             pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
             {
                 BackgroundColor = new[] // Color for the pies
@@ -485,7 +487,7 @@ else{
 
 		foreach(LogData error in errors)
 		{
-		    Console.WriteLine(error.Grade + "********************************************************************************************************************************************");
+		    //Console.WriteLine(error.Grade);
 			switch(error.Grade)
 			{
 				case "FATAL":
@@ -516,16 +518,16 @@ else{
     private int[] TotalErrorsSeverityCounter(List<ManagerStatusHandler> managers)
     {
         //_finishedManagersList[0].ErrorHandler.LogDataList[0].Grade
-            int[] totalErrors = {0, 0, 0, 0};
-            int[] counter = {0, 0, 0, 0};
-        Console.WriteLine("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW");
+        int[] totalErrors = {0, 0, 0, 0};
+        int[] counter = {0, 0, 0, 0};
+        Console.WriteLine("111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111");
         foreach (var manager in managers)
         {
             counter = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
              for (int i = 0; i < 4; i++)
              {
                  totalErrors[i] += counter[i];
-                 Console.WriteLine("TOTALERRORS "+ i + "= totalErrors[i]" + " ØØØØØØØØØØØØØØØØØØØØØØØØØØØØØØ ");
+                 Console.WriteLine("TOTALERRORS "+ i + "= totalErrors[i]" + " 2222222222222222222222222222222222222222222");
              }
             
             // foreach (var error in manager.ErrorHandler.LogDataList)
@@ -536,6 +538,7 @@ else{
             //         totalErrors[i] += counter[i];
             //     }
             // }
+        Console.WriteLine("3333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333333");
         }
             
             // foreach (var party in managers)
@@ -547,6 +550,11 @@ else{
             //     }
             // }
             //Console.WriteLine(Total_Errors[0]);
+        Console.WriteLine(("44444444444444444444444444444444444444444444444444444444444444444444444444444444444444444444"));
+        Console.WriteLine(totalErrors[0]);
+        Console.WriteLine(totalErrors[1]);
+        Console.WriteLine(totalErrors[2]);
+        Console.WriteLine(totalErrors[3]);
         return totalErrors;
     }
 
