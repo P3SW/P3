@@ -1,5 +1,4 @@
 @page "/"
-@page "/overview"
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
@@ -12,7 +11,17 @@
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (managers == null || managers.Count == 0)
+@if (managers == null || managers.Count == 0 || 
+     _lineconfig == null || 
+     lineconfig_dataset_cpu == null || 
+     lineconfig_dataset_memory == null || 
+     _pieconfig_errors == null ||
+     _pieconfig_reconciliations == null ||
+     pieconfig_dataset_errors == null ||
+     pieconfig_dataset_reconciliations == null ||
+     healthdatatests == null ||
+     _errorDataStorageList == null ||
+     _ReconDataStorageList == null)
 {
     <p>Loading ....</p>
 }
@@ -24,8 +33,8 @@ else{
         
             @* Current running manager info *@
             <div class="Current_manager_info_container">
-                <div>Current manager: @CurrentManagerDetails("managerName")</div><br>
-                <div>Manager Runtime: @CurrentManagerDetails("runtime")</div>
+                <div>Current manager: @ConversionDataAssigner._currentManager.Name</div><br>
+                <div>Manager startTime: @ConversionDataAssigner._currentManager.StartTime</div>
             </div>
         
             <div class="Current_manager_container">
@@ -194,25 +203,19 @@ else{
     PieDataset<int> pieconfig_dataset_reconciliations;
 
     List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
-    
-    //List<HealthData> _healthDatas = new List<HealthData>();
-    
-    //CAHNGED
-    List<ManagerStatusHandler> managers;
-
-    //List<ManagerStatusHandler> _finishedManagersList = new();
+    List<ManagerStatusHandler> managers = new List<ManagerStatusHandler>();
     List<LogData> _errorDataStorageList;
     List<LogData> _ReconDataStorageList;
-
+    
     protected override async Task OnInitializedAsync()
     {
+        managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
         ConfigureLineConfig();
         ConfigurePieConfig();
-        //healthdatatests = await Task.Run(() => dataList.DataList());
-        //managers = await Task.Run(() => managerList.ManagerList());
+
         string[] separtors = new string[] {" "};
         
-    //Takes data from test and stores in list
+        //Takes data from test and stores in list - TODO: DELETE?
         foreach (var data in healthdatatests)
         {
             if (data._ReportType == "CPU")
@@ -231,67 +234,46 @@ else{
                 _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
             }
         }
-
+        
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
         _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
-
-        // pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
-        // {
-        //     BackgroundColor = new[] // Color for the pies 
-        //     {
-        //         ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
-        //         ColorUtil.ColorHexString(227, 95, 82), //Error
-        //         ColorUtil.ColorHexString(221, 155, 43), //Warning
-        //         ColorUtil.ColorHexString(92, 188, 169) //Info
-        //     },
-        //     BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-        //     BorderWidth = 0
-        // };
         
-        // await Task.Run(() =>
-        //     pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
-        //     {
-        //         BackgroundColor = new[] // Color for the pies 
-        //         {
-        //             ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
-        //             ColorUtil.ColorHexString(227, 95, 82), //Error
-        //             ColorUtil.ColorHexString(221, 155, 43), //Warning
-        //             ColorUtil.ColorHexString(92, 188, 169) //Info
-        //         },
-        //         BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-        //         BorderWidth = 0
-        //     });
-
-
-        // _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
-        //
-        // pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
-        // {
-        //     BackgroundColor = new[] // Color for the pies
-        //     {
-        //         ColorUtil.ColorHexString(255, 23, 0), //Mismatch
-        //         ColorUtil.ColorHexString(227, 95, 82), //Failed
-        //         ColorUtil.ColorHexString(221, 155, 43), //Disabled
-        //         ColorUtil.ColorHexString(92, 188, 169) //OK
-        //     },
-        //     BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-        //     BorderWidth = 0,
-        // };
-        
-        // _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
-        
-        // IMPLEMENTING DATA
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
         _ReconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
-        managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
-
+        
+        // ArgumentNullException fix at page reload ********************************************************************
+        _pieconfig_errors.Data.Datasets.Clear();
+        pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
+        {
+            BackgroundColor = new[] // Color for the pies 
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
+                ColorUtil.ColorHexString(227, 95, 82), //Error
+                ColorUtil.ColorHexString(221, 155, 43), //Warning
+                ColorUtil.ColorHexString(92, 188, 169) //Info
+            },
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+            BorderWidth = 0
+        };
+        _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
+            
+        _pieconfig_reconciliations.Data.Datasets.Clear();
+        pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
+        {
+            BackgroundColor = new[] // Color for the pies
+            {
+                ColorUtil.ColorHexString(255, 23, 0), //Mismatch
+                ColorUtil.ColorHexString(227, 95, 82), //Failed
+                ColorUtil.ColorHexString(221, 155, 43), //Disabled
+                ColorUtil.ColorHexString(92, 188, 169) //OK
+            },
+            BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+            BorderWidth = 0,
+        };
+        _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
+        // *************************************************************************************************************
+        
         StateHasChanged();
-
-        // if (!calledOnce)
-        // {
-        //     calledOnce = true;
-        //     StateHasChanged();
-        // }
         
         ReconUpdateTriggered += async (o, args) =>
         {
@@ -302,7 +284,6 @@ else{
         ErrorUpdateTriggered += async (o, args) =>
         {
             _errorDataStorageList.AddRange(args.LogDataList);
-            //Console.WriteLine("COUNT -------------> " + ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count());
             await InvokeAsync(StateHasChanged);
         };
 
@@ -340,9 +321,7 @@ else{
              _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
             await InvokeAsync(StateHasChanged);
         };
-
     }
-
 }
 
 
@@ -493,15 +472,13 @@ else{
         SelectedManager = selectedID;
     }
     
-    // CHANGED
     private int[] ErrorSeverityCounter(List<LogData> errors)
 	{
 		int[] counter = {0, 0, 0, 0};
 
 		foreach(LogData error in errors)
 		{
-		    //Console.WriteLine(error.Grade);
-			switch(error.Grade)
+		    switch(error.Grade)
 			{
 				case "FATAL":
 					counter[0]++;
@@ -523,11 +500,9 @@ else{
 					throw new ArgumentException($"{error.Grade} is not a valid argument");
 			}
 		}
-        Console.WriteLine($"{counter[0]}, {counter[1]}, {counter[2]}, {counter[3]}");
         return counter;
 	}
-
-    // CHANGED
+    
     private int[] TotalErrorsSeverityCounter(List<ManagerStatusHandler> managers)
     {
         int[] totalErrors = {0, 0, 0, 0};
@@ -540,19 +515,10 @@ else{
                  totalErrors[i] += counter[i];
              }
         }
-    // foreach (var party in managers)
-            // {
-            //     test = ErrorSeverityCounter(party._errors);
-            //     for (int i = 0; i < 4; i++)
-            //     {
-            //         totalErrors[i] += test[i];
-            //     }
-            // }
-            //Console.WriteLine(Total_Errors[0]);
         return totalErrors;
     }
 
-    // CHANGED
+    // NOT USED DELETE
     private int[] CurrentManagerErrorCounter(List<ManagerStatusHandler> managers)
     {
         int[] currentManagerError = {0,0,0,0};
@@ -563,7 +529,6 @@ else{
         return currentManagerError;
     }
     
-    // CHANGED
     private int[] ReconTypeCounter(List<LogData> recons)
     {
         int[] counter = {0, 0, 0, 0};
@@ -572,7 +537,7 @@ else{
         {
             switch(recon.Grade)
             {
-                case "MISMATCH":
+                case "FAIL MISMATCH":
                     counter[0]++;
                     break;
 
@@ -613,7 +578,7 @@ else{
         return totalRecons;
     }
 
-
+    // TODO: only uses case "OK"
     private string ManagerCircleColour(ManagerStatusHandler manager)
 	{
 		int[] errors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
@@ -655,8 +620,9 @@ else{
     int[] HoveredManagerRecons { get; set; }
     double MousePositionX { get; set; }
     double MousePositionY { get; set; }
-    //CHANGED
     ManagerStatusHandler CurrentManager { get; set; }
+    
+    // NOT USED DELETE
     int[] ManagerQueueCounter { get; set; }
     
     
@@ -669,6 +635,7 @@ else{
 	    HoveredManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
 	}
 
+    // NOT USED DELETE
     private void ManagerQueueCounterFixer()
     {
         int total = 0;
@@ -685,7 +652,8 @@ else{
             ManagerQueueCounter = new[] {0, 0};
         }
     }
-
+    
+    // NOT USED DELETE
     private int ManagerQueueCounterWriter(string status)
     {
         if (ManagerQueueCounter == null)
@@ -730,11 +698,9 @@ else{
         return hours + ':' + minutes + ':' + seconds;
     }
     
-    //CHANGED
+    // NOT USED DELETE
     private string CurrentManagerDetails(string wantedInfo)
     {
-        Console.WriteLine("WANTEDINFO ------------------------------> " + wantedInfo);
-        
         if (CurrentManager == null)
         {
             return "0";
@@ -770,6 +736,7 @@ else{
         }
     }
     
+    // NOT USED DELETE
     private int[] CurrentManagerReconCounter(List<ManagerStatusHandler> managers)
     {
         int[] currentManagerRecons = {0,0,0,0};
