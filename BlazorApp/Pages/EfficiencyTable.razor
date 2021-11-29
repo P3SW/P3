@@ -9,13 +9,14 @@
 }
 else
 {
+    <div class="efficiency-table-styling">
     <RadzenDataGrid @ref="EfficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
                     AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="EfficiencyData"
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
         <Columns>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="ManagerName" Filterable="true"
-                                  Title="MANAGER" Frozen="true" Width="200px" Sortable="false">
+                                  Title="MANAGER" Frozen="false" Width="200px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 200px; max-width: 200px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
                         <span style="color: #FFFFFF; ">@data.ManagerName</span>
@@ -23,15 +24,15 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="EfficiencyScore" Filterable="false"
-                                  Title="SCORE" Frozen="true" Width="50px">
+                                  Title="SCORE" Frozen="false" Width="50px">
                 <Template Context="data">
-                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.Score">
-                        <span style="color: #FFFFFF; ">@data.Score</span>
+                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EfficiencyScore">
+                        <span style="color: #FFFFFF; ">@data.EfficiencyScore</span>
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeFinished" Filterable="true"
-                                  Title="ENDTIME" Frozen="true" Width="150px" Sortable="false">
+            <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeFinished" Filterable="false"
+                                  Title="ENDTIME" Frozen="false" Width="150px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeFinished">
                         <span style="color: #FFFFFF; ">@data.TimeFinished</span>
@@ -39,7 +40,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="RowsRead" Filterable="false"
-                                  Title="Read" Frozen="true" Width="50px" Sortable="false">
+                                  Title="Read" Frozen="false" Width="50px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsRead">
                         <span style="color: #FFFFFF; ">@data.RowsRead</span>
@@ -47,7 +48,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="RowsWritten" Filterable="false"
-                                  Title="Written" Frozen="true" Width="50px" Sortable="false">
+                                  Title="Written" Frozen="false" Width="50px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsWritten">
                         <span style="color: #FFFFFF; ">@data.RowsWritten</span>
@@ -55,7 +56,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeRan" Filterable="false"
-                                  Title="Time ran" Frozen="true" Width="50px">
+                                  Title="Time ran" Frozen="false" Width="50px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
                         <span style="color: #FFFFFF; ">@data.TimeRan</span>
@@ -63,7 +64,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="AvgCpu" Filterable="false"
-                                  Title="Avg CPU" Frozen="true" Width="50px">
+                                  Title="Avg CPU" Frozen="false" Width="50px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgCpu">
                         <span style="color: #FFFFFF; ">@data.AvgCpu</span>
@@ -71,7 +72,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="AvgMemory" Filterable="false"
-                                              Title="Avg Memory" Frozen="true" Width="50px">
+                                  Title="Avg Memory" Frozen="false" Width="50px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgMemoryPercent">
                         <span style="color: #FFFFFF; ">@data.AvgMemoryPercent</span>
@@ -80,6 +81,7 @@ else
             </RadzenDataGridColumn>
         </Columns>
     </RadzenDataGrid>
+    </div>
 }
 
 @code {
@@ -108,7 +110,7 @@ else
         };
     }
 
-    //When rendering the cells, change the background color and remove the border.
+    //When rendering the cells, change the background color.
     void CellRender(DataGridCellRenderEventArgs<EfficiencyData> dataGridCellRenderEventArgs)
     {
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561;");

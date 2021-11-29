@@ -31,8 +31,9 @@ namespace BlazorApp.Data
         public double AvgCpu;
         public double AvgMemory;
         public int MemoryPercent;
-        public int AvgMemoryPercent;
+        public int AvgMemoryPercent { get; private set; }
         public long MemoryUsed;
+        public double MaxMemory = 21473734656; /* Approx 20gb */
 
 
         public ManagerStatusHandler(string name, int id, DateTime startTime)
@@ -91,7 +92,17 @@ namespace BlazorApp.Data
         
         public void CalculateAverageMemoryUsed()
         {
-            AvgMemoryPercent = (int) (Health.MemoryPercent.Count > 0 ? Health.MemoryPercent.Average() : 0);
+            AvgMemory = Health.Memory.Count > 0 ? Health.Memory.Average(data => data.NumericValue) : 0;
+            
+            //Used for calculating used memory out of total memory
+            double result;
+            if (AvgMemory > 0)
+            {
+                result = ((MaxMemory - AvgMemory) / (MaxMemory)) * 100;
+            } else
+                result = 0;
+            
+            AvgMemoryPercent = Convert.ToInt32(result);
         }
 
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.

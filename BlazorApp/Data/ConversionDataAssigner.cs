@@ -185,13 +185,13 @@ namespace BlazorApp.Data
             Console.WriteLine($"Name: {_currentManager.Name}\n" +
                               $"Status: {_currentManager.Status}\n" +
                               $"Runtime: {_currentManager.RunTime}\n" +
-                              $"Reconciliations: {_currentManager.ReconciliationHandler.LogDataList.Count}\n"+
-                              $"Errors: {_currentManager.ErrorHandler.LogDataList.Count}\n"+
+                              $"Reconciliations: {_currentManager.ReconciliationHandler.LogDataList.Count}\n" +
+                              $"Errors: {_currentManager.ErrorHandler.LogDataList.Count}\n" +
                               $"Rows read: {_currentManager.RowsRead}\n" +
                               $"Rows written: {_currentManager.RowsWritten}\n" +
                               $"Average CPU: {_currentManager.Cpu}\n" +
-                              $"Memory logs: {_currentManager.Health.Memory.Count}\n"+
-                              $"CPU logs: {_currentManager.Health.Cpu.Count}\n"+
+                              $"Memory logs: {_currentManager.Health.Memory.Count}\n" +
+                              $"CPU logs: {_currentManager.Health.Cpu.Count}\n" +
                               $"Efficiency score: {_currentManager.EfficiencyScore}");
         }
         
@@ -249,7 +249,7 @@ namespace BlazorApp.Data
                         finishedManager.RowsWritten, 
                         finishedManager.RunTime, 
                         finishedManager.Cpu,
-                        finishedManager.Memory));
+                        finishedManager.AvgMemoryPercent));
 
                 }
             }

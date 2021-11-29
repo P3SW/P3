@@ -370,13 +370,12 @@
 /* Efficiency table */    
 .efficiency-table-container {
     background-color: #384561;
-    line-height: 80%;
-    border-bottom: none !important;
+    overflow-y: auto;
+    max-width: 100%;
 }
 
 .efficiency-table-container > div {
     font-size: 0.6em;
-    float: left;
 }
 
 
