@@ -15,14 +15,12 @@ namespace SQLDatabaseRead
         public static SqlConnection Connection { get; set; }
         private IDataHandler _dataHandlerObject;
         private bool run;
-        private string dataType;
-        public SQLDependencyListener(string queryString, string currentDataQueryString, IDataHandler dataHandlerObject, string type)
+        public SQLDependencyListener(string queryString, string currentDataQueryString, IDataHandler dataHandlerObject)
         {
             _queryString = queryString;
             _dataHandlerObject = dataHandlerObject;
             run = true;
-            dataType = type;
-            
+
             //Queries the database for data currently in the database
             AddQueryToObject(currentDataQueryString);
         }
@@ -72,7 +70,7 @@ namespace SQLDatabaseRead
             {
                 //Console.WriteLine("QUERY STRING LOOKS LIKE THIS: " + _dataObject.GetChangesQueryString());
                 //To minimise network traffic, a separate list containing only the changes is made and send to the client
-                AddQueryToObject(_dataHandlerObject.GetNewestDataQueryString(dataType));
+                AddQueryToObject(_dataHandlerObject.GetNewestDataQueryString());
             }
             StartListening();
         }

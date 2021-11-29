@@ -41,31 +41,17 @@ namespace BlazorApp.Data
 
                 LastRowTimeStamp = (DateTime)reader[2];
             }
-            PrintCPUAndMemory(NewCpu, NewMemory);
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.
-        public string GetNewestDataQueryString(string type)
+        public string GetNewestDataQueryString()
         {
             return string.Format($"SELECT REPORT_TYPE, REPORT_NUMERIC_VALUE, LOG_TIME FROM dbo.HEALTH_REPORT " +
                                  "WHERE (REPORT_TYPE = 'CPU' OR REPORT_TYPE = 'MEMORY')" +
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
-        }
-
-        public void PrintCPUAndMemory(List<HealthData> cpu, List<HealthData> memory)
-        {
-            foreach (var data in cpu)
-            {
-                Console.WriteLine(data.LogTime + " " + data.ReportType + " " + data.NumericValue);
-            }
-            
-            foreach (var data in memory)
-            {
-                Console.WriteLine(data.LogTime + " " + data.ReportType + " " + data.NumericValue);
-            }
         }
     }
 }

@@ -195,19 +195,6 @@ namespace BlazorApp.Data
                 new Reconciliation(2, "OK", Convert.ToDateTime("05-May-2021"), "This is a message"),
                 new Reconciliation(3, "DISABLED", Convert.ToDateTime("01-May-2021"), "This is a message"),
                 new Reconciliation(4, "OK", Convert.ToDateTime("10-May-2021"), "This is a message"),
-            }),
-                new Manager_test(15, "FunnyManager", Convert.ToDateTime("21-May-2021"), new List<Error>() 
-                {new Error(1, "INFO", Convert.ToDateTime("01-May-2021"), "This is a message"),
-                new Error(2, "INFO", Convert.ToDateTime("05-May-2021"), "This is a message"),
-                new Error(3, "WARNING", Convert.ToDateTime("01-May-2021"), "This is a message"),
-                new Error(4, "ERROR", Convert.ToDateTime("10-May-2021"), "This is a message"),
-                new Error(5, "ERROR", Convert.ToDateTime("21-May-2021"), "This is a message")}, new List<Reconciliation>()
-            {
-                new Reconciliation(1, "OK", Convert.ToDateTime("01-May-2021"), "This is a message"),
-                new Reconciliation(2, "OK", Convert.ToDateTime("05-May-2021"), "This is a message"),
-                new Reconciliation(3, "DISABLED", Convert.ToDateTime("01-May-2021"), "This is a message"),
-                new Reconciliation(4, "OK", Convert.ToDateTime("10-May-2021"), "This is a message"),
-                new Reconciliation(5, "MISMATCH", Convert.ToDateTime("21-May-2021"), "This is a message")
             })
         };
         
