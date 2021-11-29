@@ -7,7 +7,7 @@
 
 @code {
     //Parameters for the component which are assigned when the component is instantiated
-    [Parameter] public List<LogData> LogData { get; set; }
+    [Parameter] public List<LogData> LogDataList { get; set; }
     [Parameter] public RadzenDataGrid<LogData> DataGridRef { get; set; }
     [Parameter] public string Type { get; set; }
     [Parameter] public List<string> Grades { get; set; }
@@ -15,21 +15,24 @@
 
     protected override async Task OnInitializedAsync()
     {
-        LogData = await Task.Run(() => ConversionDataAssigner.GetErrorLogList(Type));
-        StateHasChanged();
+        if (LogDataList == null)
+        {
+            LogDataList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList(Type));
+            StateHasChanged(); 
+        }
 
         if (Type == "error")
         {
             ErrorUpdateTriggered += async (_, args) =>
             {
-                LogData.AddRange(args.LogDataList);
+                LogDataList.AddRange(args.NewLogDataList);
                 await InvokeAsync(DataGridRef.Reload);
                 await InvokeAsync(StateHasChanged);
             };
         
             ErrorUpdateResseted += async (_, _) =>
             {
-                LogData = null;
+                LogDataList = null;
                 await InvokeAsync(DataGridRef.Reload);
                 await InvokeAsync(StateHasChanged);
             };
@@ -38,14 +41,14 @@
         {
             ReconUpdateTriggered += async (_, args) =>
             {
-                LogData.AddRange(args.ReconDataList);
+                LogDataList.AddRange(args.ReconDataList);
                 await InvokeAsync(DataGridRef.Reload);
                 await InvokeAsync(StateHasChanged);
             };
         
             ReconUpdateResseted += async (_, _) =>
             {
-                LogData = null;
+                LogDataList = null;
                 await InvokeAsync(DataGridRef.Reload);
                 await InvokeAsync(StateHasChanged);
             };
@@ -64,7 +67,7 @@
         <Tabs>
             <RadzenTabsItem Text="ALL" class="TabElement">
                 <RadzenDataGrid @ref="@DataGridRef" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
-                                AllowPaging="true" AllowSorting="true" Data="@LogData" TItem="LogData"
+                                AllowPaging="true" AllowSorting="true" Data="@LogDataList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -113,7 +116,7 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="@Grades[3]" class="TabElement">
                 <RadzenDataGrid @ref="@DataGridRef" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
-                                AllowPaging="true" AllowSorting="true" Data="@LogData" TItem="LogData"
+                                AllowPaging="true" AllowSorting="true" Data="@LogDataList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -148,7 +151,7 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="@Grades[2]" class="TabElement">
                 <RadzenDataGrid @ref="@DataGridRef" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
-                                AllowPaging="true" AllowSorting="true" Data="@LogData" TItem="LogData"
+                                AllowPaging="true" AllowSorting="true" Data="@LogDataList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -183,7 +186,7 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="@Grades[1]" class="TabElement">
                 <RadzenDataGrid @ref="@DataGridRef" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
-                                AllowPaging="true" AllowSorting="true" Data="@LogData" TItem="LogData"
+                                AllowPaging="true" AllowSorting="true" Data="@LogDataList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
@@ -218,7 +221,7 @@
             </RadzenTabsItem>
             <RadzenTabsItem Text="@Grades[0]" class="TabElement">
                 <RadzenDataGrid @ref="@DataGridRef" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="50"
-                                AllowPaging="true" AllowSorting="true" Data="@LogData" TItem="LogData"
+                                AllowPaging="true" AllowSorting="true" Data="@LogDataList" TItem="LogData"
                                 FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                                 LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
                     <Columns>
