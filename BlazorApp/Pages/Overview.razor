@@ -206,13 +206,17 @@ else{
     List<ManagerStatusHandler> managers = new List<ManagerStatusHandler>();
     List<LogData> _errorDataStorageList;
     List<LogData> _ReconDataStorageList;
+
+    List<HealthData> _cpuDataList = new ();
+    List<HealthData> _memDataList = new ();
     
     protected override async Task OnInitializedAsync()
     {
         managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
         ConfigureLineConfig();
         ConfigurePieConfig();
-
+        
+        
         //string[] separtors = new string[] {" "};
         
         // //Takes data from test and stores in list - TODO: DELETE?
@@ -233,10 +237,8 @@ else{
         //     {
         //         _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
         //     }
-        // }
+        // 
         
-        _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
-        _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
         
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
         _ReconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
@@ -319,31 +321,60 @@ else{
                 BorderWidth = 0,
             };
              _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
-            await InvokeAsync(StateHasChanged);
-        };
-
-        HealthUpdateTriggered += async (o, args) =>
-        {
-            _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
-            _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
             
-            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(args.Cpu))
+            
+            // LINE CHART **********************************************************************************************
+            _lineconfig.Data.Datasets.Clear();
+            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisMem(_memDataList))
             {
                 Label = "Cpu usage",
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
             };
-            
-            lineconfig_dataset_memory.Clear();
-            lineconfig_dataset_memory = new LineDataset<long>(lineDataInputYaxisMem(args.Memory)) //Needs data From health data memory class, like the data above
+            _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
+            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(_cpuDataList))
             {
-                Label = ("Memory usage"),
-                BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
-                BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
             };
+            _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
             
+            await InvokeAsync(StateHasChanged);
+            
+
+
+        };
+
+        HealthUpdateTriggered += async (o, args) =>
+        {
+            if (args.Cpu != null) 
+                 _cpuDataList?.AddRange(args.Cpu);
+             if (args.Memory != null)
+                 _memDataList?.AddRange(args.Memory);
+
+
+             //lineconfig_dataset_cpu.Clear();
+            //lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(args.Cpu))
+            //{
+            //    Label = "Cpu usage",
+            //    BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            //    BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            //    LineTension = 0,
+            //};
+            //_lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
+            
+            // lineconfig_dataset_memory.Clear();
+            // lineconfig_dataset_memory = new LineDataset<long>(lineDataInputYaxisMem(args.Memory)) //Needs data From health data memory class, like the data above
+            // {
+            //     Label = ("Memory usage"),
+            //     BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            //     BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+            //     LineTension = 0,
+            // };
+            // _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
             await InvokeAsync(StateHasChanged);
         };
 
@@ -355,31 +386,17 @@ else{
     public LineDataset<long> lineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
     //Takes data from test and stores in list - TODO: DELETE?
+        string[] separtors = new string[] {" "};
+        lineconfig_dataset_cpu.Clear();
         foreach (var data in healthDataList)
         {
             if (data.ReportType == "CPU")
             {
-                lineconfig_dataset_cpu.Add(data.NumericValue);
-                return lineconfig_dataset_cpu;
+                lineconfig_dataset_cpu.Add(data.NumericValue); // Delete?
             }
-        }
-        return null;
-    }
 
-    public LineDataset<long> lineDataInputYaxisMem(List<HealthData> healthDataList)
-    {
-        foreach (var data in healthDataList)
-        {
-            if (data.ReportType == "MEMORY")
-                lineconfig_dataset_memory.Add(data.NumericValue);
-            return lineconfig_dataset_memory;
         }
-        return null;
-    }
-    
-    public LineDataset<long> lineDataInputXaxis(List<HealthData> healthDataList)
-    {
-        string[] separtors = new string[] {" "};
+        _lineconfig.Data.Labels.Clear();
         foreach (var data in healthDataList)
         {
             if (data.ReportType == "CPU")
@@ -388,10 +405,19 @@ else{
                 
             }
         }
-        return null;
+        return lineconfig_dataset_cpu;
     }
     
-
+    public LineDataset<long> lineDataInputYaxisMem(List<HealthData> healthDataList)
+    {
+        lineconfig_dataset_memory.Clear();
+        foreach (var data in healthDataList)
+        {
+            if (data.ReportType == "MEMORY")
+                lineconfig_dataset_memory.Add(data.NumericValue);
+        }
+        return lineconfig_dataset_memory;
+    }
 }
 
 
@@ -460,8 +486,8 @@ else{
                             Padding = 10,
                             FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
                             BeginAtZero = true,
-                            StepSize = 10,
-                            Max = 100,
+                            //StepSize = 10,
+                            //Max = 100,
                         },
                         GridLines = new GridLines
                         {
