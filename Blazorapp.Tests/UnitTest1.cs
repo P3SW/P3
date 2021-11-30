@@ -95,7 +95,7 @@ namespace P3ConversionDashboard.Tests
         }
         
         [Fact]
-        public void MarkupTextTest()
+        public void Sorting_Tabs_Test()
         {
             string[] testTabsSelectors =
             {
