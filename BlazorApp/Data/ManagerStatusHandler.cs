@@ -51,6 +51,9 @@ namespace BlazorApp.Data
         //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {
+            OverviewTriggerUpdate();
+            
+            Console.WriteLine($"Manager {Name} started");
             Console.WriteLine($"Manager {Name} started with execution_id " + ExecutionID);
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
             

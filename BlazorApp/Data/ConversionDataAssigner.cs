@@ -11,11 +11,13 @@ namespace BlazorApp.Data
 {
     public static class ConversionDataAssigner
     {
+
         public static List<ManagerStatusHandler> FinishedManagers { get; private set; } = new List<ManagerStatusHandler>();
         private static ManagerStatusHandler _currentManager;
+
         private static SqlConnection _connection;
         private static string _connectionString;
-        private static int _managerQueue;
+        public static int _managerQueue = 0;
         private static int _managerId;
         private static int _executionId;
         
@@ -47,7 +49,6 @@ namespace BlazorApp.Data
                 ManagerStatusHandler.Connection.Open();
                 
                 _connection = conn;
-
                 using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -56,7 +57,6 @@ namespace BlazorApp.Data
                         {
                             while (reader.Read())
                             {
-                                Console.WriteLine("READING MANAGER");
                                 _managerQueue++;
                             }
                             reader.Close();

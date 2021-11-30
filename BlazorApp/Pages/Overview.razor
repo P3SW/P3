@@ -1,17 +1,26 @@
 @page "/"
-@page "/overview"
 @using ChartJs.Blazor.LineChart
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
 @using System.Globalization
 
 @inject Test dataList;
-@inject QueueTest managerList;
+@* @inject QueueTest managerList; *@
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (managers == null || managers.Count == 0)
+@if (managers == null || managers.Count == 0 || 
+     _lineconfig == null || 
+     lineconfig_dataset_cpu == null || 
+     lineconfig_dataset_memory == null || 
+     _pieconfig_errors == null ||
+     _pieconfig_reconciliations == null ||
+     pieconfig_dataset_errors == null ||
+     pieconfig_dataset_reconciliations == null ||
+     healthdatatests == null ||
+     _errorDataStorageList == null ||
+     _ReconDataStorageList == null)
 {
     <p>Loading ....</p>
 }
@@ -23,25 +32,25 @@ else{
         
             @* Current running manager info *@
             <div class="Current_manager_info_container">
-                <div>Current manager: @CurrentManagerDetails("managerName")</div><br>
-                <div>Manager Runtime: @CurrentManagerDetails("runtime")</div>
+                <div>Current manager: @ConversionDataAssigner._currentManager.Name</div><br>
+                <div>Manager startTime: @ConversionDataAssigner._currentManager.StartTime</div>
             </div>
         
             <div class="Current_manager_container">
-                <div class="Current_manager_errors">Current manager errors: @CurrentManagerDetails("totalErrors")
+                <div class="Current_manager_errors">Current manager errors: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count()
                     <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Fatal: @CurrentManagerDetails("FATAL")</li>
-                        <div class="circle background-lightred"></div><li>Error: @CurrentManagerDetails("ERROR")</li>
-                        <div class="circle background-yellow"></div><li>Warning: @CurrentManagerDetails("WARNING")</li>
-                        <div class="circle background-green"></div><li>Info: @CurrentManagerDetails("INFO")</li>
+                        <div class="circle background-red"></div><li>Fatal: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "FATAL")</li>
+                        <div class="circle background-lightred"></div><li>Error: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "ERROR")</li>
+                        <div class="circle background-yellow"></div><li>Warning: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "WARN")</li>
+                        <div class="circle background-green"></div><li>Info: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "INFO")</li>
                     </ul>
                 </div>
-                <div class="Current_manager_reconciliations">Current manager reconciliations: @CurrentManagerDetails("totalRecons")
+                <div class="Current_manager_reconciliations">Current manager reconciliations: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count()
                     <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Mismatch: @CurrentManagerDetails("MISMATCH")</li>
-                        <div class="circle background-lightred"></div><li>Failed: @CurrentManagerDetails("FAILED")</li>
-                        <div class="circle background-yellow"></div><li>Disabled: @CurrentManagerDetails("DISABLED")</li>
-                        <div class="circle background-green"></div><li>OK: @CurrentManagerDetails("OK")</li>
+                        <div class="circle background-red"></div><li>Mismatch: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "MISMATCH")</li>
+                        <div class="circle background-lightred"></div><li>Failed: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "FAILED")</li>
+                        <div class="circle background-yellow"></div><li>Disabled: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "DISABLED")</li>
+                        <div class="circle background-green"></div><li>OK: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "OK")</li>
                     </ul>
                 </div>
             </div>
@@ -50,25 +59,25 @@ else{
             @* Manager queue *@
             <div class="manager-queue-container">
                 <div class="queue-text">
-                    <span class="queue-finished-text">Finished: <b>@ManagerQueueCounterWriter("FINISHED")</b></span>
-                    <span class="queue-inqueue-text">In queue: <b>@ManagerQueueCounterWriter("QUEUED")</b></span>
+                    <span class="queue-finished-text">Finished: <b>@ConversionDataAssigner.FinishedManagers.Count</b></span>
+                    <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner._managerQueue</b></span>
                 </div>
                 <div class="manager-queue-circle">
-                    @foreach(Manager_test manager in managers)
+                    @foreach(ManagerStatusHandler manager in managers)
                     {
-                        <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager._id, e, manager))">
-                            @if (manager._status == "RUNNING")
+                        <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager.Id, e, manager))">
+                            @if (manager.Status == "RUNNING")
                             {
                                 <img  src="Icons/current-manager-loader.svg" alt="loader" class="current-manager-loader">
                             }
-                            @if(HoveredManager == manager._id && HoveredManagerErrors != null)
+                            @if(HoveredManager == manager.Id && HoveredManagerErrors != null)
                             {
                                 <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(MousePositionX + "px"); top: @(MousePositionY + "px"); transform: translate(-50%,-100%);">
                                 <div class="hovered-manager" style="position: absolute; left: @(MousePositionX + "px"); top: @(MousePositionY + "px"); transform: translate(-50%,-13rem);">
                                     <div class="hoverbox-info">
-                                        <div>Manager: @manager._name</div>
+                                        <div>Manager: @manager.Name</div>
                                         <div>Runtime: @CalculateRuntime(manager)</div>
-                                        <div>Status: @manager._status</div>
+                                        <div>Status: @manager.Status</div>
                                     </div>
                                     <div class="hoverbox-errors-recons">
                                         <div class="hoverbox-erros">
@@ -138,7 +147,7 @@ else{
             <div class="cpu_usage">
                 <div class="chart-header">
                     <div class="dropdown">
-                        <b class="selected-manager-name" title="">@(SelectedManager + "-" + managers[SelectedManager]._name)</b>
+                        <b class="selected-manager-name" title="">@(SelectedManager + "-" + managers[SelectedManager].Name)</b>
                         <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                         <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                         <div class="dropdown-content">
@@ -152,10 +161,10 @@ else{
                                 else if (j == 0)
                                 {
                                     j++;
-                                    <div class="dropdown-content-first" title="@managers[managerID]._name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID]._name)</div>
+                                    <div class="dropdown-content-first" title="@managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID].Name)</div>
                                     continue;
                                 }
-                                <div title="@managers[managerID]._name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID]._name)</div>
+                                <div title="@managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID].Name)</div>
                             }
                         </div>
                     </div>
@@ -181,43 +190,60 @@ else{
 }
 
 @code{
+    int managersCount = 0;
+    bool calledOnce = false;
     private LineConfig _lineconfig;
-    LineDataset<int> lineconfig_dataset_cpu;
-    LineDataset<int> lineconfig_dataset_memory;
+    LineDataset<long> lineconfig_dataset_cpu;
+    LineDataset<long> lineconfig_dataset_memory;
 
-    private PieConfig _pieconfig_errors;
-    private PieConfig _pieconfig_reconciliations;
+    public PieConfig _pieconfig_errors;
+    public PieConfig _pieconfig_reconciliations;
     PieDataset<int> pieconfig_dataset_errors;
     PieDataset<int> pieconfig_dataset_reconciliations;
 
     List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
-    List<Manager_test> managers = new List<Manager_test>();
+    List<ManagerStatusHandler> managers = new List<ManagerStatusHandler>();
+    List<LogData> _errorDataStorageList;
+    List<LogData> _ReconDataStorageList;
 
+    List<HealthData> _cpuDataList = new ();
+    List<HealthData> _memDataList = new ();
+    
     protected override async Task OnInitializedAsync()
     {
+        managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
         ConfigureLineConfig();
         ConfigurePieConfig();
-        healthdatatests = await Task.Run(() => dataList.DataList());
-        managers = await Task.Run(() => managerList.ManagerList());
-        string[] separtors = new string[] {" "};
-
-        //Takes data from test and stores in list
-        foreach (var data in healthdatatests)
-        {
-            if (data._ReportType == "CPU")
-            {
-                lineconfig_dataset_cpu.Add(data._NumericValue);
-                _lineconfig.Data.Labels.Add((data._Date.ToString(CultureInfo.CurrentCulture).Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
-            }
-            else if (data._ReportType == "MEMORY")
-            {
-                lineconfig_dataset_memory.Add(data._NumericValue);
-            }
-        }
-
-        _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
-        _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
-
+        
+        
+        //string[] separtors = new string[] {" "};
+        
+        // //Takes data from test and stores in list - TODO: DELETE?
+        // foreach (var data in healthdatatests)
+        // {
+        //     if (data._ReportType == "CPU")
+        //     {
+        //         lineconfig_dataset_cpu.Add(data._NumericValue);
+        //     }
+        //     else if (data._ReportType == "MEMORY")
+        //     {
+        //         lineconfig_dataset_memory.Add(data._NumericValue);
+        //     }
+        // }
+        // foreach (var party in healthdatatests)
+        // {
+        //     if (party._ReportType == "CPU")
+        //     {
+        //         _lineconfig.Data.Labels.Add((party._Date.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+        //     }
+        // 
+        
+        
+        _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
+        _ReconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
+        
+        // ArgumentNullException fix at page reload ********************************************************************
+        _pieconfig_errors.Data.Datasets.Clear();
         pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
         {
             BackgroundColor = new[] // Color for the pies 
@@ -231,7 +257,8 @@ else{
             BorderWidth = 0
         };
         _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
-
+            
+        _pieconfig_reconciliations.Data.Datasets.Clear();
         pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
         {
             BackgroundColor = new[] // Color for the pies
@@ -244,10 +271,152 @@ else{
             BorderColor = ColorUtil.ColorHexString(0, 0, 0),
             BorderWidth = 0,
         };
-
         _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
-    }
+        // *************************************************************************************************************
+        
+        StateHasChanged();
+        
+        ReconUpdateTriggered += async (o, args) =>
+        {
+            _ReconDataStorageList.AddRange(args.ReconDataList);
+            await InvokeAsync(StateHasChanged);
+        };
+        
+        ErrorUpdateTriggered += async (o, args) =>
+        {
+            _errorDataStorageList.AddRange(args.LogDataList);
+            await InvokeAsync(StateHasChanged);
+        };
 
+        UpdateOverviewTriggered += async (o, args) =>
+        {
+            managersCount++;
+            _pieconfig_errors.Data.Datasets.Clear();
+            pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
+            {
+                BackgroundColor = new[] // Color for the pies 
+                {
+                    ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
+                    ColorUtil.ColorHexString(227, 95, 82), //Error
+                    ColorUtil.ColorHexString(221, 155, 43), //Warning
+                    ColorUtil.ColorHexString(92, 188, 169) //Info
+                },
+                BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+                BorderWidth = 0
+            };
+            _pieconfig_errors.Data.Datasets.Add(pieconfig_dataset_errors);
+            
+            _pieconfig_reconciliations.Data.Datasets.Clear();
+            pieconfig_dataset_reconciliations = new PieDataset<int>(TotalReconTypeCounter(managers))
+            {
+                BackgroundColor = new[] // Color for the pies
+                {
+                    ColorUtil.ColorHexString(255, 23, 0), //Mismatch
+                    ColorUtil.ColorHexString(227, 95, 82), //Failed
+                    ColorUtil.ColorHexString(221, 155, 43), //Disabled
+                    ColorUtil.ColorHexString(92, 188, 169) //OK
+                },
+                BorderColor = ColorUtil.ColorHexString(0, 0, 0),
+                BorderWidth = 0,
+            };
+             _pieconfig_reconciliations.Data.Datasets.Add(pieconfig_dataset_reconciliations);
+            
+            
+            // LINE CHART **********************************************************************************************
+            _lineconfig.Data.Datasets.Clear();
+            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisMem(_memDataList))
+            {
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                LineTension = 0,
+            };
+            _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
+            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(_cpuDataList))
+            {
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                LineTension = 0,
+            };
+            _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
+            
+            await InvokeAsync(StateHasChanged);
+            
+
+
+        };
+
+        HealthUpdateTriggered += async (o, args) =>
+        {
+            if (args.Cpu != null) 
+                 _cpuDataList?.AddRange(args.Cpu);
+             if (args.Memory != null)
+                 _memDataList?.AddRange(args.Memory);
+
+
+             //lineconfig_dataset_cpu.Clear();
+            //lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(args.Cpu))
+            //{
+            //    Label = "Cpu usage",
+            //    BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            //    BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            //    LineTension = 0,
+            //};
+            //_lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
+            
+            // lineconfig_dataset_memory.Clear();
+            // lineconfig_dataset_memory = new LineDataset<long>(lineDataInputYaxisMem(args.Memory)) //Needs data From health data memory class, like the data above
+            // {
+            //     Label = ("Memory usage"),
+            //     BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            //     BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+            //     LineTension = 0,
+            // };
+            // _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
+            await InvokeAsync(StateHasChanged);
+        };
+
+    }
+}
+
+@code{
+
+    public LineDataset<long> lineDataInputYaxisCpu(List<HealthData> healthDataList)
+    {
+    //Takes data from test and stores in list - TODO: DELETE?
+        string[] separtors = new string[] {" "};
+        lineconfig_dataset_cpu.Clear();
+        foreach (var data in healthDataList)
+        {
+            if (data.ReportType == "CPU")
+            {
+                lineconfig_dataset_cpu.Add(data.NumericValue); // Delete?
+            }
+
+        }
+        _lineconfig.Data.Labels.Clear();
+        foreach (var data in healthDataList)
+        {
+            if (data.ReportType == "CPU")
+            {
+                _lineconfig.Data.Labels.Add((data.LogTime.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+                
+            }
+        }
+        return lineconfig_dataset_cpu;
+    }
+    
+    public LineDataset<long> lineDataInputYaxisMem(List<HealthData> healthDataList)
+    {
+        lineconfig_dataset_memory.Clear();
+        foreach (var data in healthDataList)
+        {
+            if (data.ReportType == "MEMORY")
+                lineconfig_dataset_memory.Add(data.NumericValue);
+        }
+        return lineconfig_dataset_memory;
+    }
 }
 
 
@@ -308,6 +477,7 @@ else{
                             //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
+
                         },
                         Ticks = new LinearCartesianTicks
                         {
@@ -315,8 +485,8 @@ else{
                             Padding = 10,
                             FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
                             BeginAtZero = true,
-                            StepSize = 10,
-                            Max = 100,
+                            //StepSize = 10,
+                            //Max = 100,
                         },
                         GridLines = new GridLines
                         {
@@ -327,7 +497,7 @@ else{
                 }
             }
         };
-        lineconfig_dataset_cpu = new LineDataset<int>
+        lineconfig_dataset_cpu = new LineDataset<long>
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
@@ -335,7 +505,7 @@ else{
             LineTension = 0,
         };
 
-        lineconfig_dataset_memory = new LineDataset<int> //Needs data From health data memory class, like the data above
+        lineconfig_dataset_memory = new LineDataset<long> //Needs data From health data memory class, like the data above
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
@@ -393,26 +563,27 @@ else{
     
     private void GetSelectedManagerID(int selectedID)
     {
+        
         SelectedManager = selectedID;
     }
     
-    private int[] ErrorSeverityCounter(List<Error> errors)
+    private int[] ErrorSeverityCounter(List<LogData> errors)
 	{
 		int[] counter = {0, 0, 0, 0};
 
-		foreach(Error error in errors)
+		foreach(LogData error in errors)
 		{
-			switch(error._severity)
+		    switch(error.Grade)
 			{
 				case "FATAL":
-					counter[0]++;;
+					counter[0]++;
 				    break;
 
 				case "ERROR":
 					counter[1]++;
 				break;
 
-				case "WARNING":
+				case "WARN":
 					counter[2]++;
 				break;
 
@@ -421,47 +592,47 @@ else{
 				break;
 
 				default:
-					throw new ArgumentException($"{error} is not a valid argument");
+					throw new ArgumentException($"{error.Grade} is not a valid argument");
 			}
 		}
-	    return counter;
+        return counter;
 	}
-
-    private int[] TotalErrorsSeverityCounter(List<Manager_test> managers)
+    
+    private int[] TotalErrorsSeverityCounter(List<ManagerStatusHandler> managers)
     {
         int[] totalErrors = {0, 0, 0, 0};
-            int[] test;
-
-        foreach (var party in managers)
+        int[] counter = {0, 0, 0, 0};
+        foreach (var manager in managers)
         {
-            test = ErrorSeverityCounter(party._errors);
-            for (int i = 0; i < 4; i++)
-            {
-                totalErrors[i] += test[i];
-            }
+            counter = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
+             for (int i = 0; i < 4; i++)
+             {
+                 totalErrors[i] += counter[i];
+             }
         }
         return totalErrors;
     }
 
-    private int[] CurrentManagerErrorCounter(List<Manager_test> managers)
+    // NOT USED DELETE
+    private int[] CurrentManagerErrorCounter(List<ManagerStatusHandler> managers)
     {
         int[] currentManagerError = {0,0,0,0};
-        foreach (var party in managers)
+        foreach (var manager in managers)
         {
-            currentManagerError = ErrorSeverityCounter(party._errors);
+            currentManagerError = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
         }
         return currentManagerError;
     }
     
-    private int[] ReconTypeCounter(List<Reconciliation> recons)
+    private int[] ReconTypeCounter(List<LogData> recons)
     {
         int[] counter = {0, 0, 0, 0};
 
-        foreach(Reconciliation recon in recons)
+        foreach(LogData recon in recons)
         {
-            switch(recon._result)
+            switch(recon.Grade)
             {
-                case "MISMATCH":
+                case "FAIL MISMATCH":
                     counter[0]++;
                     break;
 
@@ -481,36 +652,39 @@ else{
                     throw new ArgumentException($"{recon} is not a valid argument");
             }
         }
+
         return counter;
     }
 
-    private int[] TotalReconTypeCounter(List<Manager_test> managers)
+    private int[] TotalReconTypeCounter(List<ManagerStatusHandler> managers)
     {
-        int[] totalRecons = {0, 0, 0, 0};
-        int[] test;
 
-        foreach (var party in managers)
+        int[] totalRecons = {0, 0, 0, 0};
+        int[] counter = {0, 0, 0, 0};
+
+        foreach (var manager in managers)
         {
-            test = ReconTypeCounter(party._recons);
+            counter = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
             for (int i = 0; i < 4; i++)
             {
-                totalRecons[i] += test[i];
+                totalRecons[i] += counter[i];
             }
         }
         return totalRecons;
     }
 
-
-    private string ManagerCircleColour(Manager_test manager)
+    // TODO: only uses case "OK"
+    private string ManagerCircleColour(ManagerStatusHandler manager)
 	{
-		int[] errors = ErrorSeverityCounter(manager._errors);
-        int[] recons = ReconTypeCounter(manager._recons);
+		int[] errors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
+        int[] recons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
         
         ManagerQueueCounterFixer();
 
-        switch (manager._status)
+        switch (manager.Status)
         {
-           case "FINISHED":
+            // "FINISHED" -> "OK"
+            case "OK":
                ManagerQueueCounter[0]++;
                if(errors[0] > 0 || recons[0] > 0){
                    return "background-red";
@@ -531,7 +705,7 @@ else{
                 ManagerQueueCounter[1]++;
                 return "background-queued";
             default:
-                throw new ArgumentException($"{manager._status} is not a valid manager status");
+                throw new ArgumentException($"{manager.Status} is not a valid manager status");
         }
 		
 	}
@@ -541,18 +715,22 @@ else{
     int[] HoveredManagerRecons { get; set; }
     double MousePositionX { get; set; }
     double MousePositionY { get; set; }
-    Manager_test CurrentManager { get; set; }
+    ManagerStatusHandler CurrentManager { get; set; }
+    
+    // NOT USED DELETE
     int[] ManagerQueueCounter { get; set; }
     
     
-	private void GetHoveredManager(int hovered, MouseEventArgs e, Manager_test manager)
+	private void GetHoveredManager(int hovered, MouseEventArgs e, ManagerStatusHandler manager)
 	{
 		HoveredManager = hovered;
 	    MousePositionX = e.ClientX;
 	    MousePositionY = e.ClientY;
-	    HoveredManagerErrors = ErrorSeverityCounter(manager._errors);
-	    HoveredManagerRecons = ReconTypeCounter(manager._recons);
+	    HoveredManagerErrors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
+	    HoveredManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
 	}
+
+    // NOT USED DELETE
     private void ManagerQueueCounterFixer()
     {
         int total = 0;
@@ -569,7 +747,8 @@ else{
             ManagerQueueCounter = new[] {0, 0};
         }
     }
-
+    
+    // NOT USED DELETE
     private int ManagerQueueCounterWriter(string status)
     {
         if (ManagerQueueCounter == null)
@@ -590,13 +769,13 @@ else{
         }
     }
 
-    private string CalculateRuntime(Manager_test manager)
+    private string CalculateRuntime(ManagerStatusHandler manager)
     {
-        string seconds = (manager._runtime / 1000 % 60).ToString();
+        string seconds = (manager.RunTime / 1000 % 60).ToString();
         
-        string minutes = (((manager._runtime / 1000) / 60) % 60).ToString();
+        string minutes = (((manager.RunTime / 1000) / 60) % 60).ToString();
         
-        string hours = ((manager._runtime / 1000) / 3600).ToString();
+        string hours = ((manager.RunTime / 1000) / 3600).ToString();
 
         if (seconds.Length < 2)
         {
@@ -613,7 +792,8 @@ else{
         
         return hours + ':' + minutes + ':' + seconds;
     }
-
+    
+    // NOT USED DELETE
     private string CurrentManagerDetails(string wantedInfo)
     {
         if (CurrentManager == null)
@@ -623,44 +803,46 @@ else{
         switch (wantedInfo)
         {
             case "managerName":
-                return CurrentManager._name;
+                return CurrentManager.Name;
             case "runtime":
                 return CalculateRuntime(CurrentManager); 
             case "totalErrors":
-                return CurrentManager._errors.Count.ToString();
+                return CurrentManager.ErrorHandler.LogDataList.Count.ToString();
             case "FATAL":
-                return ErrorSeverityCounter(CurrentManager._errors)[0].ToString();
+                return ErrorSeverityCounter(CurrentManager.ErrorHandler.LogDataList)[0].ToString();
             case "ERROR":
-                return ErrorSeverityCounter(CurrentManager._errors)[1].ToString();
+                return ErrorSeverityCounter(CurrentManager.ErrorHandler.LogDataList)[1].ToString();
             case "WARNING":
-                return ErrorSeverityCounter(CurrentManager._errors)[2].ToString();
+                return ErrorSeverityCounter(CurrentManager.ErrorHandler.LogDataList)[2].ToString();
             case "INFO":
-                return ErrorSeverityCounter(CurrentManager._errors)[3].ToString();
+                return ErrorSeverityCounter(CurrentManager.ErrorHandler.LogDataList)[3].ToString();
             case "totalRecons":
-                return CurrentManager._recons.Count.ToString();
+                return CurrentManager.ReconciliationHandler.LogDataList.Count.ToString();
             case "MISMATCH":
-                return ReconTypeCounter(CurrentManager._recons)[0].ToString();
+                return ReconTypeCounter(CurrentManager.ReconciliationHandler.LogDataList)[0].ToString();
             case "FAILED":
-                return ReconTypeCounter(CurrentManager._recons)[1].ToString();
+                return ReconTypeCounter(CurrentManager.ReconciliationHandler.LogDataList)[1].ToString();
             case "DISABLED":
-                return ReconTypeCounter(CurrentManager._recons)[2].ToString();
+                return ReconTypeCounter(CurrentManager.ReconciliationHandler.LogDataList)[2].ToString();
             case "OK":
-                return ReconTypeCounter(CurrentManager._recons)[3].ToString();
+                return ReconTypeCounter(CurrentManager.ReconciliationHandler.LogDataList)[3].ToString();
             default:
                 throw new ArgumentException($"{wantedInfo} is not a valid argument");
         }
     }
     
-    private int[] CurrentManagerReconCounter(List<Manager_test> managers)
+    // NOT USED DELETE
+    private int[] CurrentManagerReconCounter(List<ManagerStatusHandler> managers)
     {
         int[] currentManagerRecons = {0,0,0,0};
-        foreach (var party in managers)
+        foreach (var manager in managers)
         {
-            currentManagerRecons = ReconTypeCounter(party._recons);
+            currentManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
         }
         return currentManagerRecons;
     }
 
 
 }
+
 

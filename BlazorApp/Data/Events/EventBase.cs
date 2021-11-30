@@ -65,11 +65,14 @@ namespace BlazorApp.DataStreaming.Events
                 EfficiencyDataList = efficiencyDatalist,
             });
         }
-        
-        public void ResetEfficiencyUpdate()
+
+        // Update Overview ********************************************************
+
+        public static event EventHandler UpdateOverviewTriggered;
+
+        public void OverviewTriggerUpdate()
         {
-            EfficiencyUpdateResseted?.Invoke(this,null);
+            UpdateOverviewTriggered?.Invoke(this,null);
         }
-        
     }
 }
