@@ -93,16 +93,11 @@ namespace BlazorApp.Data
         
         public void CalculateAverageMemoryUsed()
         {
-            AvgMemory = Health.Memory.Count > 0 ? Health.Memory.Average(data => data.NumericValue) : 0;
+            AvgMemory = Health.Memory.Count > 0 ? Health.Memory.Average(data => data.NumericValue) : MaxMemory;
             
             //Used for calculating used memory out of total memory
-            double result;
-            if (AvgMemory > 0)
-            {
-                result = ((MaxMemory - AvgMemory) / (MaxMemory)) * 100;
-            } else
-                result = 0;
-            
+            double result = ((MaxMemory - AvgMemory) / (MaxMemory)) * 100;
+
             AvgMemoryPercent = Convert.ToInt32(result);
         }
 
