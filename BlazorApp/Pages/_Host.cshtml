@@ -52,9 +52,14 @@
         display: inline-block;
         }
         
-        .rz-grid-table { /* Size of table */
+        .rz-grid-table { /* Size of error- and reconciliation table */
          height: 85vh;
          max-height: 85vh;
+        }
+        
+        .efficiency-table-styling .rz-grid-table { /* Size of efficiency table  */
+         height: 100%;
+         max-height: 100%;
         }
         
         .rz-tabview-panel {
@@ -88,7 +93,7 @@
         }
         .rz-tabview-selected {
         background-color: #384561 !important;
-        }
+        }               
         .rz-column-title, .rz-sortable-column-icon, .rz-grid-filter-icon  {
         color: #FFFFFF !important;
         position: sticky !important;
@@ -96,6 +101,7 @@
         .rz-unselectable-text {
         background-color: #384561 !important;
         border: none !important;
+        text-align: left !important;
         }
         .rz-data-grid{
         border: none !important;
