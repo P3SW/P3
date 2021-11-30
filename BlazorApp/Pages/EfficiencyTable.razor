@@ -20,7 +20,14 @@ else
                                   Title="MANAGER" Frozen="false" Width="400px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 200px; max-width: 200px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
-                        <span style="color: #FFFFFF; ">@ShortenManagerName(data)</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span class="low-score-styling">@ShortenManagerName(data)</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF; ">@ShortenManagerName(data)</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -28,7 +35,14 @@ else
                                   Title="SCORE" Frozen="false" Width="100px">
                 <Template Context="data">
                     <div style="display: grid; width: 60px; max-width: 60px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EfficiencyScore">
-                        <span style="color: #FFFFFF; ">@data.EfficiencyScore</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span class="low-score-styling">@data.EfficiencyScore</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF;">@data.EfficiencyScore</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -36,7 +50,14 @@ else
                                   Title="ENDTIME" Frozen="false" Width="300px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeFinished">
-                        <span style="color: #FFFFFF; ">@data.TimeFinished</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span class="low-score-styling">@data.TimeFinished</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF;">@data.TimeFinished</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -44,7 +65,14 @@ else
                                   Title="Read" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsRead">
-                        <span style="color: #FFFFFF; ">@data.RowsRead</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span class="low-score-styling">@data.RowsRead</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF;">@data.RowsRead</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -52,7 +80,14 @@ else
                                   Title="Written" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsWritten">
-                        <span style="color: #FFFFFF; ">@data.RowsWritten</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span class="low-score-styling">@data.RowsWritten</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF;">@data.RowsWritten</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -60,7 +95,14 @@ else
                                   Title="Time ran" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
-                        <span style="color: #FFFFFF; text-align: right;">@CalculateRuntime(data)</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span style="text-align: right" class="low-score-styling">@CalculateRuntime(data)</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF; text-align: right;">@CalculateRuntime(data)</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -68,7 +110,14 @@ else
                                   Title="CPU" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgCpu">
-                        <span style="color: #FFFFFF; text-align: right;">@data.AvgCpu%</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span style="text-align: right" class="low-score-styling">@data.AvgCpu%</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF; text-align: right">@data.AvgCpu%</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
@@ -76,7 +125,14 @@ else
                                   Title="Memory" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgMemoryPercent">
-                        <span style="color: #FFFFFF; text-align: right;">@data.AvgMemoryPercent%</span>
+                        @if (data.EfficiencyScore == 0)
+                        {
+                            <span style="text-align: right" class="low-score-styling">@data.AvgMemoryPercent%</span>
+                        }
+                        else
+                        {
+                            <span style="color: #FFFFFF; text-align: right">@data.AvgMemoryPercent%</span>
+                        }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
