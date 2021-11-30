@@ -3,17 +3,18 @@
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
 @using System.Globalization
-
-@inject Test dataList;
+@* @inherits Summary *@
+@* @inherits HealthReport *@
+@* @inject Test dataList; *@
 @* @inject QueueTest managerList; *@
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
 @if (managers == null || managers.Count == 0 || 
-     _lineconfig == null || 
-     lineconfig_dataset_cpu == null || 
-     lineconfig_dataset_memory == null || 
+     // _lineconfig == null || 
+     // lineconfig_dataset_cpu == null || 
+     // lineconfig_dataset_memory == null || 
      _pieconfig_errors == null ||
      _pieconfig_reconciliations == null ||
      pieconfig_dataset_errors == null ||
@@ -22,7 +23,7 @@
      _errorDataStorageList == null ||
      _ReconDataStorageList == null)
 {
-    <p>Loading ....</p>
+    <p>Loading ..overview..</p>
 }
 else
 {
@@ -30,7 +31,7 @@ else
         <Summary></Summary>
 
         <div class="Overview-right">
-            <HealthReport></HealthReport>
+            <HealthReport managers="managers"></HealthReport>
             <div class="efficiency-table-container">
                 <EfficiencyTable></EfficiencyTable>
             </div>
@@ -39,11 +40,15 @@ else
 }
 
 @code{
+    
+    public List<ManagerStatusHandler> managers = new List<ManagerStatusHandler>();
+    
     protected int managersCount = 0;
     bool calledOnce = false;
-    protected LineConfig _lineconfig;
-    LineDataset<long> lineconfig_dataset_cpu;
-    LineDataset<long> lineconfig_dataset_memory;
+    //protected LineConfig _lineconfig;
+    // DELETE
+    // LineDataset<long> lineconfig_dataset_cpu;
+    // LineDataset<long> lineconfig_dataset_memory;
 
     protected PieConfig _pieconfig_errors;
     protected PieConfig _pieconfig_reconciliations;
@@ -51,17 +56,19 @@ else
     protected PieDataset<int> pieconfig_dataset_reconciliations;
 
     protected List<HealthDataTest> healthdatatests = new List<HealthDataTest>();
-    protected List<ManagerStatusHandler> managers = new List<ManagerStatusHandler>();
+    
+    
     protected List<LogData> _errorDataStorageList;
     protected List<LogData> _ReconDataStorageList;
 
-    List<HealthData> _cpuDataList = new ();
-    List<HealthData> _memDataList = new ();
+    // List<HealthData> _cpuDataList = new ();
+    // List<HealthData> _memDataList = new ();
     
     protected override async Task OnInitializedAsync()
     {
+        // INIT
         managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
-        ConfigureLineConfig();
+        // ConfigureLineConfig();
         ConfigurePieConfig();
      
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
@@ -115,6 +122,7 @@ else
 
         UpdateOverviewTriggered += async (o, args) =>
         {
+            Console.WriteLine("UpdateOverviewTriggered *** Overview");
             managersCount++;
             _pieconfig_errors.Data.Datasets.Clear();
             pieconfig_dataset_errors = new PieDataset<int>(TotalErrorsSeverityCounter(managers))
@@ -148,197 +156,177 @@ else
             
             
             // LINE CHART **********************************************************************************************
-            _lineconfig.Data.Datasets.Clear();
-            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisMem(_memDataList))
-            {
-                Label = "Cpu usage",
-                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-                LineTension = 0,
-            };
-            _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
-            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(_cpuDataList))
-            {
-                Label = "Cpu usage",
-                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-                LineTension = 0,
-            };
-            _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
-            
-            await InvokeAsync(StateHasChanged);
-            
-
-
-        };
-
-        HealthUpdateTriggered += async (o, args) =>
-        {
-            if (args.Cpu != null) // IKKE NØDVENDIG
-                 _cpuDataList?.AddRange(args.Cpu);
-             if (args.Memory != null) // IKKE NØDVENDIG
-                 _memDataList?.AddRange(args.Memory);
-
-
-             //lineconfig_dataset_cpu.Clear();
-            //lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(args.Cpu))
-            //{
-            //    Label = "Cpu usage",
-            //    BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            //    BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-            //    LineTension = 0,
-            //};
-            //_lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
-            
-            // lineconfig_dataset_memory.Clear();
-            // lineconfig_dataset_memory = new LineDataset<long>(lineDataInputYaxisMem(args.Memory)) //Needs data From health data memory class, like the data above
+            // _lineconfig.Data.Datasets.Clear();
+            // lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisMem(_memDataList))
             // {
-            //     Label = ("Memory usage"),
-            //     BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
-            //     BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+            //     Label = "Cpu usage",
+            //     BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            //     BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             //     LineTension = 0,
             // };
             // _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
+            // lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(_cpuDataList))
+            // {
+            //     Label = "Cpu usage",
+            //     BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            //     BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            //     LineTension = 0,
+            // };
+            // _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
+            
             await InvokeAsync(StateHasChanged);
+            
+
+
         };
+
+        // HealthUpdateTriggered += async (o, args) =>
+        // {
+        //     if (args.Cpu != null) // IKKE NØDVENDIG
+        //          _cpuDataList?.AddRange(args.Cpu);
+        //      if (args.Memory != null) // IKKE NØDVENDIG
+        //          _memDataList?.AddRange(args.Memory);
+        //     
+        //     await InvokeAsync(StateHasChanged);
+        // };
 
     }
 }
 
 @code{
 
-    public LineDataset<long> lineDataInputYaxisCpu(List<HealthData> healthDataList)
-    {
-    //Takes data from test and stores in list - TODO: DELETE?
-        string[] separtors = new string[] {" "};
-        lineconfig_dataset_cpu.Clear();
-        foreach (var data in healthDataList)
-        {
-            if (data.ReportType == "CPU")
-            {
-                lineconfig_dataset_cpu.Add(data.NumericValue); // Delete?
-            }
-
-        }
-        _lineconfig.Data.Labels.Clear();
-        foreach (var data in healthDataList)
-        {
-            if (data.ReportType == "CPU")
-            {
-                _lineconfig.Data.Labels.Add((data.LogTime.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
-                
-            }
-        }
-        return lineconfig_dataset_cpu;
-    }
+    // public LineDataset<long> lineDataInputYaxisCpu(List<HealthData> healthDataList)
+    // {
+    // //Takes data from test and stores in list - TODO: DELETE?
+    //     string[] separtors = new string[] {" "};
+    //     lineconfig_dataset_cpu.Clear();
+    //     foreach (var data in healthDataList)
+    //     {
+    //         if (data.ReportType == "CPU")
+    //         {
+    //             lineconfig_dataset_cpu.Add(data.NumericValue); // Delete?
+    //         }
+    //
+    //     }
+    //     _lineconfig.Data.Labels.Clear();
+    //     foreach (var data in healthDataList)
+    //     {
+    //         if (data.ReportType == "CPU")
+    //         {
+    //             _lineconfig.Data.Labels.Add((data.LogTime.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+    //             
+    //         }
+    //     }
+    //     return lineconfig_dataset_cpu;
+    // }
     
-    public LineDataset<long> lineDataInputYaxisMem(List<HealthData> healthDataList)
-    {
-        lineconfig_dataset_memory.Clear();
-        foreach (var data in healthDataList)
-        {
-            if (data.ReportType == "MEMORY")
-                lineconfig_dataset_memory.Add(data.NumericValue/1024/1024/1024);
-        }
-        return lineconfig_dataset_memory;
-    }
+    // public LineDataset<long> lineDataInputYaxisMem(List<HealthData> healthDataList)
+    // {
+    //     lineconfig_dataset_memory.Clear();
+    //     foreach (var data in healthDataList)
+    //     {
+    //         if (data.ReportType == "MEMORY")
+    //             lineconfig_dataset_memory.Add(data.NumericValue/1024/1024/1024);
+    //     }
+    //     return lineconfig_dataset_memory;
+    // }
 }
 
 
 @code{
-    protected void ConfigureLineConfig()
-    {
-        _lineconfig = new LineConfig();
-        _lineconfig.Options = new LineOptions
-        {
-            Responsive = true,
-            Title = new OptionsTitle
-            {
-                Display = false,
-                Text = "Cpu & Memory usage",
-                FontColor = "#FFFFFF"
-            },
-            Legend = new Legend
-            {
-                Position = Position.Bottom,
-                Display = false,
-            },
-            Hover = new Hover
-            {
-                Mode = InteractionMode.Nearest,
-                Intersect = true
-            },
-            Scales = new Scales
-            {
-                XAxes = new List<CartesianAxis> //scale for the x-axis
-                {
-                    new CategoryAxis
-                    {
-                        ScaleLabel = new ScaleLabel
-                        {
-                            Display = true,
-                            //LabelString = "Time",
-                            FontColor = "#FFFFFF",
-                            FontSize = 15,
-                        },
-                        Ticks = new CategoryTicks
-                        {
-                            FontColor = "#FFFFFF",
-                            FontSize = 13,
-                        },
-                        GridLines = new GridLines
-                        {
-                            Color = ColorUtil.ColorHexString(142, 142, 142),
-                        }
-                    },
-                },
-                YAxes = new List<CartesianAxis> //Scale for the y-axis
-                {
-                    new LinearCartesianAxis
-                    {
-                        ScaleLabel = new ScaleLabel
-                        {
-                            Display = true,
-                            //LabelString = "Usage %",
-                            FontColor = "#FFFFFF",
-                            FontSize = 15,
-
-                        },
-                        Ticks = new LinearCartesianTicks
-                        {
-                            FontSize = 13,
-                            Padding = 10,
-                            FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
-                            BeginAtZero = true,
-                            StepSize = 10,
-                            Max = 100,
-                        },
-                        GridLines = new GridLines
-                        {
-                            Color = ColorUtil.ColorHexString(142, 142, 142),
-                            DrawBorder = false, //Removes the border in the y-axis
-                        },
-                    }
-                }
-            }
-        };
-        lineconfig_dataset_cpu = new LineDataset<long>
-        {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-            LineTension = 0,
-        };
-
-        lineconfig_dataset_memory = new LineDataset<long> //Needs data From health data memory class, like the data above
-        {
-            Label = ("Memory usage"),
-            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
-            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
-            LineTension = 0,
-        };
-
-    }
+    // protected void ConfigureLineConfig()
+    // {
+    //     _lineconfig = new LineConfig();
+    //     _lineconfig.Options = new LineOptions
+    //     {
+    //         Responsive = true,
+    //         Title = new OptionsTitle
+    //         {
+    //             Display = false,
+    //             Text = "Cpu & Memory usage",
+    //             FontColor = "#FFFFFF"
+    //         },
+    //         Legend = new Legend
+    //         {
+    //             Position = Position.Bottom,
+    //             Display = false,
+    //         },
+    //         Hover = new Hover
+    //         {
+    //             Mode = InteractionMode.Nearest,
+    //             Intersect = true
+    //         },
+    //         Scales = new Scales
+    //         {
+    //             XAxes = new List<CartesianAxis> //scale for the x-axis
+    //             {
+    //                 new CategoryAxis
+    //                 {
+    //                     ScaleLabel = new ScaleLabel
+    //                     {
+    //                         Display = true,
+    //                         //LabelString = "Time",
+    //                         FontColor = "#FFFFFF",
+    //                         FontSize = 15,
+    //                     },
+    //                     Ticks = new CategoryTicks
+    //                     {
+    //                         FontColor = "#FFFFFF",
+    //                         FontSize = 13,
+    //                     },
+    //                     GridLines = new GridLines
+    //                     {
+    //                         Color = ColorUtil.ColorHexString(142, 142, 142),
+    //                     }
+    //                 },
+    //             },
+    //             YAxes = new List<CartesianAxis> //Scale for the y-axis
+    //             {
+    //                 new LinearCartesianAxis
+    //                 {
+    //                     ScaleLabel = new ScaleLabel
+    //                     {
+    //                         Display = true,
+    //                         //LabelString = "Usage %",
+    //                         FontColor = "#FFFFFF",
+    //                         FontSize = 15,
+    //
+    //                     },
+    //                     Ticks = new LinearCartesianTicks
+    //                     {
+    //                         FontSize = 13,
+    //                         Padding = 10,
+    //                         FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
+    //                         BeginAtZero = true,
+    //                         StepSize = 10,
+    //                         Max = 100,
+    //                     },
+    //                     GridLines = new GridLines
+    //                     {
+    //                         Color = ColorUtil.ColorHexString(142, 142, 142),
+    //                         DrawBorder = false, //Removes the border in the y-axis
+    //                     },
+    //                 }
+    //             }
+    //         }
+    //     };
+    //     lineconfig_dataset_cpu = new LineDataset<long>
+    //     {
+    //         Label = "Cpu usage",
+    //         BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+    //         BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+    //         LineTension = 0,
+    //     };
+    //
+    //     lineconfig_dataset_memory = new LineDataset<long> //Needs data From health data memory class, like the data above
+    //     {
+    //         Label = ("Memory usage"),
+    //         BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+    //         BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+    //         LineTension = 0,
+    //     };
+    //
+    // }
 
     private T SetUpPieLabels<T>(T config, string[] labels) where T : PieConfig
     {
@@ -346,7 +334,7 @@ else
         {
             config.Data.Labels.Add(label);
         }
-
+    
         return config;
     }
 
