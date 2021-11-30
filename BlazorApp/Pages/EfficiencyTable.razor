@@ -94,7 +94,7 @@ else
             <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeRan" Filterable="false"
                                   Title="Time ran" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
-                    <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
+                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
                         @if (data.RowsRead == 0 && data.RowsWritten == 0)
                         {
                             <span style="text-align: right" class="low-score-styling">@CalculateRuntime(data)</span>
@@ -142,18 +142,17 @@ else
 }
 
 @code {
-    //LogDataEventArgs _update;
-    List<EfficiencyData> _dataStorageList;
+    List<EfficiencyData> _dataStorageList = new List<EfficiencyData>();
     private int currentCount = 0;
     RadzenDataGrid<EfficiencyData> EfficiencyDataGrid;
     
     protected override async Task OnInitializedAsync()
     {
-        _dataStorageList = await Task.Run(() => ConversionDataAssigner.GetManagerEfficiencyData("efficiency"));
         StateHasChanged();
         
         EfficiencyUpdateTriggered += async (o, args) =>
         {
+            _dataStorageList.Clear();
             _dataStorageList.AddRange(args.EfficiencyDataList);
             await InvokeAsync(EfficiencyDataGrid.Reload);
             await InvokeAsync(StateHasChanged);

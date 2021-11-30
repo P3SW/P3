@@ -248,7 +248,7 @@ namespace BlazorApp.Data
             return await Task.FromResult(list);
         }
 
-        public static async Task<List<EfficiencyData>> GetManagerEfficiencyData(string efficiency)
+        public static List<EfficiencyData> GetManagerEfficiencyData()
         {
             
             if (FinishedManagers.Count == 0)
@@ -275,7 +275,7 @@ namespace BlazorApp.Data
 
                 }
             }
-            return await Task.FromResult(list);
+            return list;
         }
     }
 }
