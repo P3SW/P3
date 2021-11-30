@@ -1,11 +1,19 @@
 ﻿@page "/reconciliations"
-@using Microsoft.AspNetCore.SignalR.Client
+@using BlazorApp.Data
 @inject NavigationManager NavigationManager
 
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-<div class="error_reconciliation_table_formatting"> @* Styling for this can be found in site.css *@
-    <ReconciliationTable></ReconciliationTable>
+<div class="log-table-formatting"> @* Styling for this can be found in site.css *@
+    <LogDataTable DataGridRef="_reconciliationDataGrid" LogData="_dataStorageList" Type="recon" Grades="_reconGrades" GradeName="Result"></LogDataTable>
+
 </div>
+
+@code
+{
+    List<LogData> _dataStorageList = new();
+    RadzenDataGrid<LogData> _reconciliationDataGrid;
+    readonly List<string> _reconGrades = new() { "OK", "DISABLED", "FAILED", "FAIL MISMATCH" };
+}

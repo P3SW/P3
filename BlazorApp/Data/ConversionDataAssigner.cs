@@ -17,6 +17,7 @@ namespace BlazorApp.Data
         private static string _connectionString;
         private static int _managerQueue;
         private static int _managerId;
+        private static int _executionId;
         
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
@@ -27,6 +28,7 @@ namespace BlazorApp.Data
             _managerQueue = 0;
             _managerId = 1;
             _currentManager = null;
+            _executionId = 1;
             
             Console.WriteLine("Engine started");
 
@@ -40,7 +42,7 @@ namespace BlazorApp.Data
                 SqlDependency.Start(_connectionString);
                 ManagerStatusHandler.Connection = new SqlConnection(_connectionString);
                 SQLDependencyListener.Connection = new SqlConnection(_connectionString);
-
+                
                 SQLDependencyListener.Connection.Open();
                 ManagerStatusHandler.Connection.Open();
                 
@@ -65,7 +67,6 @@ namespace BlazorApp.Data
                             reader.Close();
                             WaitForStart();
                         }
-                    
                     }
                 }
             }
@@ -115,7 +116,27 @@ namespace BlazorApp.Data
                 }
             }
             ManagerTrackingListener();
-            //WatchNextManager();
+        }
+
+        private static void GetExecutionID(object sender, SqlNotificationEventArgs eventArgs)
+        {
+            if (eventArgs.Info == SqlNotificationInfo.Invalid)
+            {
+                Console.WriteLine("Info: {0}, Source: {1}, Type: {2}", eventArgs.Info, eventArgs.Source,
+                    eventArgs.Type);
+            }
+
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ExecutionIDSelect, _connection))
+            {
+                using (SqlDataReader reader = command.ExecuteReader())
+                {
+                    if (reader.Read())
+                    {
+                        _executionId = Convert.ToInt32(reader[0]);
+                    }
+                    reader.Close();
+                }
+            }
         }
 
         //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
@@ -128,6 +149,7 @@ namespace BlazorApp.Data
                 command.CommandText = DatabaseListenerQueryStrings.ManagerStartTimesSelect;
                     
                 SqlDependency dependency = new SqlDependency(command);
+                dependency.OnChange += GetExecutionID;
                 dependency.OnChange += ManagerStartTracking;
                 Console.WriteLine("Manager start dependency created");
                 
@@ -168,7 +190,7 @@ namespace BlazorApp.Data
                     if (reader.Read())
                     {
                         Console.WriteLine("Starting new manager");
-                        _currentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1]);
+                        _currentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1], _executionId);
                         Console.WriteLine("New manager name is " + reader[0]);
                         _managerId++;
                         _managerQueue--;
@@ -255,9 +277,5 @@ namespace BlazorApp.Data
             }
             return await Task.FromResult(list);
         }
-
-
-
-
     }
 }
