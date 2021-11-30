@@ -414,7 +414,8 @@ else{
         foreach (var data in healthDataList)
         {
             if (data.ReportType == "MEMORY")
-                lineconfig_dataset_memory.Add(data.NumericValue);
+                Console.WriteLine("MEM numericvalue: " + (data.NumericValue / 1024 / 1024 / 1024));
+                lineconfig_dataset_memory.Add(data.NumericValue / 1024 / 1024 / 1024);
         }
         return lineconfig_dataset_memory;
     }
