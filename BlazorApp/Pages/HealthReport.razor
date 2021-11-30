@@ -1,0 +1,54 @@
+﻿@using ChartJs.Blazor.PieChart
+@using BlazorApp.Data
+@using System.Globalization
+@using ChartJs.Blazor.LineChart
+@using BlazorApp
+@inherits Overview
+
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'> 
+
+@if (managers == null || managers.Count == 0)
+{
+    <p>Loading ....</p>
+}
+else 
+{
+    <div class="cpu_usage">
+        <div class="chart-header">
+            <div class="dropdown">
+                <b class="selected-manager-name" title="">@(SelectedManager + "-" + managers[SelectedManager].Name)</b>
+                <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
+                <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
+                <div class="dropdown-content">
+                    @for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                    {
+                        int managerID = i;
+                        if (i == SelectedManager)
+                        {
+                            continue;
+                        }
+                        else if (j == 0)
+                        {
+                            j++;
+                            <div class="dropdown-content-first" title="@managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID].Name)</div>
+                            continue;
+                        }
+                        <div title="@managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID].Name)</div>
+                    }
+                </div>
+            </div>
+            <div class="chart-title">
+                Memory/CPU
+            </div>
+        </div>
+        <div style="position: relative; width: 90%; left: 5%">
+            <Chart Config="_lineconfig"></Chart>
+        </div>
+        <div class="info-labels">
+            <div class="oblong background-lightred"></div>
+            <div class="cpu_text">CPU</div>
+            <div class="oblong background-green"></div>
+            <div class="memory_text">Memory</div>
+        </div>
+    </div>
+}
