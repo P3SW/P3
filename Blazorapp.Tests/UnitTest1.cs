@@ -3,14 +3,9 @@ using System.Collections.Generic;
 using BlazorApp.Data;
 using BlazorApp.Pages;
 using Bunit;
-using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Mvc.ModelBinding.Binders;
 using Xunit;
 using Radzen.Blazor;
-using Radzen;
-using Radzen.Blazor.Rendering;
 using Xunit.Abstractions;
-using Xunit.Sdk;
 
 namespace P3ConversionDashboard.Tests
 {
@@ -19,7 +14,7 @@ namespace P3ConversionDashboard.Tests
         private List<LogData> testLogData = new()
         {
             new LogData(new DateTime(1995, 1, 1,1,2,4), 
-                "Manager has started", "UnitTestManager","INFO"),
+                "Manager has started", "UnitTestManager1","INFO"),
             new LogData(new DateTime(2021, 10, 13,2,5,29),
                 "Manager finished converting", "UnitTestManager2","INFO"),
             new LogData(new DateTime(2019, 12, 31,2,5,23),
@@ -79,19 +74,17 @@ namespace P3ConversionDashboard.Tests
             
             string renderedComponent = component.Markup;
 
-            List<string> expectedOutputs = new List<string>()
+            List<string> expectedOutputs = new()
             {
                 $"<span class=\"rz-tabview-title\">{testGrades[0]}</span>", $"<span class=\"rz-tabview-title\">{testGrades[1]}</span>",
                 $"<span class=\"rz-tabview-title\">{testGrades[2]}</span>", $"<span class=\"rz-tabview-title\">{testGrades[3]}</span>"
             };
             
-            _testOutputHelper.WriteLine(new DateTime(1995, 1, 1,1,2,4).ToString());
-
             foreach (LogData log in testLogData)
             {
                 expectedOutputs.Add(log.Grade);
                 expectedOutputs.Add(log.ManagerName);
-                expectedOutputs.Add(log.Timestamp.ToString("MM/dd/yyyy HH:mm:ss"));
+                expectedOutputs.Add(log.Timestamp.ToString());
                 expectedOutputs.Add(log.Description);
             }
 
@@ -99,7 +92,52 @@ namespace P3ConversionDashboard.Tests
             {
                 Assert.Contains(expectedOutput, renderedComponent);
             }
-            
+        }
+        
+        [Fact]
+        public void MarkupTextTest()
+        {
+            string[] testTabsSelectors =
+            {
+                "#log-tab-tabpanel-1-label", "#log-tab-tabpanel-2-label", 
+                "#log-tab-tabpanel-3-label", "#log-tab-tabpanel-4-label"
+            }; 
+                
+            JSInterop.Mode = JSRuntimeMode.Loose;
+            var component = RenderComponent<LogDataTable>(parameterBuilder =>
+            {
+
+                parameterBuilder.Add(table => table.LogDataList, testLogData);
+                parameterBuilder.Add(table => table.Grades, testGrades);
+                parameterBuilder.Add(table => table.Type, "error");
+                parameterBuilder.Add(table => table.GradeName, "Severity");
+                parameterBuilder.Add(table => table.DataGridRef, dataGridRef);
+            });
+
+            foreach (string tab in testTabsSelectors)
+            {
+                var paraElm = component.Find(tab);
+                paraElm.Click();
+                var child = paraElm.Children;
+
+                string renderedCut = component.Markup;
+
+                foreach (LogData testData in testLogData)
+                {
+                    string[] testStrings =
+                    {
+                        testData.Description, testData.ManagerName,
+                        testData.Timestamp.ToString()
+                    };
+                    
+                    if (testData.Grade == child[0].InnerHtml)
+                        foreach (string testString in testStrings)
+                            Assert.Contains(testString, renderedCut);
+                    else
+                        foreach (string testString in testStrings)
+                            Assert.DoesNotContain(testString, renderedCut);
+                }
+            }
         }
     }
 }
