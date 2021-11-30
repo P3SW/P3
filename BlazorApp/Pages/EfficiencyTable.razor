@@ -142,14 +142,12 @@ else
 }
 
 @code {
-    //LogDataEventArgs _update;
     List<EfficiencyData> _dataStorageList = new List<EfficiencyData>();
     private int currentCount = 0;
     RadzenDataGrid<EfficiencyData> EfficiencyDataGrid;
     
     protected override async Task OnInitializedAsync()
     {
-        //dataStorageList = await Task.Run(() => ConversionDataAssigner.GetManagerEfficiencyData("efficiency"));
         StateHasChanged();
         
         EfficiencyUpdateTriggered += async (o, args) =>
