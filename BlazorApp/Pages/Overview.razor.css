@@ -368,14 +368,14 @@
 }
 
 /* Efficiency table */    
-.efficiency-container {
-    line-height: 80%;
-    border-bottom: none !important;
+.efficiency-table-container {
+    background-color: #384561;
+    overflow-y: auto;
+    max-width: 100%;
 }
 
-.efficiency-container > div {
+.efficiency-table-container > div {
     font-size: 0.6em;
-    float: left;
 }
 
 

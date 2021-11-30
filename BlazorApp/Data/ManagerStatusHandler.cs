@@ -21,6 +21,7 @@ namespace BlazorApp.Data
         public int RowsRead { get; private set; }
         public int RowsWritten { get; private set; }
         public int Cpu { get; set; }
+        public int Memory { get; set; }
         public int EfficiencyScore { get; private set; }
         public static SqlConnection Connection { get; set; }
         private SQLDependencyListener _healthStreamer;
@@ -28,6 +29,13 @@ namespace BlazorApp.Data
         private SQLDependencyListener _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
+        public double AvgCpu;
+        public double AvgMemory;
+        public int MemoryPercent;
+        public int AvgMemoryPercent { get; private set; }
+        public long MemoryUsed;
+        public double MaxMemory = 21473734656; /* Approx 20gb */
+
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
@@ -73,16 +81,32 @@ namespace BlazorApp.Data
             AssignEndTime();
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
+            CalculateAverageMemoryUsed();
         }
 
         //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
-            double averageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
-            Cpu = Convert.ToInt32(averageCpu);
-            double result = (double) (RowsRead + RowsWritten) / RunTime * averageCpu;
+            AvgCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
+            Cpu = Convert.ToInt32(AvgCpu);
+            double result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
             EfficiencyScore = Convert.ToInt32(result);
+        }
+        
+        public void CalculateAverageMemoryUsed()
+        {
+            AvgMemory = Health.Memory.Count > 0 ? Health.Memory.Average(data => data.NumericValue) : 0;
+            
+            //Used for calculating used memory out of total memory
+            double result;
+            if (AvgMemory > 0)
+            {
+                result = ((MaxMemory - AvgMemory) / (MaxMemory)) * 100;
+            } else
+                result = 0;
+            
+            AvgMemoryPercent = Convert.ToInt32(result);
         }
 
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.

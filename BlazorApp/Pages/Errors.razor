@@ -1,11 +1,18 @@
 @page "/errors"
-@using Microsoft.AspNetCore.SignalR.Client
+@using BlazorApp.Data
 @inject NavigationManager NavigationManager
 
 
 @* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-<div class="error_reconciliation_table_formatting"> @* Styling for this can be found in site.css *@
-    <ErrorTable></ErrorTable>
+<div class="log-table-formatting"> @* Styling for this can be found in site.css *@
+    <LogDataTable LogData="_dataStorageList" DataGridRef="_dataGridRef" Type="error" Grades="_errorGrades" GradeName="Severity"></LogDataTable>
 </div>
+
+@code
+{
+    List<LogData> _dataStorageList = new();
+    RadzenDataGrid<LogData> _dataGridRef;
+    readonly List<string> _errorGrades = new() { "INFO", "WARN", "ERROR", "FATAL" };
+}
