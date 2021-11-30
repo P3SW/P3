@@ -79,6 +79,7 @@ namespace BlazorApp.Data
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
             CalculateAverageMemoryUsed();
+            EfficiencyTriggerUpdate(ConversionDataAssigner.GetManagerEfficiencyData());
         }
 
         //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
