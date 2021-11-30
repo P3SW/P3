@@ -4,6 +4,7 @@
 @using Radzen.Blazor
 @using Radzen.Blazor.Rendering
 
+
 @if (_dataStorageList == null)
 {
     <p>Loading ....</p>
@@ -22,11 +23,11 @@ else
                     <div style="display: grid; width: 200px; max-width: 200px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
                         @if (data.RowsRead == 0 && data.RowsWritten == 0)
                         {
-                            <span class="low-score-styling">@ShortenManagerName(data)</span>
+                            <span class="low-score-styling">@Utility.ShortenManagerName(data.ManagerName)</span>
                         }
                         else
                         {
-                            <span style="color: #FFFFFF; ">@ShortenManagerName(data)</span>
+                            <span style="color: #FFFFFF; ">@Utility.ShortenManagerName(data.ManagerName)</span>
                         }
                     </div>
                 </Template>
@@ -97,11 +98,11 @@ else
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
                         @if (data.RowsRead == 0 && data.RowsWritten == 0)
                         {
-                            <span style="text-align: right" class="low-score-styling">@CalculateRuntime(data)</span>
+                            <span style="text-align: right" class="low-score-styling">@Utility.FormatTime(data.TimeRan)</span>
                         }
                         else
                         {
-                            <span style="color: #FFFFFF; text-align: right;">@CalculateRuntime(data)</span>
+                            <span style="color: #FFFFFF; text-align: right;">@Utility.FormatTime(data.TimeRan)</span>
                         }
                     </div>
                 </Template>
@@ -170,39 +171,5 @@ else
     void CellRender(DataGridCellRenderEventArgs<EfficiencyData> dataGridCellRenderEventArgs)
     {
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561;");
-    }
-
-    private string ShortenManagerName(EfficiencyData efficiencyData)
-    {
-        return efficiencyData.ManagerName.Split('.').Last();
-    }
-    
-    /* Calculates the runtime from ms to hh:mm:ss format */
-    private string CalculateRuntime(EfficiencyData efficiencyData)
-    {
-        string seconds = (efficiencyData.TimeRan / 1000 % 60).ToString();
-        
-        string minutes = (((efficiencyData.TimeRan / 1000) / 60) % 60).ToString();
-        
-        string hours = (efficiencyData.TimeRan / 3600 / 1000).ToString();
-
-        if (seconds.Length < 2)
-        {
-            seconds = "0" + seconds;
-        }
-        if (minutes.Length < 2)
-        {
-            minutes = "0" + minutes;
-        }
-        if (hours.Length < 2)
-        {
-            hours = "0" + hours;
-        }
-
-        if (hours == "00")
-        {
-            return minutes + ':' + seconds;
-        } else
-            return hours + ':' + minutes + ':' + seconds;
     }
 }
