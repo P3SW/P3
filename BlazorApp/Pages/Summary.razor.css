@@ -1,4 +1,4 @@
-/* Summary root */
+﻿/* Summary root */
 .overview_container{
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -294,7 +294,7 @@
     background: rgba(83, 96, 122, 0.27);
     overflow-y: visible;
     overflow-x: auto;
-    white-space: nowrap;        
+    white-space: nowrap;
 }
 
 .hovered-manager{
@@ -318,7 +318,7 @@
 .queue-finished-text {
     float: left;
 }
-    
+
 .queue-inqueue-text {
     float: right;
 }
@@ -361,13 +361,13 @@
     display: block;
     height: 80%;
     width: 80%;
-    position: relative; 
-    top: 50%; 
-    left: 50%; 
+    position: relative;
+    top: 50%;
+    left: 50%;
     transform: translate(-50%, -50%);
 }
 
-/* Efficiency table */    
+/* Efficiency table */
 .efficiency-table-container {
     background-color: #384561;
     overflow-y: auto;
