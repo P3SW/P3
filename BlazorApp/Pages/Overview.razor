@@ -413,7 +413,7 @@ else{
         foreach (var data in healthDataList)
         {
             if (data.ReportType == "MEMORY")
-                lineconfig_dataset_memory.Add(data.NumericValue);
+                lineconfig_dataset_memory.Add(data.NumericValue/1024/1024/1024);
         }
         return lineconfig_dataset_memory;
     }
@@ -485,8 +485,8 @@ else{
                             Padding = 10,
                             FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
                             BeginAtZero = true,
-                            //StepSize = 10,
-                            //Max = 100,
+                            StepSize = 10,
+                            Max = 100,
                         },
                         GridLines = new GridLines
                         {

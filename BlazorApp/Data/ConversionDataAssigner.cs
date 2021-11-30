@@ -13,7 +13,7 @@ namespace BlazorApp.Data
     {
 
         public static List<ManagerStatusHandler> FinishedManagers { get; private set; } = new List<ManagerStatusHandler>();
-        private static ManagerStatusHandler _currentManager;
+        public static ManagerStatusHandler _currentManager;
 
         private static SqlConnection _connection;
         private static string _connectionString;
