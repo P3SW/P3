@@ -3,12 +3,12 @@
 @using System.Globalization
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
-@inherits Overview
+@* @inherits Overview *@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'> 
 
 @code{
-    [Parameter] public List<ManagerStatusHandler> managers { get; set; }
+    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
     
     List<HealthData> _cpuDataList = new ();
     List<HealthData> _memDataList = new ();
@@ -188,23 +188,29 @@
         };
 
     }
+    
+    private int SelectedManager { get; set; }
+    private void GetSelectedManagerID(int selectedID)
+    {
+        SelectedManager = selectedID;
+    }
 
 }
 
-@if (managers == null || managers.Count == 0)
+@if (Managers == null || Managers.Count == 0)
 {
-    <p>Loading ..HealthReport @managers.Count..</p>
+    <p>Loading ..HealthReport @Managers.Count..</p>
 }
 else 
 {
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManager + "-" + managers[SelectedManager].Name)</b>
+                <b class="selected-manager-name" title="">@(SelectedManager + "-" + Managers[SelectedManager].Name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
-                    @for (int i = 0, j = 0; i < managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                    @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
                         int managerID = i;
                         if (i == SelectedManager)
@@ -214,10 +220,10 @@ else
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID].Name)</div>
+                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
                             continue;
                         }
-                        <div title="@managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + managers[managerID].Name)</div>
+                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
                     }
                 </div>
             </div>
