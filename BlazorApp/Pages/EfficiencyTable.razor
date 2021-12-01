@@ -20,10 +20,12 @@ else
             <RadzenDataGridColumn TItem="EfficiencyData" Property="ManagerName" Filterable="true"
                                   Title="MANAGER" Frozen="false" Width="400px" Sortable="false">
                 <Template Context="data">
-                    <div style="display: grid; width: 200px; max-width: 200px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
+                    <div style="color: white; display: block; width: 200px; max-width: 200px; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
                         @if (data.RowsRead == 0 && data.RowsWritten == 0)
                         {
-                            <span class="low-score-styling">@Utility.ShortenManagerName(data.ManagerName)</span>
+                            <div style="display: block; color: lightgray; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;">
+                                <span class="low-score-styling">@Utility.ShortenManagerName(data.ManagerName)</span>
+                            </div>
                         }
                         else
                         {
@@ -93,7 +95,7 @@ else
                 </Template>
             </RadzenDataGridColumn>
             <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeRan" Filterable="false"
-                                  Title="Time ran" Frozen="false" Width="100px" Sortable="false">
+                                  Title="rUnTIme" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
                         @if (data.RowsRead == 0 && data.RowsWritten == 0)

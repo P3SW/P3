@@ -15,7 +15,7 @@ else
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManager + "-" + Managers[SelectedManager].Name)</b>
+                <b class="selected-manager-name" title="">@(SelectedManager)-@Utility.ShortenManagerName(Managers[SelectedManager].Name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
@@ -29,10 +29,10 @@ else
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
+                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
                             continue;
                         }
-                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
+                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
                     }
                 </div>
             </div>

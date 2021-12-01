@@ -149,13 +149,12 @@
 /* Manager queue */
 .manager-queue-container > div {
     font-size: 0.6em;
-    margin: 0.5rem;
+    margin: 0.5rem 0;
 }
 
 .manager-queue-container{
     display: grid;
     grid-template-rows: 0.6em 1fr;
-    align-items: center;
 }
 
 .manager-circle {
@@ -172,6 +171,7 @@
     overflow-y: visible;
     overflow-x: auto;
     white-space: nowrap;
+    text-align: left;
 }
 
 .hovered-manager{
@@ -211,6 +211,14 @@
 
 .hoverbox-info{
     padding-left: 0.5em;
+    max-width: 19rem;
+}
+
+.hoverbox-info > div {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
 }
 
 .hoverbox-errors-recons  ul{
