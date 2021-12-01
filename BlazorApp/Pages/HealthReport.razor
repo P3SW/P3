@@ -1,0 +1,237 @@
+﻿@using ChartJs.Blazor.PieChart
+@using BlazorApp.Data
+@using System.Globalization
+@using ChartJs.Blazor.LineChart
+@using BlazorApp
+
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
+
+@if (Managers == null || Managers.Count == 0)
+{
+    <p>Loading ....</p>
+}
+else 
+{
+    <div class="cpu_usage">
+        <div class="chart-header">
+            <div class="dropdown">
+                <b class="selected-manager-name" title="">@(SelectedManager + "-" + Managers[SelectedManager].Name)</b>
+                <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
+                <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
+                <div class="dropdown-content">
+                    @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                    {
+                        int managerID = i;
+                        if (i == SelectedManager)
+                        {
+                            continue;
+                        }
+                        else if (j == 0)
+                        {
+                            j++;
+                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
+                            continue;
+                        }
+                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
+                    }
+                </div>
+            </div>
+            <div class="chart-title">
+                Memory/CPU
+            </div>
+        </div>
+        <div style="position: relative; width: 90%; left: 5%">
+            <Chart Config="_lineConfig"></Chart>
+        </div>
+        <div class="info-labels">
+            <div class="oblong background-lightred"></div>
+            <div class="cpu_text">CPU</div>
+            <div class="oblong background-green"></div>
+            <div class="memory_text">Memory</div>
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
+    
+    private List<HealthData> _cpuDataList = new ();
+    private List<HealthData> _memDataList = new ();
+    private LineDataset<long> _lineConfigDatasetCpu;
+    private LineDataset<long> _lineConfigDatasetMemory;
+    private LineConfig _lineConfig;
+    private int SelectedManager { get; set; }
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ConfigureLineConfig();
+        StateHasChanged();
+        
+        HealthUpdateTriggered += async (o, args) =>
+        {
+            _cpuDataList?.AddRange(args.Cpu);
+            _memDataList?.AddRange(args.Memory);
+            await InvokeAsync(StateHasChanged);
+        };
+
+        UpdateOverviewTriggered += async (o, args) =>
+        {
+            _lineConfig.Data.Datasets.Clear();
+            
+            // LineChart Memory
+            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+            {
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                LineTension = 0,
+            };
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+            
+            // LineChart CPU
+            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+            {
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                LineTension = 0,
+            };
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    // **** LineChart methods **** Begin ****
+    private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
+    {
+        string[] separators = new string[] {" "};
+        
+        _lineConfigDatasetCpu.Clear();
+        foreach (var data in healthDataList)
+            if (data.ReportType == "CPU")
+                _lineConfigDatasetCpu.Add(data.NumericValue);
+
+        _lineConfig.Data.Labels.Clear();
+        foreach (var data in healthDataList)
+            if (data.ReportType == "CPU")
+                _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+        
+        return _lineConfigDatasetCpu;
+    }
+    
+    private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
+    {
+        _lineConfigDatasetMemory.Clear();
+        foreach (var data in healthDataList)
+            if (data.ReportType == "MEMORY")
+                _lineConfigDatasetMemory.Add(data.NumericValue/1024/1024/1024);
+        
+        return _lineConfigDatasetMemory;
+    }
+    
+    private void ConfigureLineConfig()
+    {
+        _lineConfig = new LineConfig();
+        
+        _lineConfig.Options = new LineOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = false,
+                Text = "Cpu & Memory usage",
+                FontColor = "#FFFFFF"
+            },
+            Legend = new Legend
+            {
+                Position = Position.Bottom,
+                Display = false,
+            },
+            Hover = new Hover
+            {
+                Mode = InteractionMode.Nearest,
+                Intersect = true
+            },
+            Scales = new Scales
+            {
+                XAxes = new List<CartesianAxis> //scale for the x-axis
+                {
+                    new CategoryAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            Display = true,
+                            //LabelString = "Time",
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+                        },
+                        Ticks = new CategoryTicks
+                        {
+                            FontColor = "#FFFFFF",
+                            FontSize = 13,
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142, 142, 142),
+                        }
+                    },
+                },
+                YAxes = new List<CartesianAxis> //Scale for the y-axis
+                {
+                    new LinearCartesianAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            Display = true,
+                            //LabelString = "Usage %",
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+    
+                        },
+                        Ticks = new LinearCartesianTicks
+                        {
+                            FontSize = 13,
+                            Padding = 10,
+                            FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
+                            BeginAtZero = true,
+                            StepSize = 10,
+                            Max = 100,
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142, 142, 142),
+                            DrawBorder = false, //Removes the border in the y-axis
+                        },
+                    }
+                }
+            }
+        };
+        
+        _lineConfigDatasetCpu = new LineDataset<long>
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+
+        _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
+        {
+            Label = ("Memory usage"),
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+            LineTension = 0,
+        };
+
+    }
+    // **** LineChart methods **** END ****
+    
+    
+    // **** Dropdown menu methods **** Begin ****
+    private void GetSelectedManagerID(int selectedID)
+    {
+        SelectedManager = selectedID;
+    }
+    // **** Dropdown menu methods **** End ****
+    
+}
