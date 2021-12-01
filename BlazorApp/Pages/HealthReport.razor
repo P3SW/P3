@@ -6,6 +6,52 @@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
+@if (Managers == null || Managers.Count == 0)
+{
+    <p>Loading ....</p>
+}
+else 
+{
+    <div class="cpu_usage">
+        <div class="chart-header">
+            <div class="dropdown">
+                <b class="selected-manager-name" title="">@(SelectedManager + "-" + Managers[SelectedManager].Name)</b>
+                <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
+                <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
+                <div class="dropdown-content">
+                    @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                    {
+                        int managerID = i;
+                        if (i == SelectedManager)
+                        {
+                            continue;
+                        }
+                        else if (j == 0)
+                        {
+                            j++;
+                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
+                            continue;
+                        }
+                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
+                    }
+                </div>
+            </div>
+            <div class="chart-title">
+                Memory/CPU
+            </div>
+        </div>
+        <div style="position: relative; width: 90%; left: 5%">
+            <Chart Config="_lineConfig"></Chart>
+        </div>
+        <div class="info-labels">
+            <div class="oblong background-lightred"></div>
+            <div class="cpu_text">CPU</div>
+            <div class="oblong background-green"></div>
+            <div class="memory_text">Memory</div>
+        </div>
+    </div>
+}
+
 @code{
     [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
     
@@ -188,50 +234,4 @@
     }
     // **** Dropdown menu methods **** End ****
     
-}
-
-@if (Managers == null || Managers.Count == 0)
-{
-    <p>Loading ....</p>
-}
-else 
-{
-    <div class="cpu_usage">
-        <div class="chart-header">
-            <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManager + "-" + Managers[SelectedManager].Name)</b>
-                <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
-                <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
-                <div class="dropdown-content">
-                    @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
-                    {
-                        int managerID = i;
-                        if (i == SelectedManager)
-                        {
-                            continue;
-                        }
-                        else if (j == 0)
-                        {
-                            j++;
-                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
-                            continue;
-                        }
-                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID + "-" + Managers[managerID].Name)</div>
-                    }
-                </div>
-            </div>
-            <div class="chart-title">
-                Memory/CPU
-            </div>
-        </div>
-        <div style="position: relative; width: 90%; left: 5%">
-            <Chart Config="_lineConfig"></Chart>
-        </div>
-        <div class="info-labels">
-            <div class="oblong background-lightred"></div>
-            <div class="cpu_text">CPU</div>
-            <div class="oblong background-green"></div>
-            <div class="memory_text">Memory</div>
-        </div>
-    </div>
 }

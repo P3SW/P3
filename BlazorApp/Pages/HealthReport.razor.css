@@ -128,24 +128,3 @@
     width: 1em;
     border-radius: 0.25em;
 }
-
-/* 2k monitor w/ 150% zoom compatibility */
-@media screen and (max-width: 1500px) {
-
-    .Current_manager_info_container > div {
-        font-size: 0.6em;
-    }
-
-    .Current_manager_container > div {
-        font-size: 0.6em;
-    }
-
-    .Total_errors_and_reconciliations_container{
-        grid-template-columns: 1.5fr 1fr 2.5fr 1fr;
-    }
-
-    .Total_errors_and_reconciliations_container > div{
-        font-size: 0.6em;
-    }
-
-}
