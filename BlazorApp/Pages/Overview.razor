@@ -3,23 +3,17 @@
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
 @using System.Globalization
-@* @inherits Summary *@
-@* @inherits HealthReport *@
-@* @inject Test dataList; *@
-@* @inject QueueTest managerList; *@
 
-@* Font *@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
 @if (_managers == null || _managers.Count == 0)
 {
-    <p>Loading ..overview..</p>
+    <p>Loading ....</p>
 }
 else
 {
     <div class="overview_container">
         <Summary Managers="_managers"></Summary>
-
         <div class="Overview-right">
             <HealthReport Managers="_managers"></HealthReport>
             <div class="efficiency-table-container">
@@ -35,9 +29,8 @@ else
     protected override async Task OnInitializedAsync()
     {
 	    _managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
-        
         StateHasChanged();
-	    UpdateOverviewTriggered += async (o, args) =>
+        UpdateOverviewTriggered += async (o, args) =>
 	    {
 		    await InvokeAsync(StateHasChanged);
 	    };
