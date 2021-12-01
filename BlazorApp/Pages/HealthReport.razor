@@ -3,102 +3,91 @@
 @using System.Globalization
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
-@* @inherits Overview *@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'> 
 
 @code{
     [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
     
-    List<HealthData> _cpuDataList = new ();
-    List<HealthData> _memDataList = new ();
-    LineDataset<long> lineconfig_dataset_cpu;
-    LineDataset<long> lineconfig_dataset_memory;
-    LineConfig _lineconfig;
-    
-    //private List<ManagerStatusHandler> managers = new List<ManagerStatusHandler>();
+    private List<HealthData> _cpuDataList = new ();
+    private List<HealthData> _memDataList = new ();
+    private LineDataset<long> _lineConfigDatasetCpu;
+    private LineDataset<long> _lineConfigDatasetMemory;
+    private LineConfig _lineConfig;
+    private int SelectedManager { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
-        // managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
         ConfigureLineConfig();
-        
         StateHasChanged();
+        
         HealthUpdateTriggered += async (o, args) =>
         {
-            if (args.Cpu != null) // IKKE NØDVENDIG
-                _cpuDataList?.AddRange(args.Cpu);
-            if (args.Memory != null) // IKKE NØDVENDIG
-                _memDataList?.AddRange(args.Memory);
-            
+            _cpuDataList?.AddRange(args.Cpu);
+            _memDataList?.AddRange(args.Memory);
             await InvokeAsync(StateHasChanged);
         };
 
         UpdateOverviewTriggered += async (o, args) =>
         {
-            Console.WriteLine("UpdateOverviewTriggered *** HealthReport");
-            _lineconfig.Data.Datasets.Clear();
-            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisMem(_memDataList))
+            _lineConfig.Data.Datasets.Clear();
+            
+            // LineChart Memory
+            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
             {
                 Label = "Cpu usage",
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
             };
-            _lineconfig.Data.Datasets.Add(lineconfig_dataset_memory);
-            lineconfig_dataset_cpu = new LineDataset<long>(lineDataInputYaxisCpu(_cpuDataList))
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+            
+            // LineChart CPU
+            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
             {
                 Label = "Cpu usage",
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
             };
-            _lineconfig.Data.Datasets.Add(lineconfig_dataset_cpu);
-
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
             await InvokeAsync(StateHasChanged);
         };
     }
     
-    public LineDataset<long> lineDataInputYaxisCpu(List<HealthData> healthDataList)
+    // **** LineChart methods **** Begin ****
+    private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
-    //Takes data from test and stores in list - TODO: DELETE?
-        string[] separtors = new string[] {" "};
-        lineconfig_dataset_cpu.Clear();
+        string[] separators = new string[] {" "};
+        
+        _lineConfigDatasetCpu.Clear();
         foreach (var data in healthDataList)
-        {
             if (data.ReportType == "CPU")
-            {
-                lineconfig_dataset_cpu.Add(data.NumericValue); // Delete?
-            }
-    
-        }
-        _lineconfig.Data.Labels.Clear();
+                _lineConfigDatasetCpu.Add(data.NumericValue);
+
+        _lineConfig.Data.Labels.Clear();
         foreach (var data in healthDataList)
-        {
             if (data.ReportType == "CPU")
-            {
-                _lineconfig.Data.Labels.Add((data.LogTime.ToString().Split(separtors, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
-                
-            }
-        }
-        return lineconfig_dataset_cpu;
+                _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+        
+        return _lineConfigDatasetCpu;
     }
     
-    public LineDataset<long> lineDataInputYaxisMem(List<HealthData> healthDataList)
+    private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
     {
-        lineconfig_dataset_memory.Clear();
+        _lineConfigDatasetMemory.Clear();
         foreach (var data in healthDataList)
-        {
             if (data.ReportType == "MEMORY")
-                lineconfig_dataset_memory.Add(data.NumericValue/1024/1024/1024);
-        }
-        return lineconfig_dataset_memory;
+                _lineConfigDatasetMemory.Add(data.NumericValue/1024/1024/1024);
+        
+        return _lineConfigDatasetMemory;
     }
     
-    protected void ConfigureLineConfig()
+    private void ConfigureLineConfig()
     {
-        _lineconfig = new LineConfig();
-        _lineconfig.Options = new LineOptions
+        _lineConfig = new LineConfig();
+        
+        _lineConfig.Options = new LineOptions
         {
             Responsive = true,
             Title = new OptionsTitle
@@ -171,7 +160,8 @@
                 }
             }
         };
-        lineconfig_dataset_cpu = new LineDataset<long>
+        
+        _lineConfigDatasetCpu = new LineDataset<long>
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
@@ -179,7 +169,7 @@
             LineTension = 0,
         };
 
-        lineconfig_dataset_memory = new LineDataset<long> //Needs data From health data memory class, like the data above
+        _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
         {
             Label = ("Memory usage"),
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
@@ -188,18 +178,21 @@
         };
 
     }
+    // **** LineChart methods **** END ****
     
-    private int SelectedManager { get; set; }
+    
+    // **** Dropdown menu methods **** Begin ****
     private void GetSelectedManagerID(int selectedID)
     {
         SelectedManager = selectedID;
     }
-
+    // **** Dropdown menu methods **** End ****
+    
 }
 
 @if (Managers == null || Managers.Count == 0)
 {
-    <p>Loading ..HealthReport @Managers.Count..</p>
+    <p>Loading ....</p>
 }
 else 
 {
@@ -232,7 +225,7 @@ else
             </div>
         </div>
         <div style="position: relative; width: 90%; left: 5%">
-            <Chart Config="_lineconfig"></Chart>
+            <Chart Config="_lineConfig"></Chart>
         </div>
         <div class="info-labels">
             <div class="oblong background-lightred"></div>
