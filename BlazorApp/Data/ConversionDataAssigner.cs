@@ -22,7 +22,7 @@ namespace BlazorApp.Data
         //The program will wait for data if the table is empty
         public static void Start()
         {
-            _connectionString = ConfigReader.ReadSetupFile();
+            _connectionString = ConfigReader.ReadSetupFile("setup.txt");
             _managerQueue = 0;
             FinishedManagers = new List<ManagerStatusHandler>();
             _managerId = 1;

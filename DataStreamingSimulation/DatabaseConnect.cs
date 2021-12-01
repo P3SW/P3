@@ -40,9 +40,8 @@ namespace DataStreamingSimulation
         ///   <para> Format example: 'Server=localhost\\SQLEXPRESS01;Database=ANS_CUSTOM_MVP;
         ///     User ID=sa; Password=Password123;Trusted_Connection=False' </para>
         /// </remarks>
-        public string ReadSetupFile(bool transferData = false)
+        public string ReadSetupFile(string fileName, bool transferData = false)
         {
-            const string fileName = "../../../setup.txt";
             string[] connectionString = new[] {"","" };
             
             using (StreamReader sr = new StreamReader(fileName))

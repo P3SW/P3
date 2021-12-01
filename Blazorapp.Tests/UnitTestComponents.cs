@@ -9,7 +9,7 @@ using Xunit.Abstractions;
 
 namespace P3ConversionDashboard.Tests
 {
-    public class Testtest : TestContext
+    public class UnitTestComponents : TestContext
     {
         private List<LogData> testLogData = new()
         {
@@ -36,14 +36,14 @@ namespace P3ConversionDashboard.Tests
         
         private readonly ITestOutputHelper _testOutputHelper;
 
-        public Testtest(ITestOutputHelper testOutputHelper)
+        public UnitTestComponents(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
         }
         
         
         [Fact]
-        public void ErrorDiv_Has_Rendered()
+        public void ErrorDivHasRenderedTest()
         {
             JSInterop.Mode = JSRuntimeMode.Loose;
             var sut = RenderComponent<Errors>();
@@ -59,7 +59,7 @@ namespace P3ConversionDashboard.Tests
         }
 
         [Fact]
-        public void LogDataTable_Rendered()
+        public void LogDataTableTest()
         {
             JSInterop.Mode = JSRuntimeMode.Loose; // because of radzen
             
@@ -95,7 +95,7 @@ namespace P3ConversionDashboard.Tests
         }
         
         [Fact]
-        public void Sorting_Tabs_Test()
+        public void SortingTabsTest()
         {
             string[] testTabsSelectors =
             {
