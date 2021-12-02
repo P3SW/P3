@@ -12,7 +12,7 @@
 else
 {
     <div class="efficiency-table-styling">
-    <RadzenDataGrid @ref="EfficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+    <RadzenDataGrid @ref="_efficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
                     AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="EfficiencyData"
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
@@ -146,25 +146,19 @@ else
 
 @code {
     List<EfficiencyData> _dataStorageList = new List<EfficiencyData>();
-    private int currentCount = 0;
-    RadzenDataGrid<EfficiencyData> EfficiencyDataGrid;
+    RadzenDataGrid<EfficiencyData> _efficiencyDataGrid;
     
     protected override async Task OnInitializedAsync()
     {
+        _dataStorageList.Clear();
+        _dataStorageList = await Task.Run(ConversionDataAssigner.GetManagerEfficiencyData);
         StateHasChanged();
         
-        EfficiencyUpdateTriggered += async (o, args) =>
+        UpdateOverviewTriggered += async (o, args) =>
         {
             _dataStorageList.Clear();
-            _dataStorageList.AddRange(args.EfficiencyDataList);
-            await InvokeAsync(EfficiencyDataGrid.Reload);
-            await InvokeAsync(StateHasChanged);
-        };
-        
-        EfficiencyUpdateResseted += async (o, args) =>
-        {
-            _dataStorageList = null;
-            await InvokeAsync(EfficiencyDataGrid.Reload);
+            _dataStorageList = await Task.Run(ConversionDataAssigner.GetManagerEfficiencyData);
+            await InvokeAsync(_efficiencyDataGrid.Reload);
             await InvokeAsync(StateHasChanged);
         };
     }

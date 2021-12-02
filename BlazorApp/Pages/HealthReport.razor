@@ -54,9 +54,9 @@ else
 
 @code{
     [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
-    
-    private List<HealthData> _cpuDataList = new ();
-    private List<HealthData> _memDataList = new ();
+
+    private List<HealthData> _cpuDataList;
+    private List<HealthData> _memDataList;
     private LineDataset<long> _lineConfigDatasetCpu;
     private LineDataset<long> _lineConfigDatasetMemory;
     private LineConfig _lineConfig;
@@ -65,12 +65,37 @@ else
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
+        
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner._cpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner._memDataList);
+        
+        // **** Show LineChart at page reload ****
+        // LineChart Memory
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+            
+        // LineChart CPU
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+        
         StateHasChanged();
         
         HealthUpdateTriggered += async (o, args) =>
         {
-            _cpuDataList?.AddRange(args.Cpu);
-            _memDataList?.AddRange(args.Memory);
+            ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
+            ConversionDataAssigner._memDataList?.AddRange(args.Memory);
             await InvokeAsync(StateHasChanged);
         };
 
