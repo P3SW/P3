@@ -2,18 +2,22 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
+using BlazorApp.Data;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
+
 
 namespace BlazorApp.Data
 {
     public static class ConversionDataAssigner
     {
-        public static List<ManagerStatusHandler> FinishedManagers { get; private set; }
-        private static ManagerStatusHandler _currentManager;
+
+        public static List<ManagerStatusHandler> FinishedManagers { get; private set; } = new List<ManagerStatusHandler>();
+        public static ManagerStatusHandler _currentManager;
+
         private static SqlConnection _connection;
         private static string _connectionString;
-        private static int _managerQueue;
+        public static int _managerQueue = 0;
         private static int _managerId;
         private static int _executionId;
         
@@ -24,7 +28,6 @@ namespace BlazorApp.Data
         {
             _connectionString = ConfigReader.ReadSetupFile();
             _managerQueue = 0;
-            FinishedManagers = new List<ManagerStatusHandler>();
             _managerId = 1;
             _currentManager = null;
             _executionId = 1;
@@ -46,7 +49,6 @@ namespace BlazorApp.Data
                 ManagerStatusHandler.Connection.Open();
                 
                 _connection = conn;
-
                 using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagersSelect, _connection))
                 {
                     using (SqlDataReader reader = command.ExecuteReader())
@@ -55,7 +57,6 @@ namespace BlazorApp.Data
                         {
                             while (reader.Read())
                             {
-                                Console.WriteLine("READING MANAGER");
                                 _managerQueue++;
                             }
                             reader.Close();
@@ -206,13 +207,13 @@ namespace BlazorApp.Data
             Console.WriteLine($"Name: {_currentManager.Name}\n" +
                               $"Status: {_currentManager.Status}\n" +
                               $"Runtime: {_currentManager.RunTime}\n" +
-                              $"Reconciliations: {_currentManager.ReconciliationHandler.LogDataList.Count}\n"+
-                              $"Errors: {_currentManager.ErrorHandler.LogDataList.Count}\n"+
+                              $"Reconciliations: {_currentManager.ReconciliationHandler.LogDataList.Count}\n" +
+                              $"Errors: {_currentManager.ErrorHandler.LogDataList.Count}\n" +
                               $"Rows read: {_currentManager.RowsRead}\n" +
                               $"Rows written: {_currentManager.RowsWritten}\n" +
                               $"Average CPU: {_currentManager.Cpu}\n" +
-                              $"Memory logs: {_currentManager.Health.Memory.Count}\n"+
-                              $"CPU logs: {_currentManager.Health.Cpu.Count}\n"+
+                              $"Memory logs: {_currentManager.Health.Memory.Count}\n" +
+                              $"CPU logs: {_currentManager.Health.Cpu.Count}\n" +
                               $"Efficiency score: {_currentManager.EfficiencyScore}");
         }
         
@@ -245,6 +246,36 @@ namespace BlazorApp.Data
                 list.AddRange(_currentManager.ReconciliationHandler.LogDataList);
             
             return await Task.FromResult(list);
+        }
+
+        public static List<EfficiencyData> GetManagerEfficiencyData()
+        {
+            
+            if (FinishedManagers.Count == 0)
+            {
+                Console.WriteLine(FinishedManagers.Count);
+                Console.WriteLine("Sending new list");
+                return new List<EfficiencyData>();
+            }
+            
+            List<EfficiencyData> list = new List<EfficiencyData>();
+
+            if (FinishedManagers.Count > 0)
+            {
+                foreach (var finishedManager in FinishedManagers)
+                {
+                    list.Add(new EfficiencyData(finishedManager.Name, 
+                        finishedManager.EfficiencyScore,
+                        finishedManager.EndTime, 
+                        finishedManager.RowsRead, 
+                        finishedManager.RowsWritten, 
+                        finishedManager.RunTime, 
+                        finishedManager.Cpu,
+                        finishedManager.AvgMemoryPercent));
+
+                }
+            }
+            return list;
         }
     }
 }
