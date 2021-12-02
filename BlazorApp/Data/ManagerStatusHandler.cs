@@ -111,23 +111,19 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    if (reader.HasRows)
-                    {
-                        successfulRead = true;
-                    }
                     if (reader.Read())
                     {
-                        Status = (string) reader["[STATUS]"];
-                        RunTime = (int) reader["[RUNTIME]"];
-                        RowsRead = (int) reader["[PERFORMANCECOUNTROWSREAD]"];
-                        RowsWritten = (int) reader["[PERFORMANCECOUNTROWSWRITTEN]"];
-                        EndTime = (DateTime) reader["[ENDTIME]"];
+                        Status = (string) reader["STATUS"];
+                        RunTime = (int) reader["RUNTIME"];
+                        RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
+                        RowsWritten = (int) reader["PERFORMANCECOUNTROWSWRITTEN"];
+                        EndTime = (DateTime) reader["ENDTIME"];
                     }
                     reader.Close();
                 }
             }
 
-            if (!successfulRead && mtRetryCount < 5)
+            if (RunTime == 0 && mtRetryCount < 5)
             {
                 mtRetryCount++;
                 Thread.Sleep(500);
