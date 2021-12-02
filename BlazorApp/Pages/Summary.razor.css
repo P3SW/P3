@@ -31,12 +31,11 @@
 /* Current manager */
 .Current_manager_info_container {
     border-bottom: 0 !important;
-    line-height: 80%;
 
 }
 
 .Current_manager_info_container > div{
-    float: left;
+    text-align: left;
     font-size: 0.6em;
 }
 
@@ -92,6 +91,11 @@
 
 .efficiency-container{
     border-bottom: none !important;
+}
+
+.efficiency-container > div{
+    font-size: 0.6em;
+    text-align: left;
 }
 
 .PieConfigTotalErrors {

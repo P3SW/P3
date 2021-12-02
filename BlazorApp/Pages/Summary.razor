@@ -17,7 +17,7 @@ else
 
         @* Current running manager info *@
         <div class="Current_manager_info_container">
-            <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div><br>
+            <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div>
             <div>Manager runtime: @ConversionDataAssigner._currentManager.StartTime</div>
         </div>
 
@@ -126,8 +126,8 @@ else
         }
         @* Efficiency score table summary *@
         <div class="efficiency-container">
-            <div class="efficiency-text">Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div><br/>
-            <div class="efficiency-text">Total read: <b>@TotalRows(Managers, "read")</b></div><br/>
+            <div class="efficiency-text">Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div>
+            <div class="efficiency-text">Total read: <b>@TotalRows(Managers, "read")</b></div>
             <div class="efficiency-text">Total written: <b>@TotalRows(Managers, "written")</b></div>
         </div>
     </div>
