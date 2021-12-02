@@ -21,7 +21,7 @@ else
                                   Title="MANAGER" Frozen="false" Width="400px" Sortable="false">
                 <Template Context="data">
                     <div style="color: white; display: block; width: 200px; max-width: 200px; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <div style="display: block; color: lightgray; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;">
                                 <span class="low-score-styling">@Utility.ShortenManagerName(data.ManagerName)</span>
@@ -38,7 +38,7 @@ else
                                   Title="SCORE" Frozen="false" Width="100px">
                 <Template Context="data">
                     <div style="display: grid; width: 60px; max-width: 60px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EfficiencyScore">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.EfficiencyScore</span>
                         }
@@ -53,7 +53,7 @@ else
                                   Title="ENDTIME" Frozen="false" Width="300px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeFinished">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.TimeFinished</span>
                         }
@@ -68,7 +68,7 @@ else
                                   Title="Read" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsRead">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.RowsRead</span>
                         }
@@ -83,7 +83,7 @@ else
                                   Title="Written" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsWritten">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.RowsWritten</span>
                         }
@@ -98,7 +98,7 @@ else
                                   Title="rUnTIme" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span style="text-align: right" class="low-score-styling">@Utility.FormatTime(data.TimeRan)</span>
                         }
@@ -113,7 +113,7 @@ else
                                   Title="CPU" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgCpu">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span style="text-align: right" class="low-score-styling">@data.AvgCpu%</span>
                         }
@@ -128,7 +128,7 @@ else
                                   Title="Memory" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgMemoryPercent">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span style="text-align: right" class="low-score-styling">@data.AvgMemoryPercent%</span>
                         }
