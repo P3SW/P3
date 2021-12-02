@@ -123,9 +123,9 @@ else
         }
         @* Efficiency score table summary *@
         <div class="efficiency-container">
-            <div class="efficiency-text">Median efficiency score: <b>2702</b></div><br/>
-            <div class="efficiency-text">Total read: <b>17021044</b></div><br/>
-            <div class="efficiency-text">Total written: <b>30461662</b></div>
+            <div class="efficiency-text">Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div><br/>
+            <div class="efficiency-text">Total read: <b>@TotalRows(Managers, "read")</b></div><br/>
+            <div class="efficiency-text">Total written: <b>@TotalRows(Managers, "written")</b></div>
         </div>
     </div>
 }
@@ -411,5 +411,42 @@ else
         _mousePositionY = e.ClientY;
         _hoveredManagerErrors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
         _hoveredManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
+    }
+    //Calculate total rows/written
+    private long TotalRows(List<ManagerStatusHandler> managers, string wanted)
+    {
+        long result = 0;
+        if (wanted == "written")
+        {
+            foreach (ManagerStatusHandler manager in managers)
+            {
+                result += manager.RowsWritten;
+            }
+        }
+        else if (wanted == "read")
+        {
+            foreach (ManagerStatusHandler manager in managers)
+            {
+                result += manager.RowsRead;
+            }
+        }
+        return result;
+    }
+    //Sorted list by efficiency score
+    private List<ManagerStatusHandler> SortByEfficiency(List<ManagerStatusHandler> managers)
+    {
+        List<ManagerStatusHandler> sortedList = managers.OrderBy(o => o.EfficiencyScore).ToList();
+        return sortedList;
+    }
+    
+    //Median efficiency score
+    private int MedianEfficiencyScore(List<ManagerStatusHandler> managers)
+    {
+        List<ManagerStatusHandler> sortedList = SortByEfficiency(managers);
+
+        int size = sortedList.Count;
+        int middle = size/2;
+        double median = (size % 2 != 0) ? (double)sortedList[middle].EfficiencyScore : ((double)sortedList[middle].EfficiencyScore + (double)sortedList[middle-1].EfficiencyScore) / 2;
+        return Convert.ToInt32(median);
     }
 }
