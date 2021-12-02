@@ -8,13 +8,13 @@ using Xunit.Abstractions;
 
 namespace P3ConversionDashboard.Tests
 {
-    public class IntegrationTest
+    public class DataStreamingIntegrationTest
     {
         private DatabaseStreamer testDatabaseStreamer;
 
         private readonly ITestOutputHelper _testOutputHelper;
 
-        public IntegrationTest(ITestOutputHelper testOutputHelper)
+        public DataStreamingIntegrationTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
             testDatabaseStreamer = new DatabaseStreamer("../../../integrationTestDataStreamingSetup.txt");
