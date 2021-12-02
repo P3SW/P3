@@ -31,7 +31,7 @@ namespace BlazorApp.Data
         private SqlCommand command;
         private int run_number = 0;
         private int mtRetryCount = 0;
-        public double AvgCpu;
+        public long AvgCpu;
         public long AvgMemory;
         public int MemoryPercent;
         public int AvgMemoryPercent { get; private set; }
@@ -89,7 +89,7 @@ namespace BlazorApp.Data
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
-            AvgCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
+            AvgCpu = Health.Cpu.Count > 0 ?  Convert.ToInt64(Health.Cpu.Average(data => data.NumericValue)) : 0;
             Cpu = Convert.ToInt32(AvgCpu);
             double result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
             EfficiencyScore = Convert.ToInt32(result);
