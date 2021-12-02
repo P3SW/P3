@@ -124,8 +124,11 @@ else
         _lineConfigDatasetMemory.Clear();
         foreach (var data in healthDataList)
             if (data.ReportType == "MEMORY")
-                _lineConfigDatasetMemory.Add(data.NumericValue/1024/1024/1024);
-        
+            {
+                double MaxMemory = 21473734656;
+                _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, 21473734656));
+            }
+
         return _lineConfigDatasetMemory;
     }
     

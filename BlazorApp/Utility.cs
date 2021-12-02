@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BlazorApp.Data;
 
 namespace BlazorApp
@@ -38,6 +39,11 @@ namespace BlazorApp
                 return minutes + ':' + seconds;
             } else
                 return hours + ':' + minutes + ':' + seconds;
+        }
+
+        public static int CalculateMemoryUsage(long memoryAvailable, long maxMemory)
+        {
+            return Convert.ToInt32(((double)(maxMemory - memoryAvailable) / (maxMemory)) * 100);
         }
     }
 }
