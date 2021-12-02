@@ -13,6 +13,7 @@ namespace BlazorApp.Data
         public List<HealthData> NewCpu { get; private set; }
         public List<HealthData> NewMemory { get; private set; }
         public static DateTime LastRowTimeStamp { get; private set; }
+        
 
         public HealthDataHandler(DateTime managerStartTime)
         {
@@ -34,7 +35,7 @@ namespace BlazorApp.Data
                 {
                     NewCpu.Add(new HealthData(reader));
                 }
-                else
+                else if (reportType.Equals("MEMORY"))
                 {
                     NewMemory.Add(new HealthData(reader));
                 }
@@ -43,6 +44,8 @@ namespace BlazorApp.Data
             }
             Cpu.AddRange(NewCpu);
             Memory.AddRange(NewMemory);
+            
+            HealthTriggerUpdate(Cpu, Memory);
         }
 
         //Returns a query string with the latest timestamp to ensure only new data is queried.

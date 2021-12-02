@@ -75,7 +75,7 @@
                                               Title="Manager name" Frozen="true" Width="400px">
                             <Template Context="data">
                                 <div style="display: grid; width: 400px; max-width: 400px; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
-                                    <span style="color: #FFFFFF; ">@data.ManagerName</span>
+                                    <span style="color: #FFFFFF; ">@Utility.ShortenManagerName(data.ManagerName)</span>
                                 </div>
                             </Template>
                         </RadzenDataGridColumn>
