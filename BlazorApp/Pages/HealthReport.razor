@@ -96,11 +96,7 @@ else
         {
             ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._memDataList?.AddRange(args.Memory);
-            await InvokeAsync(StateHasChanged);
-        };
-
-        UpdateOverviewTriggered += async (o, args) =>
-        {
+            
             _lineConfig.Data.Datasets.Clear();
             
             // LineChart Memory
