@@ -117,11 +117,11 @@ namespace BlazorApp.Data
                     }
                     if (reader.Read())
                     {
-                        Status = (string) reader["[STATUS]"];
-                        RunTime = (int) reader["[RUNTIME]"];
-                        RowsRead = (int) reader["[PERFORMANCECOUNTROWSREAD]"];
-                        RowsWritten = (int) reader["[PERFORMANCECOUNTROWSWRITTEN]"];
-                        EndTime = (DateTime) reader["[ENDTIME]"];
+                        Status = (string) reader["STATUS"];
+                        RunTime = (int) reader["RUNTIME"];
+                        RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
+                        RowsWritten = (int) reader["PERFORMANCECOUNTROWSWRITTEN"];
+                        EndTime = (DateTime) reader["ENDTIME"];
                     }
                     reader.Close();
                 }
