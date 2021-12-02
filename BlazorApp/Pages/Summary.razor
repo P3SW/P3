@@ -445,6 +445,10 @@ else
     //Median efficiency score
     private int MedianEfficiencyScore(List<ManagerStatusHandler> managers)
     {
+        if (managers.Count == 0)
+        {
+            return 0;
+        }
         List<ManagerStatusHandler> sortedList = SortByEfficiency(managers);
 
         int size = sortedList.Count;

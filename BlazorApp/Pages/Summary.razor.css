@@ -90,6 +90,10 @@
     background-color: #384561;
 }
 
+.efficiency-container{
+    border-bottom: none !important;
+}
+
 .PieConfigTotalErrors {
     position: relative;
     background-color: rgba(15, 33, 71, 0.2);
