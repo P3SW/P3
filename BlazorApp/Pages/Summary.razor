@@ -6,9 +6,9 @@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (Managers == null || Managers.Count == 0)
+@if (ConversionDataAssigner._currentManager == null)
 {
-    <p>Loading ..summary..</p>
+    <p>Waiting for logdata ....</p>
 }
 else
 {
@@ -48,45 +48,48 @@ else
                 <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner._managerQueue</b></span>
             </div>
             <div class="manager-queue-circle">
-                @foreach (ManagerStatusHandler manager in Managers)
+                @if (Managers != null)
                 {
-                    <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager.Id, e, manager))">
-                        @if (manager.Status == "RUNNING")
-                        {
-                            <img src="Icons/current-manager-loader.svg" alt="loader" class="current-manager-loader">
-                        }
-                        @if (_hoveredManager == manager.Id && _hoveredManagerErrors != null)
-                        {
-                            <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-100%);">
-                            <div class="hovered-manager" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-13rem);">
-                                <div class="hoverbox-info">
-                                    <div>Manager: @Utility.ShortenManagerName(manager.Name)</div>
-                                    <div>Runtime: @Utility.FormatTime(manager.RunTime)</div>
-                                    <div>Status: @manager.Status</div>
-                                </div>
-                                <div class="hoverbox-errors-recons">
-                                    <div class="hoverbox-erros">
-                                        <div>Errors</div>
-                                        <ul class="error-reconciliation-formatting">
-                                            <div class="circle background-red"></div><li>Fatal: @_hoveredManagerErrors[0]</li>
-                                            <div class="circle background-lightred"></div><li>Error: @_hoveredManagerErrors[1]</li>
-                                            <div class="circle background-yellow"></div><li>Warning: @_hoveredManagerErrors[2]</li>
-                                            <div class="circle background-green"></div><li>Info: @_hoveredManagerErrors[3]</li>
-                                        </ul>
+                    @foreach (ManagerStatusHandler manager in Managers)
+                    {
+                        <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager.Id, e, manager))">
+                            @if (manager.Status == "RUNNING")
+                            {
+                                <img src="Icons/current-manager-loader.svg" alt="loader" class="current-manager-loader">
+                            }
+                            @if (_hoveredManager == manager.Id && _hoveredManagerErrors != null)
+                            {
+                                <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-100%);">
+                                <div class="hovered-manager" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-13rem);">
+                                    <div class="hoverbox-info">
+                                        <div>Manager: @Utility.ShortenManagerName(manager.Name)</div>
+                                        <div>Runtime: @Utility.FormatTime(manager.RunTime)</div>
+                                        <div>Status: @manager.Status</div>
                                     </div>
-                                    <div class="hoverbox-recons">
-                                        <div>Reconciliations</div>
-                                        <ul class="error-reconciliation-formatting">
-                                            <div class="circle background-red"></div><li>Mismatch: @_hoveredManagerRecons[0]</li>
-                                            <div class="circle background-lightred"></div><li>Failed: @_hoveredManagerRecons[1]</li>
-                                            <div class="circle background-yellow"></div><li>Disabled: @_hoveredManagerRecons[2]</li>
-                                            <div class="circle background-green"></div><li>OK: @_hoveredManagerRecons[3]</li>
-                                        </ul>
+                                    <div class="hoverbox-errors-recons">
+                                        <div class="hoverbox-erros">
+                                            <div>Errors</div>
+                                            <ul class="error-reconciliation-formatting">
+                                                <div class="circle background-red"></div><li>Fatal: @_hoveredManagerErrors[0]</li>
+                                                <div class="circle background-lightred"></div><li>Error: @_hoveredManagerErrors[1]</li>
+                                                <div class="circle background-yellow"></div><li>Warning: @_hoveredManagerErrors[2]</li>
+                                                <div class="circle background-green"></div><li>Info: @_hoveredManagerErrors[3]</li>
+                                            </ul>
+                                        </div>
+                                        <div class="hoverbox-recons">
+                                            <div>Reconciliations</div>
+                                            <ul class="error-reconciliation-formatting">
+                                                <div class="circle background-red"></div><li>Mismatch: @_hoveredManagerRecons[0]</li>
+                                                <div class="circle background-lightred"></div><li>Failed: @_hoveredManagerRecons[1]</li>
+                                                <div class="circle background-yellow"></div><li>Disabled: @_hoveredManagerRecons[2]</li>
+                                                <div class="circle background-green"></div><li>OK: @_hoveredManagerRecons[3]</li>
+                                            </ul>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        }
-                    </div>
+                            }
+                        </div>
+                    }
                 }
             </div>
         </div>
