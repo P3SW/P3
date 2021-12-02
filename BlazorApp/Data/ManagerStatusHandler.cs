@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using System.Threading;
 using BlazorApp.DataStreaming.Events;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
@@ -28,6 +29,7 @@ namespace BlazorApp.Data
         private SQLDependencyListener _reconciliationStreamer;
         private SqlCommand command;
         private int run_number = 0;
+        private int mtRetryCount = 0;
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
@@ -45,7 +47,7 @@ namespace BlazorApp.Data
         {
             Console.WriteLine($"Manager {Name} started with execution_id " + ExecutionID);
             Console.WriteLine("MANAGER START TIME IS: " + StartTime);
-            
+
             _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,
                 GetSelectStringsForTableStreamer("health"), Health);
             _errorStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ErrorSelect,
@@ -67,12 +69,11 @@ namespace BlazorApp.Data
             _reconciliationStreamer.StopListening();
             Console.WriteLine("Listening stopped");
             
-            AssignEndTime();
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
         }
 
-        //The EfficiencyScore(TM) algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
+        //The EfficiencyScore© algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
@@ -85,48 +86,39 @@ namespace BlazorApp.Data
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.
         private void AssignManagerTrackingData()
         {
+            bool successfulRead = false;
             using (SqlCommand command = new SqlCommand(GetManagerTrackingQueryString(), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
+                    if (reader.HasRows)
+                    {
+                        successfulRead = true;
+                    }
                     if (reader.Read())
                     {
-                        Status = (string) reader["STATUS"];
-                        RunTime = (int) reader["RUNTIME"];
-                        RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
-                        RowsWritten = (int) reader["PERFORMANCECOUNTROWSWRITTEN"];
+                        Status = (string) reader["[STATUS]"];
+                        RunTime = (int) reader["[RUNTIME]"];
+                        RowsRead = (int) reader["[PERFORMANCECOUNTROWSREAD]"];
+                        RowsWritten = (int) reader["[PERFORMANCECOUNTROWSWRITTEN]"];
+                        EndTime = (DateTime) reader["[ENDTIME]"];
                     }
                     reader.Close();
                 }
             }
-        }
 
-        //Queries the end time from the ENGINE_PROPERTIES table
-        private void AssignEndTime()
-        {
-            using (SqlCommand command = new SqlCommand(ObtainManagerEndTime(), Connection))
+            if (!successfulRead && mtRetryCount < 5)
             {
-                using (SqlDataReader reader = command.ExecuteReader())
-                {
-                    if (reader.Read())
-                    {
-                        EndTime = (DateTime) reader[0];
-                    }
-                    reader.Close();
-                }
+                mtRetryCount++;
+                Thread.Sleep(500);
+                AssignManagerTrackingData();
             }
-        }
-        
-        //Returns a sql string which queries the relevant data from ENGINE_PROPERTIES, if name has a random number, the runtimeOverall is found using the name without randomnumber
-        private string ObtainManagerEndTime()
-        {
-            return string.Format($"SELECT [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE [MGR] = '{Name}'");
         }
 
         //Queries data from the MANAGER_TRACKING table
         private string GetManagerTrackingQueryString()
         {
-            return string.Format($"SELECT [STATUS], RUNTIME, PERFORMANCECOUNTROWSREAD, PERFORMANCECOUNTROWSWRITTEN FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
+            return string.Format($"SELECT [STATUS], [RUNTIME], [PERFORMANCECOUNTROWSREAD], [PERFORMANCECOUNTROWSWRITTEN], [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
         }
 
         //Returns the select string for the table streamers
