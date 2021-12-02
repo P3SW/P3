@@ -21,6 +21,8 @@ namespace BlazorApp.Data
         private static int _managerId;
         private static int _executionId;
         
+        public static List<HealthData> _cpuDataList = new ();
+        public static List<HealthData> _memDataList = new ();
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
