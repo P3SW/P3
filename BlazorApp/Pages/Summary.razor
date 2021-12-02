@@ -17,8 +17,8 @@ else
 
         @* Current running manager info *@
         <div class="Current_manager_info_container">
-            <div>Current manager: @ConversionDataAssigner._currentManager.Name</div><br>
-            <div>Manager startTime: @ConversionDataAssigner._currentManager.StartTime</div>
+            <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div><br>
+            <div>Manager runtime: @ConversionDataAssigner._currentManager.StartTime</div>
         </div>
 
         <div class="Current_manager_container">
@@ -39,7 +39,7 @@ else
                 </ul>
             </div>
         </div>
-        <div class="mind-the-gap">&nbsp;</div>
+        <div class="mind-the-gap">&nbsp;</div> @* Creates an empty space under current manager box *@
 
         @* Manager queue *@
         <div class="manager-queue-container">
@@ -60,8 +60,8 @@ else
                             <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-100%);">
                             <div class="hovered-manager" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-13rem);">
                                 <div class="hoverbox-info">
-                                    <div>Manager: @manager.Name</div>
-                                    <div>Runtime: @CalculateRuntime(manager)</div>
+                                    <div>Manager: @Utility.ShortenManagerName(manager.Name)</div>
+                                    <div>Runtime: @Utility.FormatTime(manager.RunTime)</div>
                                     <div>Status: @manager.Status</div>
                                 </div>
                                 <div class="hoverbox-errors-recons">
@@ -412,23 +412,4 @@ else
         _hoveredManagerErrors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
         _hoveredManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
     }
-    
-    private string CalculateRuntime(ManagerStatusHandler manager)
-    {
-        string seconds = (manager.RunTime / 1000 % 60).ToString();
-        string minutes = ((manager.RunTime / 1000) / 60 % 60).ToString();
-        string hours = ((manager.RunTime / 1000) / 3600).ToString();
-
-        if (seconds.Length < 2)
-            seconds = "0" + seconds;
-        
-        if (minutes.Length < 2)
-            minutes = "0" + minutes;
-        
-        if (hours.Length < 2)
-            hours = "0" + hours;
-
-        return hours + ':' + minutes + ':' + seconds;
-    }
-    // **** Manager Circle methods **** End ****
 }
