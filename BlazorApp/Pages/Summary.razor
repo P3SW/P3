@@ -178,7 +178,7 @@ else
                 ColorUtil.ColorHexString(92, 188, 169) //Info
             },
             BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-            BorderWidth = 0
+            BorderWidth = 0,
         };
         _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
          
@@ -228,7 +228,7 @@ else
                     ColorUtil.ColorHexString(92, 188, 169) //Info
                 },
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-                BorderWidth = 0
+                BorderWidth = 0,
             };
             _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
             
@@ -260,17 +260,32 @@ else
         _pieConfigErrors.Options = new PieOptions
         {
             Responsive = true,
+            Hover = new Hover
+            {
+                Intersect = false,
+                AnimationDuration = 00,
+            },
+            Tooltips = new Tooltips()
+            {
+            },
             Title = new OptionsTitle
             {
                 Display = false,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
+                
             },
             CutoutPercentage = 45,
             Legend = new Legend
             {
                 Display = false,
+                
             },
+            Animation = new ArcAnimation()
+            {
+                AnimateRotate = false,
+            },
+            
         };
         _pieConfigReconciliations.Options = _pieConfigErrors.Options;
 
