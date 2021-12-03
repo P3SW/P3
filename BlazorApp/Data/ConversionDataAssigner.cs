@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using BlazorApp.Data;
+using BlazorApp.Pages;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
@@ -55,6 +56,7 @@ namespace BlazorApp.Data
                     {
                         if (reader.HasRows) //If the result of the query contains any rows, they will be added to the queue
                         {
+                            Summary.Runtime.StartTimer(); //Starts the timer for conversion runtime on summary
                             while (reader.Read())
                             {
                                 _managerQueue++;
@@ -194,6 +196,7 @@ namespace BlazorApp.Data
                         Console.WriteLine("New manager name is " + reader[0]);
                         _managerId++;
                         _managerQueue--;
+                        Summary.Runtime.CurrentManagerResetTimer();
                     }
                     reader.Close();
                 }

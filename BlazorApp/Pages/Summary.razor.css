@@ -28,6 +28,10 @@
     line-height: 2rem;
 }
 
+.conversion-runtime {
+    font-size: 0.75em;
+}
+
 /* Current manager */
 .Current_manager_info_container {
     border-bottom: 0 !important;
