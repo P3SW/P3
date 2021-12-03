@@ -31,12 +31,11 @@
 /* Current manager */
 .Current_manager_info_container {
     border-bottom: 0 !important;
-    line-height: 80%;
 
 }
 
 .Current_manager_info_container > div{
-    float: left;
+    text-align: left;
     font-size: 0.6em;
 }
 
@@ -92,6 +91,11 @@
 
 .efficiency-container{
     border-bottom: none !important;
+}
+
+.efficiency-container > div{
+    font-size: 0.6em;
+    text-align: left;
 }
 
 .PieConfigTotalErrors {
@@ -159,6 +163,7 @@
 .manager-queue-container{
     display: grid;
     grid-template-rows: 0.6em 1fr;
+    height: 100%;
 }
 
 .manager-circle {
@@ -172,8 +177,7 @@
 .manager-queue-circle {
     display: block;
     background: rgba(83, 96, 122, 0.27);
-    overflow-y: visible;
-    overflow-x: auto;
+    overflow-x: scroll;
     white-space: nowrap;
     text-align: left;
 }
@@ -254,6 +258,15 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+}
+
+.summary_efficiency_table{
+    border: 1px solid white;
+}
+
+.summary_efficiency_table > div{
+    text-align: left;
+    font-size: 0.6em;
 }
 
 /* 2k monitor w/ 150% zoom compatibility */

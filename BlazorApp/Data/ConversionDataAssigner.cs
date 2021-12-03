@@ -249,35 +249,6 @@ namespace BlazorApp.Data
             
             return await Task.FromResult(list);
         }
-
-        public static List<EfficiencyData> GetManagerEfficiencyData()
-        {
-            
-            if (FinishedManagers.Count == 0)
-            {
-                Console.WriteLine(FinishedManagers.Count);
-                Console.WriteLine("Sending new list");
-                return new List<EfficiencyData>();
-            }
-            
-            List<EfficiencyData> list = new List<EfficiencyData>();
-
-            if (FinishedManagers.Count > 0)
-            {
-                foreach (var finishedManager in FinishedManagers)
-                {
-                    list.Add(new EfficiencyData(finishedManager.Name, 
-                        finishedManager.EfficiencyScore,
-                        finishedManager.EndTime, 
-                        finishedManager.RowsRead, 
-                        finishedManager.RowsWritten, 
-                        finishedManager.RunTime, 
-                        finishedManager.Cpu,
-                        finishedManager.AvgMemoryPercent));
-
-                }
-            }
-            return list;
-        }
+        
     }
 }
