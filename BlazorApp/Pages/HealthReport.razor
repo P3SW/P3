@@ -86,6 +86,8 @@ else
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             
@@ -96,6 +98,8 @@ else
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
         
@@ -115,6 +119,8 @@ else
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
+                PointRadius = 0,
+                PointHitRadius = 0,
             };
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             
@@ -125,6 +131,8 @@ else
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
+                PointRadius = 0,
+                PointHitRadius = 0,
             };
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
             await InvokeAsync(StateHasChanged);
@@ -184,6 +192,10 @@ else
             {
                 Mode = InteractionMode.Nearest,
                 Intersect = true
+            },
+            Animation = new Animation()
+            {
+                Duration = 0,
             },
             Scales = new Scales
             {
@@ -246,6 +258,8 @@ else
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
 
         _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
@@ -254,6 +268,8 @@ else
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
             BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
 
     }
