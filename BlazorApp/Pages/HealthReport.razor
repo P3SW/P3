@@ -29,10 +29,19 @@ else
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
+                            <div class="dropdown-content-first" 
+                                 title="@Managers[managerID].Name" 
+                                 id="@managerID"
+                                 @onclick="@(() => GetSelectedManagerID(managerID))">
+                                 @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                            </div>
                             continue;
                         }
-                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
+                        <div title="@Managers[managerID].Name"
+                             id="@managerID"
+                             @onclick="@(() => GetSelectedManagerID(managerID))">
+                             @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                        </div>
                     }
                 </div>
             </div>
