@@ -29,10 +29,19 @@ else
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
+                            <div class="dropdown-content-first" 
+                                 title="@Managers[managerID].Name" 
+                                 id="@managerID"
+                                 @onclick="@(() => GetSelectedManagerID(managerID))">
+                                 @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                            </div>
                             continue;
                         }
-                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
+                        <div title="@Managers[managerID].Name"
+                             id="@managerID"
+                             @onclick="@(() => GetSelectedManagerID(managerID))">
+                             @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                        </div>
                     }
                 </div>
             </div>
@@ -96,11 +105,7 @@ else
         {
             ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._memDataList?.AddRange(args.Memory);
-            await InvokeAsync(StateHasChanged);
-        };
-
-        UpdateOverviewTriggered += async (o, args) =>
-        {
+            
             _lineConfig.Data.Datasets.Clear();
             
             // LineChart Memory
