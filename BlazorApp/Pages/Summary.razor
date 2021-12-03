@@ -443,7 +443,7 @@ else
     private List<ManagerStatusHandler> SortByEfficiency(List<ManagerStatusHandler> managers)
     {
         List<ManagerStatusHandler> sortedList = managers.OrderBy(o => o.EfficiencyScore).ToList();
-        sortedList.RemoveAll(r => (r.RowsRead == 0 && r.RowsWritten == 0) || (r.AvgCpu == 0 && Utility.CalculateMemoryUsage(r.AvgMemory, 21473734656) == 0));
+        sortedList.RemoveAll(r => (r.RowsRead == 0 && r.RowsWritten == 0) || (r.AvgCpu == 0 && r.AvgMemoryPercent == 0));
         
         return sortedList;
     }
@@ -451,7 +451,7 @@ else
     //Median efficiency score
     private int MedianEfficiencyScore(List<ManagerStatusHandler> managers)
     {
-        if (managers.Count == 0)
+        if (managers.Count < 1)
         {
             return 0;
         }
