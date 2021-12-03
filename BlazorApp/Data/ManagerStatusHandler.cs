@@ -31,7 +31,7 @@ namespace BlazorApp.Data
         private SqlCommand command;
         private int run_number = 0;
         private int mtRetryCount = 0;
-        public double AvgCpu;
+        public long AvgCpu;
         public long AvgMemory;
         public int MemoryPercent;
         public int AvgMemoryPercent { get; private set; }
@@ -83,14 +83,13 @@ namespace BlazorApp.Data
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
             CalculateAverageMemoryUsed();
-            EfficiencyTriggerUpdate(ConversionDataAssigner.GetManagerEfficiencyData());
         }
 
         //The EfficiencyScore© algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
-            AvgCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
+            double AverageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
             Cpu = Convert.ToInt32(AvgCpu);
 
             double result;
@@ -102,8 +101,9 @@ namespace BlazorApp.Data
             {
                 result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
             }
-            
+
             EfficiencyScore = Convert.ToInt32(result);
+            AvgCpu = Convert.ToInt64(AverageCpu);
         }
         
         public void CalculateAverageMemoryUsed()

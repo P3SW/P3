@@ -22,6 +22,8 @@ namespace BlazorApp.Data
         private static int _managerId;
         private static int _executionId;
         
+        public static List<HealthData> _cpuDataList = new ();
+        public static List<HealthData> _memDataList = new ();
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
@@ -250,35 +252,6 @@ namespace BlazorApp.Data
             
             return await Task.FromResult(list);
         }
-
-        public static List<EfficiencyData> GetManagerEfficiencyData()
-        {
-            
-            if (FinishedManagers.Count == 0)
-            {
-                Console.WriteLine(FinishedManagers.Count);
-                Console.WriteLine("Sending new list");
-                return new List<EfficiencyData>();
-            }
-            
-            List<EfficiencyData> list = new List<EfficiencyData>();
-
-            if (FinishedManagers.Count > 0)
-            {
-                foreach (var finishedManager in FinishedManagers)
-                {
-                    list.Add(new EfficiencyData(finishedManager.Name, 
-                        finishedManager.EfficiencyScore,
-                        finishedManager.EndTime, 
-                        finishedManager.RowsRead, 
-                        finishedManager.RowsWritten, 
-                        finishedManager.RunTime, 
-                        finishedManager.Cpu,
-                        finishedManager.AvgMemoryPercent));
-
-                }
-            }
-            return list;
-        }
+        
     }
 }
