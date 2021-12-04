@@ -15,14 +15,16 @@ else
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManager)-@Utility.ShortenManagerName(Managers[SelectedManager].Name)</b>
+                <b class="selected-manager-name" title="">@(SelectedManagerId)-@Utility.ShortenManagerName(Managers[SelectedManagerId].Name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
                     @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
+                        //Console.WriteLine(Managers.Count + "Count ***********************************************************************'");
                         int managerID = i;
-                        if (i == SelectedManager)
+                        Console.WriteLine("******************" + i + "COUNT " + Managers.Count);
+                        if (i == SelectedManagerId)
                         {
                             continue;
                         }
@@ -32,14 +34,14 @@ else
                             <div class="dropdown-content-first" 
                                  title="@Managers[managerID].Name" 
                                  id="@managerID"
-                                 @onclick="@(() => GetSelectedManagerID(managerID))">
+                                 @onclick="@(() => DropDownHandler(managerID))">
                                  @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
                             </div>
                             continue;
                         }
                         <div title="@Managers[managerID].Name"
                              id="@managerID"
-                             @onclick="@(() => GetSelectedManagerID(managerID))">
+                             @onclick="@(() => DropDownHandler(managerID))">
                              @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
                         </div>
                     }
@@ -69,14 +71,18 @@ else
     private LineDataset<long> _lineConfigDatasetCpu;
     private LineDataset<long> _lineConfigDatasetMemory;
     private LineConfig _lineConfig;
-    private int SelectedManager { get; set; }
+    private int SelectedManagerId { get; set; }
+    private ManagerStatusHandler SelectedManager { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
         
-        _cpuDataList = await Task.Run(() => ConversionDataAssigner._cpuDataList);
-        _memDataList = await Task.Run(() => ConversionDataAssigner._memDataList);
+        //_cpuDataList = await Task.Run(() => ConversionDataAssigner._cpuDataList);
+        //_memDataList = await Task.Run(() => ConversionDataAssigner._memDataList);
+        
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
         
         // **** Show LineChart at page reload ****
         // LineChart Memory
@@ -103,8 +109,14 @@ else
         
         HealthUpdateTriggered += async (o, args) =>
         {
-            ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
-            ConversionDataAssigner._memDataList?.AddRange(args.Memory);
+            //ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
+            //ConversionDataAssigner._memDataList?.AddRange(args.Memory);
+            
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
+            
+            ConversionDataAssigner._currentManager._cpuDataList?.AddRange(args.Cpu);
+            ConversionDataAssigner._currentManager._memDataList?.AddRange(args.Memory);
             
             _lineConfig.Data.Datasets.Clear();
             
@@ -263,8 +275,41 @@ else
     // **** Dropdown menu methods **** Begin ****
     private void GetSelectedManagerID(int selectedID)
     {
-        SelectedManager = selectedID;
+        SelectedManagerId = selectedID;
     }
+
+    private void DropDownHandler(int selectedID)
+    {
+        SelectedManagerId = selectedID;
+        SelectedManager = ConversionDataAssigner.FinishedManagers.Find(manager => manager.Id == selectedID);
+
+        _cpuDataList = SelectedManager?._cpuDataList;
+        _memDataList = SelectedManager?._memDataList;
+        
+        _lineConfig.Data.Datasets.Clear();
+        
+        // LineChart Memory
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+        
+        // LineChart CPU
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+        StateHasChanged();
+    }
+    
     // **** Dropdown menu methods **** End ****
     
 }
