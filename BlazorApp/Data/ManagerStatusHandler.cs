@@ -31,12 +31,12 @@ namespace BlazorApp.Data
         private SqlCommand command;
         private int run_number = 0;
         private int mtRetryCount = 0;
-        public double AvgCpu;
-        public double AvgMemory;
+        public long AvgCpu;
+        public long AvgMemory;
         public int MemoryPercent;
         public int AvgMemoryPercent { get; private set; }
         public long MemoryUsed;
-        public double MaxMemory = 21473734656; /* Approx 20gb */
+        public long MaxMemory = 21473734656; /* Approx 20gb */
 
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
@@ -83,27 +83,34 @@ namespace BlazorApp.Data
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
             CalculateAverageMemoryUsed();
-            EfficiencyTriggerUpdate(ConversionDataAssigner.GetManagerEfficiencyData());
         }
 
         //The EfficiencyScore© algorithm is a proprietary intellectual property owned by Arthur Osnes Gottlieb.
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
-            AvgCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0.0;
+            double AverageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
             Cpu = Convert.ToInt32(AvgCpu);
-            double result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
+
+            double result;
+            if (RunTime == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
+            }
+
             EfficiencyScore = Convert.ToInt32(result);
+            AvgCpu = Convert.ToInt64(AverageCpu);
         }
         
         public void CalculateAverageMemoryUsed()
         {
-            AvgMemory = Health.Memory.Count > 0 ? Health.Memory.Average(data => data.NumericValue) : MaxMemory;
-            
-            //Used for calculating used memory out of total memory
-            double result = ((MaxMemory - AvgMemory) / (MaxMemory)) * 100;
+            AvgMemory = Health.Memory.Count > 0 ? Convert.ToInt64(Health.Memory.Average(data => data.NumericValue)) : MaxMemory;
 
-            AvgMemoryPercent = Convert.ToInt32(result);
+            AvgMemoryPercent = Utility.CalculateMemoryUsage(AvgMemory, MaxMemory);
         }
 
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.
@@ -114,23 +121,19 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    if (reader.HasRows)
-                    {
-                        successfulRead = true;
-                    }
                     if (reader.Read())
                     {
-                        Status = (string) reader["[STATUS]"];
-                        RunTime = (int) reader["[RUNTIME]"];
-                        RowsRead = (int) reader["[PERFORMANCECOUNTROWSREAD]"];
-                        RowsWritten = (int) reader["[PERFORMANCECOUNTROWSWRITTEN]"];
-                        EndTime = (DateTime) reader["[ENDTIME]"];
+                        Status = (string) reader["STATUS"];
+                        RunTime = (int) reader["RUNTIME"];
+                        RowsRead = (int) reader["PERFORMANCECOUNTROWSREAD"];
+                        RowsWritten = (int) reader["PERFORMANCECOUNTROWSWRITTEN"];
+                        EndTime = (DateTime) reader["ENDTIME"];
                     }
                     reader.Close();
                 }
             }
 
-            if (!successfulRead && mtRetryCount < 5)
+            if (RunTime == 0 && mtRetryCount < 5)
             {
                 mtRetryCount++;
                 Thread.Sleep(500);

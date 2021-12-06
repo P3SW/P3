@@ -5,40 +5,40 @@
 @using Radzen.Blazor.Rendering
 
 
-@if (_dataStorageList == null)
+@if (Managers == null)
 {
     <p>Loading ....</p>
 }
 else
 {
     <div class="efficiency-table-styling">
-    <RadzenDataGrid @ref="EfficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                    AllowPaging="false" AllowSorting="true" Data="@_dataStorageList" TItem="EfficiencyData"
+    <RadzenDataGrid @ref="_efficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="150"
+                    AllowPaging="true" AllowSorting="true" Data="@Managers" TItem="ManagerStatusHandler"
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
         <Columns>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="ManagerName" Filterable="true"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="ManagerName" Filterable="true"
                                   Title="MANAGER" Frozen="false" Width="400px" Sortable="false">
                 <Template Context="data">
-                    <div style="color: white; display: block; width: 200px; max-width: 200px; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@data.ManagerName">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                    <div style="color: white; display: block; width: 200px; max-width: 200px; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@data.Name">
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <div style="display: block; color: lightgray; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;">
-                                <span class="low-score-styling">@Utility.ShortenManagerName(data.ManagerName)</span>
+                                <span class="low-score-styling">@Utility.ShortenManagerName(data.Name)</span>
                             </div>
                         }
                         else
                         {
-                            <span style="color: #FFFFFF; ">@Utility.ShortenManagerName(data.ManagerName)</span>
+                            <span style="color: #FFFFFF; ">@Utility.ShortenManagerName(data.Name)</span>
                         }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="EfficiencyScore" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="EfficiencyScore" Filterable="false"
                                   Title="SCORE" Frozen="false" Width="100px">
                 <Template Context="data">
                     <div style="display: grid; width: 60px; max-width: 60px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EfficiencyScore">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.EfficiencyScore</span>
                         }
@@ -49,26 +49,26 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeFinished" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="TimeFinished" Filterable="false"
                                   Title="ENDTIME" Frozen="false" Width="300px" Sortable="false">
                 <Template Context="data">
-                    <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeFinished">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                    <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EndTime">
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
-                            <span class="low-score-styling">@data.TimeFinished</span>
+                            <span class="low-score-styling">@data.EndTime</span>
                         }
                         else
                         {
-                            <span style="color: #FFFFFF;">@data.TimeFinished</span>
+                            <span style="color: #FFFFFF;">@data.EndTime</span>
                         }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="RowsRead" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="RowsRead" Filterable="false"
                                   Title="Read" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsRead">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.RowsRead</span>
                         }
@@ -79,11 +79,11 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="RowsWritten" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="RowsWritten" Filterable="false"
                                   Title="Written" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsWritten">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span class="low-score-styling">@data.RowsWritten</span>
                         }
@@ -94,26 +94,26 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="TimeRan" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="Runtime" Filterable="false"
                                   Title="rUnTIme" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
-                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.TimeRan">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RunTime">
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
-                            <span style="text-align: right" class="low-score-styling">@Utility.FormatTime(data.TimeRan)</span>
+                            <span style="text-align: right" class="low-score-styling">@Utility.FormatTime(data.RunTime)</span>
                         }
                         else
                         {
-                            <span style="color: #FFFFFF; text-align: right;">@Utility.FormatTime(data.TimeRan)</span>
+                            <span style="color: #FFFFFF; text-align: right;">@Utility.FormatTime(data.RunTime)</span>
                         }
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="AvgCpu" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="AvgCpu" Filterable="false"
                                   Title="CPU" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgCpu">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span style="text-align: right" class="low-score-styling">@data.AvgCpu%</span>
                         }
@@ -124,11 +124,11 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="EfficiencyData" Property="AvgMemory" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="AvgMemory" Filterable="false"
                                   Title="Memory" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgMemoryPercent">
-                        @if (data.RowsRead == 0 && data.RowsWritten == 0)
+                        @if ((data.RowsRead == 0 && data.RowsWritten == 0) || (data.AvgCpu == 0 && data.AvgMemoryPercent == 0))
                         {
                             <span style="text-align: right" class="low-score-styling">@data.AvgMemoryPercent%</span>
                         }
@@ -145,32 +145,22 @@ else
 }
 
 @code {
-    List<EfficiencyData> _dataStorageList = new List<EfficiencyData>();
-    private int currentCount = 0;
-    RadzenDataGrid<EfficiencyData> EfficiencyDataGrid;
+    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
+    RadzenDataGrid<ManagerStatusHandler> _efficiencyDataGrid;
     
     protected override async Task OnInitializedAsync()
     {
         StateHasChanged();
         
-        EfficiencyUpdateTriggered += async (o, args) =>
+        UpdateOverviewTriggered += async (o, args) =>
         {
-            _dataStorageList.Clear();
-            _dataStorageList.AddRange(args.EfficiencyDataList);
-            await InvokeAsync(EfficiencyDataGrid.Reload);
-            await InvokeAsync(StateHasChanged);
-        };
-        
-        EfficiencyUpdateResseted += async (o, args) =>
-        {
-            _dataStorageList = null;
-            await InvokeAsync(EfficiencyDataGrid.Reload);
+            await InvokeAsync(_efficiencyDataGrid.Reload);
             await InvokeAsync(StateHasChanged);
         };
     }
 
     //When rendering the cells, change the background color.
-    void CellRender(DataGridCellRenderEventArgs<EfficiencyData> dataGridCellRenderEventArgs)
+    void CellRender(DataGridCellRenderEventArgs<ManagerStatusHandler> dataGridCellRenderEventArgs)
     {
         dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561;");
     }

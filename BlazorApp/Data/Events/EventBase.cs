@@ -33,7 +33,7 @@ namespace BlazorApp.DataStreaming.Events
         {
             ErrorUpdateTriggered?.Invoke(this, new LogDataEventArgs
             {
-                LogDataList = logDatalist,
+                NewLogDataList = logDatalist,
             });
         }
 
@@ -54,18 +54,6 @@ namespace BlazorApp.DataStreaming.Events
             });
         }
         
-        // Efficiency ************************************************************
-        public static event EventHandler<EfficiencyDataEventArgs> EfficiencyUpdateTriggered;
-        public static event EventHandler EfficiencyUpdateResseted;
-
-        public void EfficiencyTriggerUpdate(List<EfficiencyData> efficiencyDatalist)
-        {
-            EfficiencyUpdateTriggered?.Invoke(this, new EfficiencyDataEventArgs()
-            {
-                EfficiencyDataList = efficiencyDatalist,
-            });
-        }
-
         // Update Overview ********************************************************
 
         public static event EventHandler UpdateOverviewTriggered;

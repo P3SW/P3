@@ -5,9 +5,8 @@ namespace BlazorApp.Data
     //Class responsible for reading the setup.txt file and returns the connection string.
     public static class ConfigReader
     {
-        public static string ReadSetupFile()
+        public static string ReadSetupFile(string fileName)
         {
-            const string fileName = "setup.txt";
             string connectionString;
             using (StreamReader sr = new StreamReader(fileName))
             {

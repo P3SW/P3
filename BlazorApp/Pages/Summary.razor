@@ -6,19 +6,22 @@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (Managers == null || Managers.Count == 0)
+@if (ConversionDataAssigner._currentManager == null)
 {
-    <p>Loading ..summary..</p>
+    <p>Waiting for logdata ....</p>
 }
 else
 {
     <div class="summary_container">
-        <div class="summary_caption_container" style="text-align: center;">Summary</div>
+        <div class="summary_caption_container" style="text-align: center;">
+            <div class="summary-title">Summary</div>
+            <div class="conversion-runtime">Conversion runtime: @Utility.FormatTime(Runtime.ConversionRuntimeCounter*1000)</div>
+        </div>
 
         @* Current running manager info *@
         <div class="Current_manager_info_container">
-            <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div><br>
-            <div>Manager runtime: @ConversionDataAssigner._currentManager.StartTime</div>
+            <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div>
+            <div>Current manager runtime: @Utility.FormatTime(Runtime.CurrentManagerRuntimeCounter*1000)</div>
         </div>
 
         <div class="Current_manager_container">
@@ -48,113 +51,120 @@ else
                 <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner._managerQueue</b></span>
             </div>
             <div class="manager-queue-circle">
-                @foreach (ManagerStatusHandler manager in Managers)
+                @if (Managers != null)
                 {
-                    <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager.Id, e, manager))">
-                        @if (manager.Status == "RUNNING")
-                        {
-                            <img src="Icons/current-manager-loader.svg" alt="loader" class="current-manager-loader">
-                        }
-                        @if (_hoveredManager == manager.Id && _hoveredManagerErrors != null)
-                        {
-                            <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-100%);">
-                            <div class="hovered-manager" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-13rem);">
-                                <div class="hoverbox-info">
-                                    <div>Manager: @Utility.ShortenManagerName(manager.Name)</div>
-                                    <div>Runtime: @Utility.FormatTime(manager.RunTime)</div>
-                                    <div>Status: @manager.Status</div>
-                                </div>
-                                <div class="hoverbox-errors-recons">
-                                    <div class="hoverbox-erros">
-                                        <div>Errors</div>
-                                        <ul class="error-reconciliation-formatting">
-                                            <div class="circle background-red"></div><li>Fatal: @_hoveredManagerErrors[0]</li>
-                                            <div class="circle background-lightred"></div><li>Error: @_hoveredManagerErrors[1]</li>
-                                            <div class="circle background-yellow"></div><li>Warning: @_hoveredManagerErrors[2]</li>
-                                            <div class="circle background-green"></div><li>Info: @_hoveredManagerErrors[3]</li>
-                                        </ul>
+                    @foreach (ManagerStatusHandler manager in Managers)
+                    {
+                        <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager.Id, e, manager))">
+                            @if (manager.Status == "RUNNING")
+                            {
+                                <img src="Icons/current-manager-loader.svg" alt="loader" class="current-manager-loader">
+                            }
+                            @if (_hoveredManager == manager.Id && _hoveredManagerErrors != null)
+                            {
+                                <img src="Icons/triangle.svg" alt="triangle" class="hoverbox-arrow" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-100%);">
+                                <div class="hovered-manager" style="position: absolute; left: @(_mousePositionX + "px"); top: @(_mousePositionY + "px"); transform: translate(-50%,-13rem);">
+                                    <div class="hoverbox-info">
+                                        <div>Manager: @Utility.ShortenManagerName(manager.Name)</div>
+                                        <div>Runtime: @Utility.FormatTime(manager.RunTime)</div>
+                                        <div>Status: @manager.Status</div>
                                     </div>
-                                    <div class="hoverbox-recons">
-                                        <div>Reconciliations</div>
-                                        <ul class="error-reconciliation-formatting">
-                                            <div class="circle background-red"></div><li>Mismatch: @_hoveredManagerRecons[0]</li>
-                                            <div class="circle background-lightred"></div><li>Failed: @_hoveredManagerRecons[1]</li>
-                                            <div class="circle background-yellow"></div><li>Disabled: @_hoveredManagerRecons[2]</li>
-                                            <div class="circle background-green"></div><li>OK: @_hoveredManagerRecons[3]</li>
-                                        </ul>
-                                    </div>
-                                </div>
-                            </div>
-                        }
-                    </div>
-                }
-            </div>
-        </div>
-        @* Total manager info *@
-        @if (_pieConfigDatasetErrors != null && _pieConfigDatasetReconciliations != null)
-        {
-            <div class="Total_errors_and_reconciliations_container">
-                <div class="info_total_errors">
-                    Total Errors: @_pieConfigDatasetErrors.Sum()
-                    <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Fatal: @_pieConfigDatasetErrors[0]</li>
-                        <div class="circle background-lightred"></div><li>Error: @_pieConfigDatasetErrors[1]</li>
-                        <div class="circle background-yellow"></div><li>Warning: @_pieConfigDatasetErrors[2]</li>
-                        <div class="circle background-green"></div><li>Info: @_pieConfigDatasetErrors[3]</li>
-                    </ul>
-                </div>
-                <div class="PieConfigTotalErrors">
-                    <Chart Config="_pieConfigErrors" Height="50" Width="50"></Chart>
-                </div>
-
-                <div class="info_total_reconciliations">
-                    Total Reconciliations: @_pieConfigDatasetReconciliations.Sum()
-                    <ul class="error-reconciliation-formatting">
-                        <div class="circle background-red"></div><li>Mismatch: @_pieConfigDatasetReconciliations[0]</li>
+                                    <div class="hoverbox-errors-recons">
+                                        <div class="hoverbox-erros">
+                                            <div>Errors</div>
+                                            <ul class="error-reconciliation-formatting">
+                                                <div class="circle background-red"></div><li>Fatal: @_hoveredManagerErrors[0]</li>
+                                                <div class="circle background-lightred"></div><li>Error: @_hoveredManagerErrors[1]</li>
+                                                <div class="circle background-yellow"></div><li>Warning: @_hoveredManagerErrors[2]</li>
+                                                <div class="circle background-green"></div><li>Info: @_hoveredManagerErrors[3]</li>
+                                            </ul>                                                                          
+                                        </div>                                                                             
+                                        <div class="hoverbox-recons">                                                      
+                                            <div>Reconciliations</div>                                                     
+                                            <ul class="error-reconciliation-formatting">                                   
+                                                <div class="circle background-red"></div><li>Mismatch: @_hoveredManagerRecons[0]</li>
+                                                <div class="circle background-lightred"></div><li>Failed: @_hoveredManagerRecons[1]</li>
+                                                <div class="circle background-yellow"></div><li>Disabled: @_hoveredManagerRecons[2]</li>
+                                                <div class="circle background-green"></div><li>OK: @_hoveredManagerRecons[3]</li>
+                                            </ul>                                                                          
+                                        </div>                                                                             
+                                    </div>                                                                                 
+                                </div>                                                                                     
+                            }                                                                                              
+                        </div>                                                                                             
+                    }                                                                                                      
+                }                                                                                                          
+            </div>                                                                                                         
+        </div>                                                                                                             
+        @* Total manager info *@                                                                                           
+        @if (_pieConfigDatasetErrors != null && _pieConfigDatasetReconciliations != null)                                  
+        {                                                                                                                  
+            <div class="Total_errors_and_reconciliations_container">                                                       
+                <div class="info_total_errors">                                                                            
+                    Total Errors: @_pieConfigDatasetErrors.Sum()                                                           
+                    <ul class="error-reconciliation-formatting">                                                           
+                        <div class="circle background-red"></div><li>Fatal: @_pieConfigDatasetErrors[0]</li>               
+                        <div class="circle background-lightred"></div><li>Error: @_pieConfigDatasetErrors[1]</li>          
+                        <div class="circle background-yellow"></div><li>Warning: @_pieConfigDatasetErrors[2]</li>          
+                        <div class="circle background-green"></div><li>Info: @_pieConfigDatasetErrors[3]</li>              
+                    </ul>                                                                                                  
+                </div>                                                                                                     
+                <div class="PieConfigTotalErrors">                                                                         
+                    <Chart Config="_pieConfigErrors" Height="50" Width="50"></Chart>                                       
+                </div>                                                                                                     
+                                                                                                                           
+                <div class="info_total_reconciliations">                                                                   
+                    Total Reconciliations: @_pieConfigDatasetReconciliations.Sum()                                         
+                    <ul class="error-reconciliation-formatting">                                                           
+                        <div class="circle background-red"></div><li>Mismatch: @_pieConfigDatasetReconciliations[0]</li>   
                         <div class="circle background-lightred"></div><li>Failed: @_pieConfigDatasetReconciliations[1]</li>
                         <div class="circle background-yellow"></div><li>Disabled: @_pieConfigDatasetReconciliations[2]</li>
-                        <div class="circle background-green"></div><li>OK: @_pieConfigDatasetReconciliations[3]</li>
-                    </ul>
-                </div>
-                <div class="pieConfigTotalReconciliations">
-                    <Chart Config="_pieConfigReconciliations" Height="50" Width="50"></Chart>
-                </div>
-            </div>
-        }
-        @* Efficiency score table summary *@
-        <div class="efficiency-container">
-            <div class="efficiency-text">Median efficiency score: <b>2702</b></div><br/>
-            <div class="efficiency-text">Total read: <b>17021044</b></div><br/>
-            <div class="efficiency-text">Total written: <b>30461662</b></div>
-        </div>
-    </div>
-}
-
-@code{
-    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
-    
-    private PieConfig _pieConfigErrors;
-    private PieConfig _pieConfigReconciliations;
-    private PieDataset<int> _pieConfigDatasetErrors;
-    private PieDataset<int> _pieConfigDatasetReconciliations;
-    
-    private List<LogData> _errorDataStorageList;
-    private List<LogData> _reconDataStorageList;
-
-    private int _hoveredManager;
-    private int[] _hoveredManagerErrors;
-    private int[] _hoveredManagerRecons;
-    private double _mousePositionX;
-    private double _mousePositionY;
-    
-    ManagerStatusHandler _currentManager;
-    private int[] _managerQueueCounter;
-    private int _managersCount = 0;
-    
-    protected override async Task OnInitializedAsync()
-    {
-        ConfigurePieConfig();
-        
+                        <div class="circle background-green"></div><li>OK: @_pieConfigDatasetReconciliations[3]</li>       
+                    </ul>                                                                                                  
+                </div>                                                                                                     
+                <div class="pieConfigTotalReconciliations">                                                                
+                    <Chart Config="_pieConfigReconciliations" Height="50" Width="50"></Chart>                              
+                </div>                                                                                                     
+            </div>                                                                                                         
+        }                                                                                                                  
+        @* Efficiency score table summary *@                                                                               
+        <div class="efficiency-container">                                                                                 
+            <div>Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div>            
+            <div>Total read:    <b>@TotalRows(Managers, "read")</b></div>                          
+            <div>Total written: <b>@TotalRows(Managers, "written")</b></div>  
+            <div>Worst scoring managers</div>
+            <div class="summary_efficiency_table">                                                                                                          
+                <SummaryEfficiencyTable SortedData="@SortByEfficiency(Managers).Take(5).ToList()"></SummaryEfficiencyTable>
+            </div>                                                                                                         
+        </div>                                                                                                             
+    </div>                                                                                                                 
+}                                                                                                                          
+                                                                                                                           
+@code{                                                                                                                     
+    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }                                                   
+                                                                                                                           
+    private PieConfig _pieConfigErrors;                                                                                    
+    private PieConfig _pieConfigReconciliations;                                                                           
+    private PieDataset<int> _pieConfigDatasetErrors;                                                                       
+    private PieDataset<int> _pieConfigDatasetReconciliations;                                                              
+                                                                                                                           
+    private List<LogData> _errorDataStorageList;                                                                           
+    private List<LogData> _reconDataStorageList;                                                                           
+                                                                                                                           
+    private int _hoveredManager;                                                                                           
+    private int[] _hoveredManagerErrors;                                                                                   
+    private int[] _hoveredManagerRecons;                                                                                   
+    private double _mousePositionX;                                                                                        
+    private double _mousePositionY;                                                                                        
+                                                                                                                           
+    ManagerStatusHandler _currentManager;                                                                                  
+    private int[] _managerQueueCounter;                                                                                    
+    private int _managersCount = 0;                                                                                        
+                                                                                                                           
+    protected override async Task OnInitializedAsync()                                                                     
+    {                                                                                                                      
+        ConfigurePieConfig();                                                                                              
+                                                                                                                           
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
         _reconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
         
@@ -187,7 +197,7 @@ else
                 ColorUtil.ColorHexString(92, 188, 169) //OK
             },
             BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-            BorderWidth = 0,
+            BorderWidth = 0
         };
         _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
         
@@ -201,7 +211,7 @@ else
         
         ErrorUpdateTriggered += async (o, args) =>
         {
-            _errorDataStorageList.AddRange(args.LogDataList);
+            _errorDataStorageList.AddRange(args.NewLogDataList);
             await InvokeAsync(StateHasChanged);
         };
         
@@ -237,7 +247,7 @@ else
                     ColorUtil.ColorHexString(92, 188, 169) //OK
                 },
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-                BorderWidth = 0,
+                BorderWidth = 0
             };
             _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
             await InvokeAsync(StateHasChanged);
@@ -253,17 +263,34 @@ else
         _pieConfigErrors.Options = new PieOptions
         {
             Responsive = true,
+            Hover = new Hover
+            {
+                Intersect = false,
+                AnimationDuration = 00,
+            },
+            Tooltips = new Tooltips()
+            {
+            },
             Title = new OptionsTitle
             {
                 Display = false,
                 Text = "Total Errors",
                 FontColor = "#FFFFFF",
+                
             },
             CutoutPercentage = 45,
             Legend = new Legend
             {
                 Display = false,
+                
             },
+            Animation = new ArcAnimation()
+            {
+                AnimateRotate = false,
+                AnimateScale = false,
+                Duration = 0
+            },
+            
         };
         _pieConfigReconciliations.Options = _pieConfigErrors.Options;
 
@@ -412,4 +439,82 @@ else
         _hoveredManagerErrors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
         _hoveredManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
     }
+
+    /* Calculates the runtime for the entire conversion and for each manager */
+    public static class Runtime
+    {
+        private static System.Timers.Timer _runtimeTimer = new System.Timers.Timer(1000);
+        public static int ConversionRuntimeCounter = 0;
+        public static int CurrentManagerRuntimeCounter = 0;
+        
+        public static void StartTimer()
+        {
+            _runtimeTimer.Elapsed += RuntimeCounter;
+            _runtimeTimer.Enabled = true;
+        }
+        
+        public static void CurrentManagerResetTimer()
+        {
+            CurrentManagerRuntimeCounter = 0;
+        }
+
+        /* Adds 1 to the counter */
+        private static void RuntimeCounter(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner._currentManager == null)
+            {
+                _runtimeTimer.Enabled = false;
+            }
+            else
+            {
+                ConversionRuntimeCounter++;
+                CurrentManagerRuntimeCounter++;
+            }
+        }
+    }
+
+    //Calculate total rows/written
+    private long TotalRows(List<ManagerStatusHandler> managers, string wanted)
+    {
+        long result = 0;
+        if (wanted == "written")
+        {
+            foreach (ManagerStatusHandler manager in managers)
+            {
+                result += manager.RowsWritten;
+            }
+        }
+        else if (wanted == "read")
+        {
+            foreach (ManagerStatusHandler manager in managers)
+            {
+                result += manager.RowsRead;
+            }
+        }
+        return result;
+    }
+    //Sorted list by efficiency score
+    private List<ManagerStatusHandler> SortByEfficiency(List<ManagerStatusHandler> managers)
+    {
+        List<ManagerStatusHandler> sortedList = managers.OrderBy(o => o.EfficiencyScore).ToList();
+        sortedList.RemoveAll(r => (r.RowsRead == 0 && r.RowsWritten == 0) || (r.AvgCpu == 0 && r.AvgMemoryPercent == 0));
+        
+        return sortedList;
+    }
+    
+    //Median efficiency score
+    private int MedianEfficiencyScore(List<ManagerStatusHandler> managers)
+    {
+        if (managers.Count < 1)
+        {
+            return 0;
+        }
+        List<ManagerStatusHandler> sortedList = SortByEfficiency(managers);
+
+        int size = sortedList.Count;
+        int middle = size/2;
+        double median = (size % 2 != 0) ? (double)sortedList[middle].EfficiencyScore : ((double)sortedList[middle].EfficiencyScore + (double)sortedList[middle-1].EfficiencyScore) / 2;
+        return Convert.ToInt32(median);
+    }
 }
+
