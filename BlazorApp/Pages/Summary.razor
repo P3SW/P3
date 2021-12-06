@@ -1,6 +1,8 @@
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
 @using System.Globalization
+@using System.Threading
+@using System.Timers
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
 @using Microsoft.AspNetCore.Http.Extensions
@@ -446,14 +448,14 @@ else
     /* Calculates the runtime for the entire conversion and for each manager */
     public static class Runtime
     {
-        private static System.Timers.Timer _runtimeTimer = new System.Timers.Timer(1000);
+        new static AutoResetEvent _autoEvent = new AutoResetEvent(false);
+        private static System.Threading.Timer _runtimeTimer = new System.Threading.Timer(RuntimeCounter, _autoEvent, 1000, 1000);
         public static int ConversionRuntimeCounter = 0;
         public static int CurrentManagerRuntimeCounter = 0;
         
         public static void StartTimer()
         {
-            _runtimeTimer.Elapsed += RuntimeCounter;
-            _runtimeTimer.Enabled = true;
+            _autoEvent.Set();
         }
         
         public static void CurrentManagerResetTimer()
@@ -462,11 +464,11 @@ else
         }
 
         /* Adds 1 to the counter */
-        private static void RuntimeCounter(Object source, System.Timers.ElapsedEventArgs e)
+        private static void RuntimeCounter(Object source)
         {
             if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner._currentManager == null)
             {
-                _runtimeTimer.Enabled = false;
+                _runtimeTimer.Dispose();
             }
             else
             {
