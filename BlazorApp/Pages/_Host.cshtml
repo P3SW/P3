@@ -16,96 +16,84 @@
     <link href="BlazorApp.styles.css" rel="stylesheet"/>
     
     <style>
+        /* General styling for the Radzen table */
         #log-tab > .rz-tabview-panels{
-        background-color: #384561 !important;
-        border: none;
-        overflow: hidden;
-        text-align: left;
-        border-radius: 0;
+            background-color: #384561 !important;
+            border: none;
+            overflow: hidden;
+            text-align: left;
+            border-radius: 0;
         }
         
-        .rz-tabview-panel {
-        background-color: #384561 !important;
-        }
-        
+        /* Ensures new data-entries comes in from the top */
         table {
-        table-layout: fixed !important;
-        width: 100%;
-        display: block;
+            table-layout: fixed !important;
+            display: block;
         }
         
-        thead{
-        display: inline-block;
+        /* Size of Error and Reconciliation tables */
+        .rz-grid-table { 
+            height: 74vh;
+            max-height: 74vh;
         }
         
-        thead tr {
-        display: block;
-        width: 100% !important;
-        overflow: hidden !important;
-        padding: 0 !important;
-        margin: 0 !important;
-        top: 0;
+        /* Size of efficiency table */
+        .efficiency-table-styling .rz-grid-table { 
+            height: 100%;
+            max-height: 100%;
         }
         
-        tbody{ 
-        overflow: auto;
-        display: inline-block;
-        }
-        
-        .rz-grid-table { /* Size of table */
-         height: 74vh;
-         max-height: 74vh;
-        }
-        
-        .efficiency-table-styling .rz-grid-table { /* Size of efficiency table  */
-         height: 100%;
-         max-height: 100%;
-        }
-        
+        /* Padding for the entire tables */
         .rz-tabview-panel {
-        padding: 0 !important;
-        padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
-        padding-left: 1rem !important;
-        }
+            padding: 1rem 0 0 0 !important;
+        }      
         
-        .rz-button-icon-left {
-            position: absolute;
-            top: -5px;
-            left: 0;
-            height: 100% !important;
-            width: 100% !important;
-        }        
-        
-        .TabElement > a {
-        color: #FFFFFF !important;
-        text-decoration: none !important;
-        height: 100%;
-        width: 100%;
-        }
+        /* Styling for tabs on Error and Reconciliation page */
         .TabElement {
-        display: flex;
-        align-items: center;
-        border-radius: 0 !important; 
-        border: none !important;
-        background-color: #0F2147 !important;
-        height: 4em;
+            display: flex;
+            align-items: center;
+            border-radius: 0 !important; 
+            border: none !important;
+            background-color: #0F2147 !important;
+            height: 4em;
         }
+        
+        /* Styling, which points at the active-tag, for tabs on Error and Reconciliation page */
+        .TabElement > a {
+            color: #FFFFFF !important;
+            text-decoration: none !important;
+            height: 100%;
+            width: 100%;
+        }
+        
+        /* Needed background colouring */
         .rz-tabview-selected {
-        background-color: #384561 !important;
-        }               
+            background-color: #384561 !important;
+        }  
+        
+        /* Color of titles and icons */
         .rz-column-title, .rz-sortable-column-icon, .rz-grid-filter-icon  {
-        color: #FFFFFF !important;
-        position: sticky !important;
+            color: #FFFFFF !important;
         }
+        
+        /* Styling for the titles of the columns */
         .rz-unselectable-text {
-        background-color: #384561 !important;
-        border: none !important;
-        text-align: left !important;
+            background-color: #384561 !important;
+            border: none !important;
+            text-align: left;
         }
+        
+        /* Outer border removal and table background colour */
         .rz-data-grid{
-        border: none !important;
-        background-color: #384561 !important;
+            border: none !important;
+            background-color: #384561 !important;
+        }
+        
+        /* Changes colours of the buttons */
+        .rz-paginator-element {
+            background-color: #0F2147 !important;
+            color: white !important;
+            text-decoration: none !important;
         }
     </style>
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/default-base.css">
