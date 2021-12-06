@@ -12,8 +12,8 @@
 else
 {
     <div class="efficiency-table-styling">
-    <RadzenDataGrid @ref="_efficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
-                    AllowPaging="false" AllowSorting="true" Data="@Managers" TItem="ManagerStatusHandler"
+    <RadzenDataGrid @ref="_efficiencyDataGrid" AllowFiltering="true" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="150"
+                    AllowPaging="true" AllowSorting="true" Data="@Managers" TItem="ManagerStatusHandler"
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
         <Columns>
