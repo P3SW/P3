@@ -223,8 +223,8 @@ else
             _managersCount++;
             _pieConfigReconciliations.Data.Datasets.RemoveAt(0);
             _pieConfigErrors.Data.Datasets.RemoveAt(0);
+            
             // PieChart Errors
-            //_pieConfigErrors.Data.Datasets.Clear();
             _pieConfigDatasetErrors = new PieDataset<int>(TotalErrorsSeverityCounter(Managers))
             {
                 BackgroundColor = new[] // Color for the pies 
@@ -237,12 +237,10 @@ else
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
-            
             _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
 
 
             // PieChart Reconciliations
-            //_pieConfigReconciliations.Data.Datasets.Clear();
             _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
             {
                 BackgroundColor = new[] // Color for the pies
@@ -255,7 +253,6 @@ else
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
-            
             _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
             
             await InvokeAsync(StateHasChanged);
@@ -274,7 +271,7 @@ else
             Hover = new Hover
             {
                 Intersect = false,
-                AnimationDuration = 00,
+                AnimationDuration = 00
             },
             Tooltips = new Tooltips()
             {
@@ -283,14 +280,12 @@ else
             {
                 Display = false,
                 Text = "Total Errors",
-                FontColor = "#FFFFFF",
-                
+                FontColor = "#FFFFFF"
             },
             CutoutPercentage = 45,
             Legend = new Legend
             {
-                Display = false,
-                
+                Display = false
             },
             Animation = new ArcAnimation()
             {

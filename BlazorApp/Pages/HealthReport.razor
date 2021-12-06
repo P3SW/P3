@@ -100,7 +100,7 @@ else
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
             PointRadius = 0,
-            PointHitRadius = 0,
+            PointHitRadius = 0
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
         
@@ -110,8 +110,7 @@ else
         {
             ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._memDataList?.AddRange(args.Memory);
-            
-            //_lineConfig.Data.Datasets.Clear();
+            _lineConfig.Data.Datasets.Clear();
             
             // LineChart Memory
             _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
@@ -123,7 +122,7 @@ else
                 PointRadius = 0,
                 PointHitRadius = 0
             };
-            _lineConfig.Data.Datasets[0] = _lineConfigDatasetMemory;
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             
             // LineChart CPU
             _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
@@ -135,7 +134,7 @@ else
                 PointRadius = 0,
                 PointHitRadius = 0
             };
-            _lineConfig.Data.Datasets[1] = _lineConfigDatasetCpu;
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
             await InvokeAsync(StateHasChanged);
         };
     }
