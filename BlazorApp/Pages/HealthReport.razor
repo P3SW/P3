@@ -22,9 +22,7 @@ else
                 <div class="dropdown-content">
                     @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
-                        //Console.WriteLine(Managers.Count + "Count ***********************************************************************'");
                         int managerID = i;
-                        Console.WriteLine("******************" + i + "COUNT " + Managers.Count);
                         if (i == SelectedManagerId)
                         {
                             continue;
@@ -52,7 +50,7 @@ else
                 Memory/CPU
             </div>
             <div class="follow-checkbox-container">
-                <input type="checkbox" id="follow_current_manager" @bind="@Bool" @onclick="OnFollow">
+                <input type="checkbox" id="follow_current_manager" @bind="@Follow" @onclick="OnCheckboxClick">
                 <label style="font-size: 0.5em" for="follow_current_manager">Track current manager</label>
             </div>
         </div>
@@ -78,9 +76,8 @@ else
     private LineConfig _lineConfig;
     private int SelectedManagerId { get; set; }
     private ManagerStatusHandler SelectedManager { get; set; }
-
-    private bool _follow = false;
-    private bool Bool { get; set; }
+    
+    private bool Follow { get; set; } = true;
     
     protected override async Task OnInitializedAsync()
     {
@@ -117,36 +114,24 @@ else
         
         StateHasChanged();
 
-        // UpdateOverviewTriggered += async (o,args) =>
-        // {
-        //     // Console.WriteLine("------------------------NEW------------------------------------------------------------");
-        //     // Console.WriteLine(ConversionDataAssigner._currentManager.Id);
-        //     // Console.WriteLine(SelectedManagerId);
-        //     // Console.WriteLine("---------------------------------------------------------------------------------------");
-        //     //SelectedManagerId = await Task.Run(() => ConversionDataAssigner._currentManager.Id);
-        //     // await InvokeAsync(StateHasChanged);
-        // };
-        
-            HealthUpdateTriggered += async (o, args) =>
+        UpdateOverviewTriggered += async (o,args) =>
         {
-            // Console.WriteLine("**********************************************************************************************************************''");
-            // Console.WriteLine("ConversionDataAssigner._currentManager.Id ****");
-            // Console.WriteLine(ConversionDataAssigner._currentManager.Id);
-            // Console.WriteLine("Managers.Count ****");
-            // Console.WriteLine(Managers.Count);
-            // Console.WriteLine("SelectedManagerId ****");
-            // Console.WriteLine(SelectedManagerId);
+            if (Follow)
+            {
+                _lineConfig.Data.Datasets.Clear();
+                await InvokeAsync(StateHasChanged);
+            }
+        };
         
-            //SelectedManagerId = Managers.Count;
-            //Console.WriteLine(SelectedManagerId);
-        
+        HealthUpdateTriggered += async (o, args) =>
+        {
             _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
             _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
         
             ConversionDataAssigner._currentManager._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._currentManager._memDataList?.AddRange(args.Memory);
             
-            if (_follow)
+            if (Follow)
             {
                 _lineConfig.Data.Datasets.Clear();
                 
@@ -314,12 +299,7 @@ else
 
     private void DropDownHandler(int selectedID)
     {
-        //_follow = false;
-        
         SelectedManagerId = selectedID;
-        
-        //ConversionDataAssigner._currentManager.Id;
-        //ConversionDataAssigner._currentManager.Name;
         
         SelectedManager = ConversionDataAssigner.FinishedManagers.Find(manager => manager.Id == selectedID);
 
@@ -355,24 +335,44 @@ else
     
     // **** Dropdown menu methods **** End ****
 
-    private void OnFollow()
+    private async Task OnCheckboxClick()
     {
-        if (Bool)
+        Console.WriteLine(SelectedManagerId + "*****************************************************************************************************************");
+        if (Follow)
         {
-            _follow = false;
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
         }
         else
         {
-            _follow = true;
+            SelectedManager = await Task.Run( () => ConversionDataAssigner.FinishedManagers.Find(manager => manager.Id == SelectedManagerId));
+            _cpuDataList = SelectedManager?._cpuDataList;
+            _memDataList = SelectedManager?._memDataList;
         }
-        Bool = !Bool;
-        Console.WriteLine("***********************************************");
-        Console.WriteLine(Bool);
-    }
+        
+        
+        _lineConfig.Data.Datasets.Clear();
+        
+        // LineChart Memory
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+                
+        // LineChart CPU
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
 
-    private void OffFlollow()
-    {
-        Console.WriteLine("OFF ------------------------------------------------------");
+        await InvokeAsync(StateHasChanged);
     }
-
 }
