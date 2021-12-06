@@ -24,9 +24,9 @@ namespace BlazorApp.Data
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
-        public static void Start()
+        public static void Start(string setupFile)
         {
-            _connectionString = ConfigReader.ReadSetupFile("setup.txt");
+            _connectionString = ConfigReader.ReadSetupFile(setupFile);
             _managerQueue = 0;
             _managerId = 1;
             _currentManager = null;

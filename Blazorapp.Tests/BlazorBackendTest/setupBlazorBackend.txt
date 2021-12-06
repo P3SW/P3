@@ -1,0 +1,1 @@
+Server=localhost,1433;Database=ANS_DB_P3_BLAZORTEST;Trust Server Certificate = true; User Id=sa;Password=Password123;Trusted_Connection=False

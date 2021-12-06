@@ -52,7 +52,7 @@ namespace BlazorApp
                 endpoints.MapFallbackToPage("/_Host");
             });
 
-            ConversionDataAssigner.Start();
+            ConversionDataAssigner.Start("setup.txt");
         }
     }
 }

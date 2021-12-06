@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using BlazorApp.Data;
 using DataStreamingSimulation;
 using Microsoft.Data.SqlClient;
@@ -8,16 +9,25 @@ using Xunit.Abstractions;
 
 namespace P3ConversionDashboard.Tests
 {
+    [Collection("Sequential")]
     public class DataStreamingIntegrationTest
     {
         private DatabaseStreamer testDatabaseStreamer;
+
+        private Dictionary<string, int> numberOfRows = new Dictionary<string, int>()
+        {
+            {"LOGGING", 2213}, {"MANAGERS", 118}, {"LOGGING_CONTEXT", 124}, 
+            {"MANAGER_TRACKING", 32}, {"HEALTH_REPORT", 282}, {"ENGINE_PROPERTIES", 957}, 
+            {"AFSTEMNING", 159}
+        };
 
         private readonly ITestOutputHelper _testOutputHelper;
 
         public DataStreamingIntegrationTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-            testDatabaseStreamer = new DatabaseStreamer("../../../integrationTestDataStreamingSetup.txt");
+            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/setupDataStreaming.txt", 
+                "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
         }
 
         [Theory] 
@@ -30,7 +40,7 @@ namespace P3ConversionDashboard.Tests
         {
             testDatabaseStreamer.StreamTable(table,Convert.ToDateTime(startTime),Convert.ToDateTime(nextTime));
             
-            TestStream();
+            TestStream(table);
         }
 
         
@@ -42,35 +52,24 @@ namespace P3ConversionDashboard.Tests
         {
             testDatabaseStreamer.StreamTableOneTime(table);
             
-            TestStream();
+            TestStream(table);
         }
 
-        public void TestStream()
+        public void TestStream(string table)
         {
-           
-            List<List<string>> dataFromTestDatabase = new();
-            List<List<string>> dataFromNetcompanyDatabase = new();
-
-            QueryTestData(testDatabaseStreamer._queryString, dataFromNetcompanyDatabase);
-            QueryTestData(testDatabaseStreamer._queryString, dataFromTestDatabase);
-
-            Assert.Equal(dataFromNetcompanyDatabase.Count, dataFromTestDatabase.Count);
+            int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/setupQueryTestData.txt");
             
-            for (int i = 0; i < dataFromNetcompanyDatabase.Count; i++)
-            {
-                Assert.Equal(dataFromNetcompanyDatabase[i].Count, dataFromTestDatabase[i].Count);
-                
-                for (int j = 0; j < dataFromNetcompanyDatabase[i].Count; j++)
-                    Assert.Equal(dataFromNetcompanyDatabase[i][j], dataFromTestDatabase[i][j]);
-                
-            } 
+            System.Threading.Thread.Sleep(1000);
+
+            Assert.Equal(numberOfRows[table], rows);
         }
         
-        private void QueryTestData(string queryString, List<List<string>> storage)
+        private int QueryTestData(string queryString, string setupFile)
         {
-            string connectionString = ConfigReader.ReadSetupFile("../../../blazorTestSetup.txt");
+            string connectionString = ConfigReader.ReadSetupFile(setupFile);
             SqlConnection connection = new SqlConnection(connectionString);
             connection.Open();
+            int rows = 0;
 
             using (SqlCommand command = new SqlCommand(queryString, connection))
             {
@@ -78,15 +77,13 @@ namespace P3ConversionDashboard.Tests
                 {
                     while (reader.Read())
                     {
-                        List<string> testData = new();
-                        for (int i = 0; i < reader.FieldCount; i++)
-                            testData.Add(Convert.ToString(reader[i]));
-                        
-                        storage.Add(testData);
+                        rows++;
                     }
                     reader.Close();
                 }
             }
+
+            return rows;
         }
     }
 }
