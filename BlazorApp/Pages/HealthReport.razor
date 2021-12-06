@@ -3,6 +3,7 @@
 @using System.Globalization
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
+@using Microsoft.VisualBasic
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
@@ -35,20 +36,24 @@ else
                                  title="@Managers[managerID].Name" 
                                  id="@managerID"
                                  @onclick="@(() => DropDownHandler(managerID))">
-                                 @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                                @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
                             </div>
                             continue;
                         }
                         <div title="@Managers[managerID].Name"
                              id="@managerID"
                              @onclick="@(() => DropDownHandler(managerID))">
-                             @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                            @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
                         </div>
                     }
                 </div>
             </div>
             <div class="chart-title">
                 Memory/CPU
+            </div>
+            <div class="follow-checkbox-container">
+                <input type="checkbox" id="follow_current_manager" @bind="@Bool" @onclick="OnFollow">
+                <label style="font-size: 0.5em" for="follow_current_manager">Track current manager</label>
             </div>
         </div>
         <div style="position: relative; width: 90%; left: 5%">
@@ -73,10 +78,15 @@ else
     private LineConfig _lineConfig;
     private int SelectedManagerId { get; set; }
     private ManagerStatusHandler SelectedManager { get; set; }
+
+    private bool _follow = false;
+    private bool Bool { get; set; }
     
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
+        SelectedManagerId = 0;
+        //SelectedManagerId = await Task.Run(() => ConversionDataAssigner._currentManager.Id);
         
         //_cpuDataList = await Task.Run(() => ConversionDataAssigner._cpuDataList);
         //_memDataList = await Task.Run(() => ConversionDataAssigner._memDataList);
@@ -106,40 +116,64 @@ else
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
         
         StateHasChanged();
+
+        // UpdateOverviewTriggered += async (o,args) =>
+        // {
+        //     // Console.WriteLine("------------------------NEW------------------------------------------------------------");
+        //     // Console.WriteLine(ConversionDataAssigner._currentManager.Id);
+        //     // Console.WriteLine(SelectedManagerId);
+        //     // Console.WriteLine("---------------------------------------------------------------------------------------");
+        //     //SelectedManagerId = await Task.Run(() => ConversionDataAssigner._currentManager.Id);
+        //     // await InvokeAsync(StateHasChanged);
+        // };
         
-        HealthUpdateTriggered += async (o, args) =>
+            HealthUpdateTriggered += async (o, args) =>
         {
-            //ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
-            //ConversionDataAssigner._memDataList?.AddRange(args.Memory);
-            
+            // Console.WriteLine("**********************************************************************************************************************''");
+            // Console.WriteLine("ConversionDataAssigner._currentManager.Id ****");
+            // Console.WriteLine(ConversionDataAssigner._currentManager.Id);
+            // Console.WriteLine("Managers.Count ****");
+            // Console.WriteLine(Managers.Count);
+            // Console.WriteLine("SelectedManagerId ****");
+            // Console.WriteLine(SelectedManagerId);
+        
+            //SelectedManagerId = Managers.Count;
+            //Console.WriteLine(SelectedManagerId);
+        
             _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
             _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
-            
+        
             ConversionDataAssigner._currentManager._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._currentManager._memDataList?.AddRange(args.Memory);
             
-            _lineConfig.Data.Datasets.Clear();
-            
-            // LineChart Memory
-            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+            if (_follow)
             {
-                Label = "Cpu usage",
-                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-                LineTension = 0,
-            };
-            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
-            
-            // LineChart CPU
-            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
-            {
-                Label = "Cpu usage",
-                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-                LineTension = 0,
-            };
-            _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
-            await InvokeAsync(StateHasChanged);
+                _lineConfig.Data.Datasets.Clear();
+                
+                // LineChart Memory
+                _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+                {
+                    Label = "Cpu usage",
+                    BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                    BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                    LineTension = 0,
+                };
+                _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+                
+                // LineChart CPU
+                _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+                {
+                    Label = "Cpu usage",
+                    BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                    BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                    LineTension = 0,
+                };
+                _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+                
+                //SelectedManagerId = ConversionDataAssigner._currentManager.Id;
+                
+                await InvokeAsync(StateHasChanged);
+            }
         };
     }
     
@@ -280,36 +314,65 @@ else
 
     private void DropDownHandler(int selectedID)
     {
+        //_follow = false;
+        
         SelectedManagerId = selectedID;
+        
+        //ConversionDataAssigner._currentManager.Id;
+        //ConversionDataAssigner._currentManager.Name;
+        
         SelectedManager = ConversionDataAssigner.FinishedManagers.Find(manager => manager.Id == selectedID);
 
         _cpuDataList = SelectedManager?._cpuDataList;
         _memDataList = SelectedManager?._memDataList;
         
         _lineConfig.Data.Datasets.Clear();
-        
-        // LineChart Memory
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+
+        if (_cpuDataList != null || _memDataList != null)
         {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-            LineTension = 0,
-        };
-        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
-        
-        // LineChart CPU
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
-        {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-            LineTension = 0,
-        };
-        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+            // LineChart Memory
+            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+            {
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                LineTension = 0,
+            };
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+            
+            // LineChart CPU
+            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+            {
+                Label = "Cpu usage",
+                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                LineTension = 0,
+            };
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+        }
         StateHasChanged();
     }
     
     // **** Dropdown menu methods **** End ****
-    
+
+    private void OnFollow()
+    {
+        if (Bool)
+        {
+            _follow = false;
+        }
+        else
+        {
+            _follow = true;
+        }
+        Bool = !Bool;
+        Console.WriteLine("***********************************************");
+        Console.WriteLine(Bool);
+    }
+
+    private void OffFlollow()
+    {
+        Console.WriteLine("OFF ------------------------------------------------------");
+    }
+
 }
