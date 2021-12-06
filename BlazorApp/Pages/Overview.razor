@@ -6,29 +6,29 @@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (_managers == null || _managers.Count == 0)
+@if (ConversionDataAssigner._currentManager == null)
 {
-    <p>Loading ....</p>
+    <p>Waiting for a manager to start ....</p>
 }
 else
 {
     <div class="overview_container">
         <Summary Managers="_managers"></Summary>
-        <div class="Overview-right">
-            <HealthReport Managers="_managers"></HealthReport>
-            <div class="efficiency-table-container">
-                <EfficiencyTable></EfficiencyTable>
+            <div class="Overview-right">
+                <HealthReport Managers="_managers"></HealthReport>
+                <div class="efficiency-table-container">
+                    <EfficiencyTable Managers="_managers"></EfficiencyTable>
+                </div>
             </div>
-        </div>
     </div>
 }
 
 @code{
-	private List<ManagerStatusHandler> _managers = new ();
+    private List<ManagerStatusHandler> _managers = new ();
     
     protected override async Task OnInitializedAsync()
     {
-	    _managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
+        _managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);
         StateHasChanged();
         UpdateOverviewTriggered += async (o, args) =>
 	    {

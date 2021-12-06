@@ -8,7 +8,7 @@
 
 @if (Managers == null || Managers.Count == 0)
 {
-    <p>Loading ....</p>
+    <p>Waiting for a manager to finish ....</p>
 }
 else 
 {
@@ -29,10 +29,19 @@ else
                         else if (j == 0)
                         {
                             j++;
-                            <div class="dropdown-content-first" title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
+                            <div class="dropdown-content-first" 
+                                 title="@Managers[managerID].Name" 
+                                 id="@managerID"
+                                 @onclick="@(() => GetSelectedManagerID(managerID))">
+                                 @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                            </div>
                             continue;
                         }
-                        <div title="@Managers[managerID].Name" id="@managerID" @onclick="@(() => GetSelectedManagerID(managerID))">@(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)</div>
+                        <div title="@Managers[managerID].Name"
+                             id="@managerID"
+                             @onclick="@(() => GetSelectedManagerID(managerID))">
+                             @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                        </div>
                     }
                 </div>
             </div>
@@ -54,9 +63,9 @@ else
 
 @code{
     [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
-    
-    private List<HealthData> _cpuDataList = new ();
-    private List<HealthData> _memDataList = new ();
+
+    private List<HealthData> _cpuDataList;
+    private List<HealthData> _memDataList;
     private LineDataset<long> _lineConfigDatasetCpu;
     private LineDataset<long> _lineConfigDatasetMemory;
     private LineConfig _lineConfig;
@@ -65,17 +74,42 @@ else
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
+        
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner._cpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner._memDataList);
+        
+        // **** Show LineChart at page reload ****
+        // LineChart Memory
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+            
+        // LineChart CPU
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+        
         StateHasChanged();
         
         HealthUpdateTriggered += async (o, args) =>
         {
-            _cpuDataList?.AddRange(args.Cpu);
-            _memDataList?.AddRange(args.Memory);
-            await InvokeAsync(StateHasChanged);
-        };
-
-        UpdateOverviewTriggered += async (o, args) =>
-        {
+            ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
+            ConversionDataAssigner._memDataList?.AddRange(args.Memory);
+            
             _lineConfig.Data.Datasets.Clear();
             
             // LineChart Memory
@@ -85,6 +119,8 @@ else
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
+                PointRadius = 0,
+                PointHitRadius = 0,
             };
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             
@@ -95,6 +131,8 @@ else
                 BorderColor = ColorUtil.ColorHexString(227, 95, 82),
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
+                PointRadius = 0,
+                PointHitRadius = 0,
             };
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
             await InvokeAsync(StateHasChanged);
@@ -124,8 +162,11 @@ else
         _lineConfigDatasetMemory.Clear();
         foreach (var data in healthDataList)
             if (data.ReportType == "MEMORY")
-                _lineConfigDatasetMemory.Add(data.NumericValue/1024/1024/1024);
-        
+            {
+                long MaxMemory = 21473734656;
+                _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
+            }
+
         return _lineConfigDatasetMemory;
     }
     
@@ -151,6 +192,10 @@ else
             {
                 Mode = InteractionMode.Nearest,
                 Intersect = true
+            },
+            Animation = new Animation()
+            {
+                Duration = 0,
             },
             Scales = new Scales
             {
@@ -213,6 +258,8 @@ else
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
 
         _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
@@ -221,6 +268,8 @@ else
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
             BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
 
     }
