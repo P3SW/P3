@@ -13,6 +13,12 @@
     gap: 1rem;
 }
 
+.health-report-table-container {
+    background-color: #384561;
+    overflow-y: auto;
+    max-width: 100%;
+}
+
 /* Efficiency table */    
 .efficiency-table-container {
     background-color: #384561;
