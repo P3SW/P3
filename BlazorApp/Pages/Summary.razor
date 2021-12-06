@@ -468,12 +468,16 @@ else
     //Median efficiency score
     private int MedianEfficiencyScore(List<ManagerStatusHandler> managers)
     {
-        if (managers.Count < 1)
+        if (managers.Count == 0)
         {
             return 0;
         }
         List<ManagerStatusHandler> sortedList = SortByEfficiency(managers);
-
+        if (sortedList.Count == 0)
+        {
+            return 0;
+        }
+        
         int size = sortedList.Count;
         int middle = size/2;
         double median = (size % 2 != 0) ? (double)sortedList[middle].EfficiencyScore : ((double)sortedList[middle].EfficiencyScore + (double)sortedList[middle-1].EfficiencyScore) / 2;
