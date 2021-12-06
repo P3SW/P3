@@ -10,7 +10,7 @@ namespace DataStreamingSimulation
         {
             DatabaseConnect sqlConnection = new DatabaseConnect();
             
-            using (SqlConnection connection = new SqlConnection(sqlConnection.ReadSetupFile(true)))
+            using (SqlConnection connection = new SqlConnection(sqlConnection.ReadSetupFile(DatabaseStreamer.FilePath,true)))
             {
                 DataTable schemaTable = reader.GetSchemaTable();
                 DataRow row = schemaTable.Rows[0];

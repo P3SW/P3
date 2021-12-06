@@ -211,7 +211,7 @@ else
         
         ErrorUpdateTriggered += async (o, args) =>
         {
-            _errorDataStorageList.AddRange(args.LogDataList);
+            _errorDataStorageList.AddRange(args.NewLogDataList);
             await InvokeAsync(StateHasChanged);
         };
         
