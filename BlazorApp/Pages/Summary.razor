@@ -3,6 +3,7 @@
 @using System.Globalization
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
+@using Microsoft.AspNetCore.Http.Extensions
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
@@ -159,7 +160,8 @@ else
     private int _managersCount = 0;                                                                                        
                                                                                                                            
     protected override async Task OnInitializedAsync()                                                                     
-    {                                                                                                                      
+    {                          
+        
         ConfigurePieConfig();                                                                                              
                                                                                                                            
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
@@ -183,7 +185,7 @@ else
         _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
          
         // PieChart Reconciliations
-        _pieConfigReconciliations.Data.Datasets.Clear();
+        //_pieConfigReconciliations.Data.Datasets.Clear();
         _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
         {
             BackgroundColor = new[] // Color for the pies
@@ -203,21 +205,24 @@ else
         ReconUpdateTriggered += async (o, args) =>
         {
             _reconDataStorageList.AddRange(args.ReconDataList);
+            
             await InvokeAsync(StateHasChanged);
         };
         
         ErrorUpdateTriggered += async (o, args) =>
         {
             _errorDataStorageList.AddRange(args.LogDataList);
+            
             await InvokeAsync(StateHasChanged);
         };
         
         UpdateOverviewTriggered += async (o, args) =>
         {
             _managersCount++;
-            
+            _pieConfigReconciliations.Data.Datasets.RemoveAt(0);
+            _pieConfigErrors.Data.Datasets.RemoveAt(0);
             // PieChart Errors
-            _pieConfigErrors.Data.Datasets.Clear();
+            //_pieConfigErrors.Data.Datasets.Clear();
             _pieConfigDatasetErrors = new PieDataset<int>(TotalErrorsSeverityCounter(Managers))
             {
                 BackgroundColor = new[] // Color for the pies 
@@ -230,10 +235,12 @@ else
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
-            _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
             
+            _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
+
+
             // PieChart Reconciliations
-            _pieConfigReconciliations.Data.Datasets.Clear();
+            //_pieConfigReconciliations.Data.Datasets.Clear();
             _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
             {
                 BackgroundColor = new[] // Color for the pies
@@ -246,7 +253,9 @@ else
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
+            
             _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
+            
             await InvokeAsync(StateHasChanged);
         };
     }
