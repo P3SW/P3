@@ -7,12 +7,12 @@
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
 <div class="log-table-formatting"> @* Styling for this can be found in site.css *@
-    <LogDataTable DataGridRef="_reconciliationDataGrid" LogData="_dataStorageList" Type="recon" Grades="_reconGrades" GradeName="Result"></LogDataTable>
+    <LogDataTable DataGridRef="_reconciliationDataGrid" LogDataList="_dataStorageList" Type="recon" Grades="_reconGrades" GradeName="Result"></LogDataTable>
 </div>
 
 @code
 {
-    List<LogData> _dataStorageList = new();
+    List<LogData> _dataStorageList;
     RadzenDataGrid<LogData> _reconciliationDataGrid;
     readonly List<string> _reconGrades = new() { "OK", "DISABLED", "FAILED", "FAIL MISMATCH" };
 }

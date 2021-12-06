@@ -6,7 +6,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DataStreamingSimulation", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlazorApp", "BlazorApp\BlazorApp.csproj", "{844161E6-3075-46CC-AA3E-521BA5320E5B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Blazorapp.Tests", "Blazorapp.Tests\Blazorapp.Tests.csproj", "{D1C9E496-0715-4A0E-A78F-DAE40D9F3296}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{D1C9E496-0715-4A0E-A78F-DAE40D9F3296}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -14,12 +14,15 @@
 else
 {
     <div class="summary_container">
-        <div class="summary_caption_container" style="text-align: center;">Summary</div>
+        <div class="summary_caption_container" style="text-align: center;">
+            <div class="summary-title">Summary</div>
+            <div class="conversion-runtime">Conversion runtime: @Utility.FormatTime(Runtime.ConversionRuntimeCounter*1000)</div>
+        </div>
 
         @* Current running manager info *@
         <div class="Current_manager_info_container">
             <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div>
-            <div>Manager runtime: @ConversionDataAssigner._currentManager.StartTime</div>
+            <div>Current manager runtime: @Utility.FormatTime(Runtime.CurrentManagerRuntimeCounter*1000)</div>
         </div>
 
         <div class="Current_manager_container">
@@ -211,8 +214,7 @@ else
         
         ErrorUpdateTriggered += async (o, args) =>
         {
-            _errorDataStorageList.AddRange(args.LogDataList);
-            
+            _errorDataStorageList.AddRange(args.NewLogDataList);
             await InvokeAsync(StateHasChanged);
         };
         
@@ -445,6 +447,40 @@ else
         _hoveredManagerErrors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
         _hoveredManagerRecons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
     }
+
+    /* Calculates the runtime for the entire conversion and for each manager */
+    public static class Runtime
+    {
+        private static System.Timers.Timer _runtimeTimer = new System.Timers.Timer(1000);
+        public static int ConversionRuntimeCounter = 0;
+        public static int CurrentManagerRuntimeCounter = 0;
+        
+        public static void StartTimer()
+        {
+            _runtimeTimer.Elapsed += RuntimeCounter;
+            _runtimeTimer.Enabled = true;
+        }
+        
+        public static void CurrentManagerResetTimer()
+        {
+            CurrentManagerRuntimeCounter = 0;
+        }
+
+        /* Adds 1 to the counter */
+        private static void RuntimeCounter(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner._currentManager == null)
+            {
+                _runtimeTimer.Enabled = false;
+            }
+            else
+            {
+                ConversionRuntimeCounter++;
+                CurrentManagerRuntimeCounter++;
+            }
+        }
+    }
+
     //Calculate total rows/written
     private long TotalRows(List<ManagerStatusHandler> managers, string wanted)
     {
@@ -493,3 +529,4 @@ else
         return Convert.ToInt32(median);
     }
 }
+

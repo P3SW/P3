@@ -91,7 +91,17 @@ namespace BlazorApp.Data
         {
             double AverageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
             Cpu = Convert.ToInt32(AvgCpu);
-            double result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AverageCpu))*10;
+
+            double result;
+            if (RunTime == 0)
+            {
+                result = 0;
+            }
+            else
+            {
+                result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
+            }
+
             EfficiencyScore = Convert.ToInt32(result);
             AvgCpu = Convert.ToInt64(AverageCpu);
         }
@@ -111,10 +121,6 @@ namespace BlazorApp.Data
             {
                 using (SqlDataReader reader = command.ExecuteReader())
                 {
-                    if (reader.HasRows)
-                    {
-                        successfulRead = true;
-                    }
                     if (reader.Read())
                     {
                         Status = (string) reader["STATUS"];
@@ -127,7 +133,7 @@ namespace BlazorApp.Data
                 }
             }
 
-            if (!successfulRead && mtRetryCount < 5)
+            if (RunTime == 0 && mtRetryCount < 5)
             {
                 mtRetryCount++;
                 Thread.Sleep(500);
