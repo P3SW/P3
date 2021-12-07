@@ -1,2 +1,2 @@
 Server=localhost,1433;Database=ANS_CUSTOM_2;Trust Server Certificate = true; User ID=sa; Password=Password123;Trusted_Connection=False
-Server=localhost,1433;Database=ANS_DB_P3_TEST;Trust Server Certificate = true; User ID=sa; Password=Password123;Trusted_Connection=False
+Server=localhost,1433;Database=ANS_DB_P3_STREAMTEST;Trust Server Certificate = true; User ID=sa; Password=Password123;Trusted_Connection=False

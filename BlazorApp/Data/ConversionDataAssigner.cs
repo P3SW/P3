@@ -30,7 +30,6 @@ namespace BlazorApp.Data
         //The program will wait for data if the table is empty
         public static void Start(string setupFile)
         {
-            SQLScriptExecuter.Execute("../ExecuteSQLScript/TRUNCATE_TABLE.sql");
             _connectionString = ConfigReader.ReadSetupFile(setupFile);
             _managerQueue = 0;
             _managerId = 1;
@@ -64,6 +63,7 @@ namespace BlazorApp.Data
                             while (reader.Read())
                             {
                                 _managerQueue++;
+                                Console.WriteLine("READING MANAGER");
                             }
                             reader.Close();
                             ManagerTrackingListener();

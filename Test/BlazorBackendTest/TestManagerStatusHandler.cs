@@ -1,8 +1,6 @@
-using System.Collections.Generic;
 using BlazorApp.Data;
-using Radzen;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.BlazorBackendTest
 {
     public class TestManagerStatusHandler
     {

@@ -1,13 +1,13 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BlazorApp.Data;
 using DataStreamingSimulation;
-using Microsoft.Data.SqlClient;
+using ExecuteSQLScript;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.BlazorBackendTest
 {
     [Collection("Sequential")]
     public class BlazorBackendIntegrationTest
@@ -20,11 +20,16 @@ namespace P3ConversionDashboard.Tests
         public BlazorBackendIntegrationTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
+            
         }
 
         [Fact]
-        public void BlazorBackendTest()
+        public async void BlazorBackendTest()
         {
+            System.Threading.Thread.Sleep(1000);
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            
             ConversionDataAssigner.Start("../../../BlazorBackendTest/setupBlazorBackend.txt");
 
             testDatabaseStreamer = new DatabaseStreamer("../../../BlazorBackendTest/setupDataStreamingBlazorTest.txt", 
@@ -41,6 +46,7 @@ namespace P3ConversionDashboard.Tests
 
         public void CheckData()
         {
+            _testOutputHelper.WriteLine(ConversionDataAssigner.FinishedManagers.Count.ToString());
             for (int i = 0; i < BlazorBackendCheckData.testManagers.Count; i++)
             {
                 ManagerStatusHandler manager = ConversionDataAssigner.FinishedManagers[i];
@@ -83,7 +89,6 @@ namespace P3ConversionDashboard.Tests
                     Assert.Contains(testManager.Reconciliation.Timestamp, manager.ReconciliationHandler.LogDataList.Select(data => data.Timestamp));
                     Assert.Contains(testManager.Reconciliation.ManagerName, manager.ReconciliationHandler.LogDataList.Select(data => data.ManagerName));
                 }
-
             }
         }
     }

@@ -1,9 +1,8 @@
 using System;
 using System.Collections.Generic;
 using BlazorApp.Data;
-using Xunit;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.BlazorBackendTest
 {
     public static class BlazorBackendCheckData
     {
@@ -12,8 +11,7 @@ namespace P3ConversionDashboard.Tests
             new TestManagerStatusHandler()
             {
                 managerName = "dk.aes.ans.konvertering.managers.conversionUser.AnsConversionUserManager,rnd_2032045042",
-                CPU =  new HealthData("CPU", 5,DateTime.Parse("2021-10-28 15:07:24.683")),
-                Memory = new HealthData("MEMORY", 6601781248, DateTime.Parse("2021-10-28 15:07:24.700")),
+                //No CPU or Memory
                 Error = new LogData(DateTime.Parse("2021-10-28 15:07:25.763"), "Executing pre-run scripts",
                     "DK.AES.ANS.KONVERTERING.MANAGERS.CONVERSIONUSER.ANSCONVERSIONUSERMANAGER","INFO"),
                 //No reconciliations logged by this manager

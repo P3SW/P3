@@ -1,13 +1,14 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using BlazorApp.Data;
 using DataStreamingSimulation;
+using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using Xunit;
 using Xunit.Abstractions;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.DataStreamingTest
 {
     [Collection("Sequential")]
     public class DataStreamingIntegrationTest
@@ -21,33 +22,51 @@ namespace P3ConversionDashboard.Tests
             {"AFSTEMNING", 159}
         };
 
+        private List<List<string>> streamsWithTimestamp = new List<List<string>>()
+        {
+            new List<string>() {"AFSTEMNING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"LOGGING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"MANAGER_TRACKING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"HEALTH_REPORT", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"ENGINE_PROPERTIES", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"}
+        };
+
+        private List<string> streamsWithoutTimestamp = new List<string>() { "MANAGERS", "LOGGING_CONTEXT" };
+
         private readonly ITestOutputHelper _testOutputHelper;
 
         public DataStreamingIntegrationTest(ITestOutputHelper testOutputHelper)
         {
             _testOutputHelper = testOutputHelper;
-            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/setupDataStreaming.txt", 
-                "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
         }
 
-        [Theory] 
-        [InlineData("AFSTEMNING", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("LOGGING", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("MANAGER_TRACKING", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("HEALTH_REPORT", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("ENGINE_PROPERTIES", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        public void TestStreamWithoutTimeStamp(string table, string startTime, string nextTime)
+        [Fact]
+        public async void DatabaseStreamTest()
+        {
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            
+            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/setupDataStreaming.txt", 
+                "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
+
+            foreach (string stream in streamsWithoutTimestamp)
+            {
+                TestStreamWithoutTimeStamp(stream);
+            }
+
+            foreach (List<string> stream in streamsWithTimestamp)
+            {
+                TestStreamWithTimeStamp(stream[0], stream[1], stream[2]);
+            }
+        }
+        
+        public void TestStreamWithTimeStamp(string table, string startTime, string nextTime)
         {
             testDatabaseStreamer.StreamTable(table,Convert.ToDateTime(startTime),Convert.ToDateTime(nextTime));
             
             TestStream(table);
         }
-
         
-        
-        [Theory]
-        [InlineData("MANAGERS")]
-        [InlineData("LOGGING_CONTEXT")]
         public void TestStreamWithoutTimeStamp(string table)
         {
             testDatabaseStreamer.StreamTableOneTime(table);
@@ -82,7 +101,6 @@ namespace P3ConversionDashboard.Tests
                     reader.Close();
                 }
             }
-
             return rows;
         }
     }

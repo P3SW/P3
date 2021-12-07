@@ -32,6 +32,7 @@ namespace DataStreamingSimulation
                 {
                     Console.WriteLine(e.Message);
                 }
+                connection.Close();
             }
         }
         
