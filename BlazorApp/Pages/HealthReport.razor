@@ -106,8 +106,8 @@ else
         
         HealthUpdateTriggered += async (o, args) =>
         {
-            _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
-            _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
         
             ConversionDataAssigner._currentManager._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._currentManager._memDataList?.AddRange(args.Memory);
