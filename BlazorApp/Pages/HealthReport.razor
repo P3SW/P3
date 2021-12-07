@@ -84,8 +84,8 @@ else
         ConfigureLineConfig();
         SelectedManagerId = 0;
         
-        _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
-        _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
         
         // **** Show LineChart at page reload ****
         if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
@@ -108,21 +108,21 @@ else
         
         HealthUpdateTriggered += async (o, args) =>
         {
-            _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
-            _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
             
             await Task.Run(() =>
             {
-                if (ConversionDataAssigner._currentManager._cpuDataList != null)
-                    lock (ConversionDataAssigner._currentManager._cpuDataList)
+                if (ConversionDataAssigner.CurrentManager.CpuDataList != null)
+                    lock (ConversionDataAssigner.CurrentManager.CpuDataList)
                     {
-                        ConversionDataAssigner._currentManager._cpuDataList.AddRange(args.Cpu);
+                        ConversionDataAssigner.CurrentManager.CpuDataList.AddRange(args.Cpu);
                     }
 
-                if (ConversionDataAssigner._currentManager._memDataList != null)
-                    lock (ConversionDataAssigner._currentManager._memDataList)
+                if (ConversionDataAssigner.CurrentManager.MemDataList != null)
+                    lock (ConversionDataAssigner.CurrentManager.MemDataList)
                     {
-                        ConversionDataAssigner._currentManager._memDataList.AddRange(args.Memory);
+                        ConversionDataAssigner.CurrentManager.MemDataList.AddRange(args.Memory);
                     }
             });
             
@@ -319,8 +319,8 @@ else
     {
         SelectedManagerId = selectedID;
         
-        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._cpuDataList);
-        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._memDataList);
+        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
+        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
         
         if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
         {
@@ -335,14 +335,13 @@ else
     {
         if (Follow)
         {
-            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._cpuDataList);
-            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._memDataList);
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
         }
         else
         {
-            Console.WriteLine("Get CURRENT MANAGER!");
-            _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
-            _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
         }
         
         if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
