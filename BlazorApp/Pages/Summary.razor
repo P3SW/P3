@@ -9,7 +9,7 @@
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (ConversionDataAssigner._currentManager == null)
+@if (ConversionDataAssigner.CurrentManager == null)
 {
     <p>Waiting for logdata ....</p>
 }
@@ -23,25 +23,25 @@ else
 
         @* Current running manager info *@
         <div class="Current_manager_info_container">
-            <div>Current manager: <b>@Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</b></div>
+            <div>Current manager: <b>@Utility.ShortenManagerName(ConversionDataAssigner.CurrentManager.Name)</b></div>
             <div>Current manager runtime: <b>@Utility.FormatTime(Runtime.CurrentManagerRuntimeCounter*1000)</b></div>
         </div>
 
         <div class="Current_manager_container">
-            <div class="Current_manager_errors">Current manager errors: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count()
+            <div class="Current_manager_errors">Current manager errors: @ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count()
                 <ul class="error-reconciliation-formatting">
-                    <div class="circle background-red"></div><li>Fatal: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "FATAL")</li>
-                    <div class="circle background-lightred"></div><li>Error: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "ERROR")</li>
-                    <div class="circle background-yellow"></div><li>Warning: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "WARN")</li>
-                    <div class="circle background-green"></div><li>Info: @ConversionDataAssigner._currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "INFO")</li>
+                    <div class="circle background-red"></div><li>Fatal: @ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "FATAL")</li>
+                    <div class="circle background-lightred"></div><li>Error: @ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "ERROR")</li>
+                    <div class="circle background-yellow"></div><li>Warning: @ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "WARN")</li>
+                    <div class="circle background-green"></div><li>Info: @ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "INFO")</li>
                 </ul>
             </div>
-            <div class="Current_manager_reconciliations">Current manager reconciliations: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count()
+            <div class="Current_manager_reconciliations">Current manager reconciliations: @ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count()
                 <ul class="error-reconciliation-formatting">
-                    <div class="circle background-red"></div><li>Mismatch: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "MISMATCH")</li>
-                    <div class="circle background-lightred"></div><li>Failed: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "FAILED")</li>
-                    <div class="circle background-yellow"></div><li>Disabled: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "DISABLED")</li>
-                    <div class="circle background-green"></div><li>OK: @ConversionDataAssigner._currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "OK")</li>
+                    <div class="circle background-red"></div><li>Mismatch: @ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "MISMATCH")</li>
+                    <div class="circle background-lightred"></div><li>Failed: @ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "FAILED")</li>
+                    <div class="circle background-yellow"></div><li>Disabled: @ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "DISABLED")</li>
+                    <div class="circle background-green"></div><li>OK: @ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "OK")</li>
                 </ul>
             </div>
         </div>
@@ -466,7 +466,7 @@ else
         /* Adds 1 to the counter */
         private static void RuntimeCounter(Object source)
         {
-            if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner._currentManager == null)
+            if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner.CurrentManager == null)
             {
                 _runtimeTimer.Dispose();
             }
