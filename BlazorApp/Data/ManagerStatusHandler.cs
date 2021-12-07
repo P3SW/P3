@@ -22,16 +22,21 @@ namespace BlazorApp.Data
         public int RowsRead { get; private set; }
         public int RowsWritten { get; private set; }
         public int Cpu { get; set; }
+        public int Memory { get; set; }
         public int EfficiencyScore { get; private set; }
         public static SqlConnection Connection { get; set; }
         private SQLDependencyListener _healthStreamer;
         private SQLDependencyListener _errorStreamer;
         private SQLDependencyListener _reconciliationStreamer;
-        private int _mtRetryCount;
+        private SqlCommand command;
+        private int run_number = 0;
+        private int mtRetryCount = 0;
         public long AvgCpu;
         public long AvgMemory;
+        public int MemoryPercent;
         public int AvgMemoryPercent { get; private set; }
-        private const long MaxMemory = 21473734656; /* Approx 20gb */
+        public long MemoryUsed;
+        public long MaxMemory = 21473734656; /* Approx 20gb */
 
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
@@ -84,7 +89,7 @@ namespace BlazorApp.Data
         //Do NOT change, share or reproduce in any form.
         public void CalculateEfficiencyScore()
         {
-            double averageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
+            double AverageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
             Cpu = Convert.ToInt32(AvgCpu);
 
             double result;
@@ -98,7 +103,7 @@ namespace BlazorApp.Data
             }
 
             EfficiencyScore = Convert.ToInt32(result);
-            AvgCpu = Convert.ToInt64(averageCpu);
+            AvgCpu = Convert.ToInt64(AverageCpu);
         }
         
         public void CalculateAverageMemoryUsed()
@@ -111,6 +116,7 @@ namespace BlazorApp.Data
         //Queries status, runtime, rows read and rows written from the MANAGER_TRACKING table.
         private void AssignManagerTrackingData()
         {
+            bool successfulRead = false;
             using (SqlCommand command = new SqlCommand(GetManagerTrackingQueryString(), Connection))
             {
                 using (SqlDataReader reader = command.ExecuteReader())
@@ -127,9 +133,9 @@ namespace BlazorApp.Data
                 }
             }
 
-            if (RunTime == 0 && _mtRetryCount < 5)
+            if (RunTime == 0 && mtRetryCount < 5)
             {
-                _mtRetryCount++;
+                mtRetryCount++;
                 Thread.Sleep(500);
                 AssignManagerTrackingData();
             }
