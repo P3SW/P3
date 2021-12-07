@@ -33,7 +33,7 @@ namespace BlazorApp.DataStreaming.Events
         {
             ErrorUpdateTriggered?.Invoke(this, new LogDataEventArgs
             {
-                LogDataList = logDatalist,
+                NewLogDataList = logDatalist,
             });
         }
 

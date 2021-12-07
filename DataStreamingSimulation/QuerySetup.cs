@@ -29,11 +29,11 @@ namespace DataStreamingSimulation
             {
                 case "AFSTEMNING": // 2021-10-28 15:09:05.390
                     queryString = $@"SELECT * FROM AFSTEMNING
-                                     WHERE START_TIME BETWEEN '{startTime}' and '{nextTime}';";
+                                     WHERE START_TIME BETWEEN '{startTime}' and '{nextTime}' ORDER BY AFSTEMTDATO;";
                     break;
                 case "LOGGING": // 2021-10-28 15:04:42.693
                     queryString = $@"SELECT * FROM LOGGING
-                                     WHERE CREATED BETWEEN '{startTime}' and '{nextTime}';"; 
+                                     WHERE CREATED BETWEEN '{startTime}' and '{nextTime}' ORDER BY CREATED ASC;"; 
                     break;
                 case "ENGINE_PROPERTIES": //2021-10-28 15:07:23.347
                     queryString = $@"SELECT * FROM ENGINE_PROPERTIES

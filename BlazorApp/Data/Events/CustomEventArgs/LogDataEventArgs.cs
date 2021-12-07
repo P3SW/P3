@@ -6,6 +6,6 @@ namespace BlazorApp.DataStreaming.Events.CustomEventArgs
 {
     public class LogDataEventArgs : EventArgs
     {
-        public List<LogData> LogDataList { get; set; }
+        public List<LogData> NewLogDataList { get; set; }
     }
 }
