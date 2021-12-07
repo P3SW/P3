@@ -84,10 +84,13 @@ else
         ConfigureLineConfig();
         SelectedManagerId = 0;
         
-        _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager._cpuDataList);
-        _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager._memDataList);
+        Console.WriteLine("SEEDMANGER ID ******************************************************** " + SelectedManagerId);
+        
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
         
         // **** Show LineChart at page reload ****
+        ClearLineChart();
         CreateLineChart(_memDataList, _cpuDataList);
         
         StateHasChanged();
@@ -119,6 +122,34 @@ else
     }
     
     // **** LineChart methods **** Begin ****
+    private void CreateLineChart(List<HealthData> memDataList, List<HealthData> cpuDataList)
+    {
+        // LineChart Memory
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(memDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+        
+        // LineChart CPU
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+    }
+
+    private void ClearLineChart()
+    {
+        _lineConfig.Data.Datasets.Clear();
+    }
+    
     private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
         string[] separators = new string[] {" "};
@@ -260,12 +291,8 @@ else
         await InvokeAsync(StateHasChanged);
     }
     
-    // **** Dropdown menu methods **** End ****
-
     private async Task OnCheckboxClick()
     {
-        // Console.WriteLine(SelectedManagerId + $"**********************************************{Follow}*******************************************************************");
-        // Console.WriteLine(SelectedManagerId + $"**********************************************{SelectedManagerId}*********************************************************");
         if (Follow)
         {
             _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._cpuDataList);
@@ -282,33 +309,5 @@ else
         CreateLineChart(_memDataList, _cpuDataList);
         await InvokeAsync(StateHasChanged);
     }
-
-    private void CreateLineChart(List<HealthData> memDataList, List<HealthData> cpuDataList)
-    {
-        //_lineConfig.Data.Datasets.Clear();
-        // LineChart Memory
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(memDataList))
-        {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-            LineTension = 0,
-        };
-        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
-        // LineChart CPU
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList))
-        {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-            LineTension = 0,
-        };
-        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
-    }
-
-    private void ClearLineChart()
-    {
-        _lineConfig.Data.Datasets.Clear();
-    }
-    
+    // **** Dropdown menu methods **** End ****
 }
