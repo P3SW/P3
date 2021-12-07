@@ -80,14 +80,15 @@ else
         
         // **** Show LineChart at page reload ****
         // LineChart Memory
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+        _lineConfig.Data.Datasets.Clear();
+        _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
         {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            Label = "Memory usage",
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
             PointRadius = 0,
-            PointHitRadius = 0,
+            PointHitRadius = 0
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             
@@ -99,7 +100,7 @@ else
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
             PointRadius = 0,
-            PointHitRadius = 0,
+            PointHitRadius = 0
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
         
@@ -109,18 +110,17 @@ else
         {
             ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
             ConversionDataAssigner._memDataList?.AddRange(args.Memory);
-            
             _lineConfig.Data.Datasets.Clear();
             
             // LineChart Memory
-            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+            _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
             {
-                Label = "Cpu usage",
-                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+                Label = "Memory usage",
+                BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+                BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
                 LineTension = 0,
                 PointRadius = 0,
-                PointHitRadius = 0,
+                PointHitRadius = 0
             };
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             
@@ -132,7 +132,7 @@ else
                 BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
                 LineTension = 0,
                 PointRadius = 0,
-                PointHitRadius = 0,
+                PointHitRadius = 0
             };
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
             await InvokeAsync(StateHasChanged);
@@ -264,7 +264,7 @@ else
 
         _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
         {
-            Label = ("Memory usage"),
+            Label = "Memory usage",
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
             BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,

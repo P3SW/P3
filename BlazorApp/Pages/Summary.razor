@@ -1,8 +1,11 @@
 @using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
 @using System.Globalization
+@using System.Threading
+@using System.Timers
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
+@using Microsoft.AspNetCore.Http.Extensions
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
@@ -15,13 +18,13 @@ else
     <div class="summary_container">
         <div class="summary_caption_container" style="text-align: center;">
             <div class="summary-title">Summary</div>
-            <div class="conversion-runtime">Conversion runtime: @Utility.FormatTime(Runtime.ConversionRuntimeCounter*1000)</div>
+            <div class="conversion-runtime">Conversion runtime: <b>@Utility.FormatTime(Runtime.ConversionRuntimeCounter*1000)</b></div>
         </div>
 
         @* Current running manager info *@
         <div class="Current_manager_info_container">
-            <div>Current manager: @Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</div>
-            <div>Current manager runtime: @Utility.FormatTime(Runtime.CurrentManagerRuntimeCounter*1000)</div>
+            <div>Current manager: <b>@Utility.ShortenManagerName(ConversionDataAssigner._currentManager.Name)</b></div>
+            <div>Current manager runtime: <b>@Utility.FormatTime(Runtime.CurrentManagerRuntimeCounter*1000)</b></div>
         </div>
 
         <div class="Current_manager_container">
@@ -132,7 +135,7 @@ else
             <div>Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div>            
             <div>Total read:    <b>@TotalRows(Managers, "read")</b></div>                          
             <div>Total written: <b>@TotalRows(Managers, "written")</b></div>  
-            <div>Worst scoring managers</div>
+            <div style="text-align: center"><b>The five worst scoring managers</b></div>
             <div class="summary_efficiency_table">                                                                                                          
                 <SummaryEfficiencyTable SortedData="@SortByEfficiency(Managers).Take(5).ToList()"></SummaryEfficiencyTable>
             </div>                                                                                                         
@@ -162,7 +165,8 @@ else
     private int _managersCount = 0;                                                                                        
                                                                                                                            
     protected override async Task OnInitializedAsync()                                                                     
-    {                                                                                                                      
+    {                          
+        
         ConfigurePieConfig();                                                                                              
                                                                                                                            
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
@@ -186,7 +190,7 @@ else
         _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
          
         // PieChart Reconciliations
-        _pieConfigReconciliations.Data.Datasets.Clear();
+        //_pieConfigReconciliations.Data.Datasets.Clear();
         _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
         {
             BackgroundColor = new[] // Color for the pies
@@ -206,6 +210,7 @@ else
         ReconUpdateTriggered += async (o, args) =>
         {
             _reconDataStorageList.AddRange(args.ReconDataList);
+            
             await InvokeAsync(StateHasChanged);
         };
         
@@ -218,9 +223,10 @@ else
         UpdateOverviewTriggered += async (o, args) =>
         {
             _managersCount++;
+            _pieConfigReconciliations.Data.Datasets.RemoveAt(0);
+            _pieConfigErrors.Data.Datasets.RemoveAt(0);
             
             // PieChart Errors
-            _pieConfigErrors.Data.Datasets.Clear();
             _pieConfigDatasetErrors = new PieDataset<int>(TotalErrorsSeverityCounter(Managers))
             {
                 BackgroundColor = new[] // Color for the pies 
@@ -234,9 +240,9 @@ else
                 BorderWidth = 0
             };
             _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
-            
+
+
             // PieChart Reconciliations
-            _pieConfigReconciliations.Data.Datasets.Clear();
             _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
             {
                 BackgroundColor = new[] // Color for the pies
@@ -250,6 +256,7 @@ else
                 BorderWidth = 0
             };
             _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
+            
             await InvokeAsync(StateHasChanged);
         };
     }
@@ -266,7 +273,7 @@ else
             Hover = new Hover
             {
                 Intersect = false,
-                AnimationDuration = 00,
+                AnimationDuration = 00
             },
             Tooltips = new Tooltips()
             {
@@ -275,14 +282,12 @@ else
             {
                 Display = false,
                 Text = "Total Errors",
-                FontColor = "#FFFFFF",
-                
+                FontColor = "#FFFFFF"
             },
             CutoutPercentage = 45,
             Legend = new Legend
             {
-                Display = false,
-                
+                Display = false
             },
             Animation = new ArcAnimation()
             {
@@ -443,14 +448,14 @@ else
     /* Calculates the runtime for the entire conversion and for each manager */
     public static class Runtime
     {
-        private static System.Timers.Timer _runtimeTimer = new System.Timers.Timer(1000);
+        new static AutoResetEvent _autoEvent = new AutoResetEvent(false);
+        private static System.Threading.Timer _runtimeTimer = new System.Threading.Timer(RuntimeCounter, _autoEvent, 1000, 1000);
         public static int ConversionRuntimeCounter = 0;
         public static int CurrentManagerRuntimeCounter = 0;
         
         public static void StartTimer()
         {
-            _runtimeTimer.Elapsed += RuntimeCounter;
-            _runtimeTimer.Enabled = true;
+            _autoEvent.Set();
         }
         
         public static void CurrentManagerResetTimer()
@@ -459,11 +464,11 @@ else
         }
 
         /* Adds 1 to the counter */
-        private static void RuntimeCounter(Object source, System.Timers.ElapsedEventArgs e)
+        private static void RuntimeCounter(Object source)
         {
             if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner._currentManager == null)
             {
-                _runtimeTimer.Enabled = false;
+                _runtimeTimer.Dispose();
             }
             else
             {
@@ -505,12 +510,16 @@ else
     //Median efficiency score
     private int MedianEfficiencyScore(List<ManagerStatusHandler> managers)
     {
-        if (managers.Count < 1)
+        if (managers.Count == 0)
         {
             return 0;
         }
         List<ManagerStatusHandler> sortedList = SortByEfficiency(managers);
-
+        if (sortedList.Count == 0)
+        {
+            return 0;
+        }
+        
         int size = sortedList.Count;
         int middle = size/2;
         double median = (size % 2 != 0) ? (double)sortedList[middle].EfficiencyScore : ((double)sortedList[middle].EfficiencyScore + (double)sortedList[middle-1].EfficiencyScore) / 2;
