@@ -39,8 +39,8 @@ namespace BlazorApp.Data
         public long MemoryUsed;
         public long MaxMemory = 21473734656; /* Approx 20gb */
 
-        public List<HealthData> _cpuDataList = new ();
-        public List<HealthData> _memDataList = new ();
+        public readonly List<HealthData> CpuDataList = new ();
+        public readonly List<HealthData> MemDataList = new ();
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
