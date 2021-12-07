@@ -84,14 +84,15 @@ else
         ConfigureLineConfig();
         SelectedManagerId = 0;
         
-        Console.WriteLine("SEEDMANGER ID ******************************************************** " + SelectedManagerId);
-        
         _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
         _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
         
         // **** Show LineChart at page reload ****
-        ClearLineChart();
-        CreateLineChart(_memDataList, _cpuDataList);
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
         
         StateHasChanged();
 
@@ -99,7 +100,8 @@ else
         {
             if (Follow)
             {
-                ClearLineChart();
+                if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+                    ClearLineChart();
                 await InvokeAsync(StateHasChanged);
             }
         };
@@ -108,14 +110,35 @@ else
         {
             _cpuDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._cpuDataList);
             _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
-        
-            ConversionDataAssigner._currentManager._cpuDataList?.AddRange(args.Cpu);
-            ConversionDataAssigner._currentManager._memDataList?.AddRange(args.Memory);
+            
+            await Task.Run(() =>
+            {
+                if (ConversionDataAssigner._currentManager._cpuDataList != null)
+                    lock (ConversionDataAssigner._currentManager._cpuDataList)
+                    {
+                        ConversionDataAssigner._currentManager._cpuDataList.AddRange(args.Cpu);
+                    }
+
+                if (ConversionDataAssigner._currentManager._memDataList != null)
+                    lock (ConversionDataAssigner._currentManager._memDataList)
+                    {
+                        ConversionDataAssigner._currentManager._memDataList.AddRange(args.Memory);
+                    }
+            });
             
             if (Follow)
             {
-                ClearLineChart();
-                CreateLineChart(_memDataList, _cpuDataList);
+                if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+                {
+                    await Task.Run(ClearLineChart);
+                    await Task.Run(() =>
+                    {
+                        lock (_memDataList) lock (_cpuDataList)
+                        {
+                            CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList());
+                        }
+                    });
+                }
                 await InvokeAsync(StateHasChanged);
             }
         };
@@ -125,22 +148,26 @@ else
     private void CreateLineChart(List<HealthData> memDataList, List<HealthData> cpuDataList)
     {
         // LineChart Memory
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisMem(memDataList))
+        _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(memDataList.ToList()))
         {
-            Label = "Cpu usage",
-            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            Label = "Memory usage",
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
-        
+            
         // LineChart CPU
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList))
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList.ToList()))
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0
         };
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
     }
@@ -150,18 +177,19 @@ else
         _lineConfig.Data.Datasets.Clear();
     }
     
+    // **** LineChart methods **** Begin ****
     private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
         string[] separators = new string[] {" "};
         
         _lineConfigDatasetCpu.Clear();
-        foreach (var data in healthDataList)
-            if (data.ReportType == "CPU")
+        foreach (var data in healthDataList.ToList())
+            if (data?.ReportType == "CPU")
                 _lineConfigDatasetCpu.Add(data.NumericValue);
 
         _lineConfig.Data.Labels.Clear();
-        foreach (var data in healthDataList)
-            if (data.ReportType == "CPU")
+        foreach (var data in healthDataList.ToList())
+            if (data?.ReportType == "CPU")
                 _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
         
         return _lineConfigDatasetCpu;
@@ -170,8 +198,8 @@ else
     private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
     {
         _lineConfigDatasetMemory.Clear();
-        foreach (var data in healthDataList)
-            if (data.ReportType == "MEMORY")
+        foreach (var data in healthDataList.ToList())
+            if (data?.ReportType == "MEMORY")
             {
                 long MaxMemory = 21473734656;
                 _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
@@ -202,6 +230,10 @@ else
             {
                 Mode = InteractionMode.Nearest,
                 Intersect = true
+            },
+            Animation = new Animation()
+            {
+                Duration = 0,
             },
             Scales = new Scales
             {
@@ -264,14 +296,18 @@ else
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
             BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
 
         _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
         {
-            Label = ("Memory usage"),
+            Label = "Memory usage",
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
             BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
             LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
         };
 
     }
@@ -286,8 +322,12 @@ else
         _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._cpuDataList);
         _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?._memDataList);
         
-        ClearLineChart();
-        CreateLineChart(_memDataList, _cpuDataList);
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
         await InvokeAsync(StateHasChanged);
     }
     
@@ -305,8 +345,12 @@ else
             _memDataList = await Task.Run(() => ConversionDataAssigner._currentManager?._memDataList);
         }
         
-        ClearLineChart();
-        CreateLineChart(_memDataList, _cpuDataList);
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
         await InvokeAsync(StateHasChanged);
     }
     // **** Dropdown menu methods **** End ****

@@ -2,8 +2,10 @@
     background-color: #384561;
     padding: 0;
     display: grid;
-    grid-template-rows: 10fr 8fr 17fr 2fr 13fr 20fr 32fr;
+    grid-template-rows: 8fr 8fr 17fr 2fr 13fr 20fr 33fr;
     max-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
 }
 
 .summary_container > div{
@@ -28,15 +30,18 @@
     line-height: 2rem;
 }
 
+.conversion-runtime {
+    font-size: 0.75em;
+}
+
 /* Current manager */
 .Current_manager_info_container {
     border-bottom: 0 !important;
-    line-height: 80%;
 
 }
 
 .Current_manager_info_container > div{
-    float: left;
+    text-align: left;
     font-size: 0.6em;
 }
 
@@ -94,6 +99,11 @@
     border-bottom: none !important;
 }
 
+.efficiency-container > div{
+    font-size: 0.6em;
+    text-align: left;
+}
+
 .PieConfigTotalErrors {
     position: relative;
     background-color: rgba(15, 33, 71, 0.2);
@@ -123,9 +133,6 @@
     grid-template-columns: 0.8em 1fr;
     font-size: 0.8em;
 }
-
-
-
 
 .dropdown {
     position: relative;
@@ -159,6 +166,7 @@
 .manager-queue-container{
     display: grid;
     grid-template-rows: 0.6em 1fr;
+    height: 100%;
 }
 
 .manager-circle {
@@ -172,8 +180,7 @@
 .manager-queue-circle {
     display: block;
     background: rgba(83, 96, 122, 0.27);
-    overflow-y: visible;
-    overflow-x: auto;
+    overflow-x: scroll;
     white-space: nowrap;
     text-align: left;
 }
@@ -256,24 +263,7 @@
     transform: translate(-50%, -50%);
 }
 
-/* 2k monitor w/ 150% zoom compatibility */
-@media screen and (max-width: 1500px) {
-
-    .Current_manager_info_container > div {
-        font-size: 0.6em;
-    }
-
-    .Current_manager_container > div {
-        font-size: 0.6em;
-    }
-
-    .Total_errors_and_reconciliations_container{
-        grid-template-columns: 1.5fr 1fr 2.5fr 1fr;
-    }
-
-    .Total_errors_and_reconciliations_container > div{
-        font-size: 0.6em;
-    }
-
+.summary_efficiency_table > div{
+    text-align: left;
+    font-size: 0.6em;
 }
-

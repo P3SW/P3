@@ -16,5 +16,12 @@ namespace BlazorApp.Data
             NumericValue = (long) reader[1];
             LogTime = (DateTime) reader[2];
         }
+
+        public HealthData(string reportType, long numericValue,  DateTime logTime)
+        {
+            ReportType = reportType;
+            NumericValue = numericValue;
+            LogTime = logTime;
+        }
     }
 }

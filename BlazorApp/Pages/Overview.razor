@@ -13,13 +13,17 @@
 else
 {
     <div class="overview_container">
-        <Summary Managers="_managers"></Summary>
-            <div class="Overview-right">
+        <div class="summary-container">
+            <Summary Managers="_managers"></Summary>
+        </div>
+        <div class="Overview-right">
+            <div class="health-report-table-container">
                 <HealthReport Managers="_managers"></HealthReport>
-                <div class="efficiency-table-container">
-                    <EfficiencyTable></EfficiencyTable>
-                </div>
             </div>
+            <div class="efficiency-table-container">
+                <EfficiencyTable Managers="_managers"></EfficiencyTable>
+            </div>
+        </div>
     </div>
 }
 

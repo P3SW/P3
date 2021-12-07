@@ -3,6 +3,7 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 1rem;
+    height: 100vh;
 }
 
 .Overview-right{
@@ -10,6 +11,12 @@
     display: grid;
     grid-template-rows: 1fr 1fr;
     gap: 1rem;
+}
+
+.health-report-table-container {
+    background-color: #384561;
+    overflow-y: auto;
+    max-width: 100%;
 }
 
 /* Efficiency table */    

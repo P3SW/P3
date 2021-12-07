@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using BlazorApp.Data;
+using BlazorApp.Pages;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
@@ -26,9 +27,9 @@ namespace BlazorApp.Data
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
-        public static void Start()
+        public static void Start(string setupFile)
         {
-            _connectionString = ConfigReader.ReadSetupFile();
+            _connectionString = ConfigReader.ReadSetupFile(setupFile);
             _managerQueue = 0;
             _managerId = 1;
             _currentManager = null;
@@ -57,6 +58,7 @@ namespace BlazorApp.Data
                     {
                         if (reader.HasRows) //If the result of the query contains any rows, they will be added to the queue
                         {
+                            Summary.Runtime.StartTimer(); //Starts the timer for conversion runtime on summary
                             while (reader.Read())
                             {
                                 _managerQueue++;
@@ -196,6 +198,7 @@ namespace BlazorApp.Data
                         Console.WriteLine("New manager name is " + reader[0]);
                         _managerId++;
                         _managerQueue--;
+                        Summary.Runtime.CurrentManagerResetTimer();
                     }
                     reader.Close();
                 }
@@ -249,35 +252,6 @@ namespace BlazorApp.Data
             
             return await Task.FromResult(list);
         }
-
-        public static List<EfficiencyData> GetManagerEfficiencyData()
-        {
-            
-            if (FinishedManagers.Count == 0)
-            {
-                Console.WriteLine(FinishedManagers.Count);
-                Console.WriteLine("Sending new list");
-                return new List<EfficiencyData>();
-            }
-            
-            List<EfficiencyData> list = new List<EfficiencyData>();
-
-            if (FinishedManagers.Count > 0)
-            {
-                foreach (var finishedManager in FinishedManagers)
-                {
-                    list.Add(new EfficiencyData(finishedManager.Name, 
-                        finishedManager.EfficiencyScore,
-                        finishedManager.EndTime, 
-                        finishedManager.RowsRead, 
-                        finishedManager.RowsWritten, 
-                        finishedManager.RunTime, 
-                        finishedManager.Cpu,
-                        finishedManager.AvgMemoryPercent));
-
-                }
-            }
-            return list;
-        }
+        
     }
 }
