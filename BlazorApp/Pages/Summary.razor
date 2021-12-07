@@ -2,10 +2,8 @@
 @using BlazorApp.Data
 @using System.Globalization
 @using System.Threading
-@using System.Timers
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
-@using Microsoft.AspNetCore.Http.Extensions
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
@@ -190,7 +188,7 @@ else
         _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
          
         // PieChart Reconciliations
-        //_pieConfigReconciliations.Data.Datasets.Clear();
+        _pieConfigReconciliations.Data.Datasets.Clear();
         _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
         {
             BackgroundColor = new[] // Color for the pies
@@ -239,7 +237,7 @@ else
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
-            _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
+            
 
 
             // PieChart Reconciliations
@@ -255,6 +253,7 @@ else
                 BorderColor = ColorUtil.ColorHexString(0, 0, 0),
                 BorderWidth = 0
             };
+            _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
             _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
             
             await InvokeAsync(StateHasChanged);
@@ -406,36 +405,18 @@ else
     {
         int[] errors = ErrorSeverityCounter(manager.ErrorHandler.LogDataList);
         int[] recons = ReconTypeCounter(manager.ReconciliationHandler.LogDataList);
-        
-        ManagerQueueCounterFixer();
 
-        if (manager.Status == "OK")
-        {
-            _managerQueueCounter[0]++;
-            if(errors[0] > 0 || recons[0] > 0)
-                return "background-red";
-            if(errors[1] > 0 || recons[1] > 0)
-                return "background-lightred";
-            if(errors[2] > 0 || recons[2] > 0)
-                return "background-yellow";
-            return "background-green";
-        }
-        throw new ArgumentException($"{manager.Status} is not a valid manager status");
+
+        if(errors[0] > 0 || recons[0] > 0)
+            return "background-red";
+        if(errors[1] > 0 || recons[1] > 0)
+            return "background-lightred";
+        if(errors[2] > 0 || recons[2] > 0)
+            return "background-yellow";
+        return "background-green";
+
     }
-    
-    private void ManagerQueueCounterFixer()
-    {
-        int total = 0;
-        if (_managerQueueCounter == null)
-            _managerQueueCounter = new[] {0, 0};
-        
-        for (int i = 0; i < 2; i++)
-            total += _managerQueueCounter[i];
-        
-        if (total == Managers.Count - 1)
-            _managerQueueCounter = new[] {0, 0};
-    }
-    
+
     private void GetHoveredManager(int hovered, MouseEventArgs e, ManagerStatusHandler manager)
     {
         _hoveredManager = hovered;

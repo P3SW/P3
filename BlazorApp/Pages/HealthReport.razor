@@ -90,7 +90,7 @@ else
             PointRadius = 0,
             PointHitRadius = 0
         };
-        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+        
             
         // LineChart CPU
         _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
@@ -102,6 +102,7 @@ else
             PointRadius = 0,
             PointHitRadius = 0
         };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
         
         StateHasChanged();
@@ -122,7 +123,7 @@ else
                 PointRadius = 0,
                 PointHitRadius = 0
             };
-            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+            
             
             // LineChart CPU
             _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
@@ -134,6 +135,7 @@ else
                 PointRadius = 0,
                 PointHitRadius = 0
             };
+            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
             _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
             await InvokeAsync(StateHasChanged);
         };
