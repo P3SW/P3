@@ -207,20 +207,20 @@ else
         
         StateHasChanged();
         
-        ReconUpdateTriggered += async (o, args) =>
+        ReconUpdateTriggered += async (_, args) =>
         {
             _reconDataStorageList.AddRange(args.ReconDataList);
             
             await InvokeAsync(StateHasChanged);
         };
         
-        ErrorUpdateTriggered += async (o, args) =>
+        ErrorUpdateTriggered += async (_, args) =>
         {
             _errorDataStorageList.AddRange(args.NewLogDataList);
             await InvokeAsync(StateHasChanged);
         };
         
-        UpdateOverviewTriggered += async (o, args) =>
+        UpdateOverviewTriggered += async (_, _) =>
         {
             _managersCount++;
             _pieConfigReconciliations.Data.Datasets.RemoveAt(0);
@@ -274,9 +274,6 @@ else
             {
                 Intersect = false,
                 AnimationDuration = 00
-            },
-            Tooltips = new Tooltips()
-            {
             },
             Title = new OptionsTitle
             {
@@ -448,7 +445,7 @@ else
     /* Calculates the runtime for the entire conversion and for each manager */
     public static class Runtime
     {
-        new static AutoResetEvent _autoEvent = new AutoResetEvent(false);
+        static AutoResetEvent _autoEvent = new AutoResetEvent(false);
         private static System.Threading.Timer _runtimeTimer = new System.Threading.Timer(RuntimeCounter, _autoEvent, 1000, 1000);
         public static int ConversionRuntimeCounter = 0;
         public static int CurrentManagerRuntimeCounter = 0;
@@ -522,7 +519,7 @@ else
         
         int size = sortedList.Count;
         int middle = size/2;
-        double median = (size % 2 != 0) ? (double)sortedList[middle].EfficiencyScore : ((double)sortedList[middle].EfficiencyScore + (double)sortedList[middle-1].EfficiencyScore) / 2;
+        double median = (size % 2 != 0) ? sortedList[middle].EfficiencyScore : (sortedList[middle].EfficiencyScore + sortedList[middle-1].EfficiencyScore) / 2;
         return Convert.ToInt32(median);
     }
 }
