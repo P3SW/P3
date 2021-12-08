@@ -88,7 +88,7 @@ else
         _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
         
         // **** Show LineChart at page reload ****
-        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        if ((_memDataList != null && _memDataList?.Count != 0) && (_cpuDataList != null && _cpuDataList?.Count != 0))
         {
             await Task.Run(ClearLineChart);
             await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
