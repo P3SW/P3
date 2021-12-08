@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using BlazorApp.Data.Events;
@@ -34,6 +35,8 @@ namespace BlazorApp.Data
         public int AvgMemoryPercent { get; private set; }
         private const long MaxMemory = 21473734656; /* Approx 20gb */
 
+        public readonly List<HealthData> CpuDataList = new ();
+        public readonly List<HealthData> MemDataList = new ();
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {

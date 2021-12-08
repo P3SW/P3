@@ -3,6 +3,7 @@
 @using System.Globalization
 @using ChartJs.Blazor.LineChart
 @using BlazorApp
+@using Microsoft.VisualBasic
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
@@ -15,14 +16,14 @@ else
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManager)-@Utility.ShortenManagerName(Managers[SelectedManager].Name)</b>
+                <b class="selected-manager-name" title="">@(SelectedManagerId)-@Utility.ShortenManagerName(Managers[SelectedManagerId].Name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
                     @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
                         int managerID = i;
-                        if (i == SelectedManager)
+                        if (i == SelectedManagerId)
                         {
                             continue;
                         }
@@ -32,21 +33,25 @@ else
                             <div class="dropdown-content-first" 
                                  title="@Managers[managerID].Name" 
                                  id="@managerID"
-                                 @onclick="@(() => GetSelectedManagerID(managerID))">
-                                 @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                                 @onclick="@(() => DropDownHandler(managerID))">
+                                @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
                             </div>
                             continue;
                         }
                         <div title="@Managers[managerID].Name"
                              id="@managerID"
-                             @onclick="@(() => GetSelectedManagerID(managerID))">
-                             @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                             @onclick="@(() => DropDownHandler(managerID))">
+                            @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
                         </div>
                     }
                 </div>
             </div>
             <div class="chart-title">
                 Memory/CPU
+            </div>
+            <div class="follow-checkbox-container">
+                <input type="checkbox" id="follow_current_manager" @bind="@Follow" @onclick="OnCheckboxClick">
+                <label style="font-size: 0.5em" for="follow_current_manager">Track current manager</label>
             </div>
         </div>
         <div style="position: relative; width: 90%; left: 5%">
@@ -69,19 +74,81 @@ else
     private LineDataset<long> _lineConfigDatasetCpu;
     private LineDataset<long> _lineConfigDatasetMemory;
     private LineConfig _lineConfig;
-    private int SelectedManager { get; set; }
+    private int SelectedManagerId { get; set; }
+    private ManagerStatusHandler SelectedManager { get; set; }
+    
+    private bool Follow { get; set; } = true;
     
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
+        SelectedManagerId = 0;
         
-        _cpuDataList = await Task.Run(() => ConversionDataAssigner._cpuDataList);
-        _memDataList = await Task.Run(() => ConversionDataAssigner._memDataList);
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
         
         // **** Show LineChart at page reload ****
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
+        StateHasChanged();
+
+        UpdateOverviewTriggered += async (o,args) =>
+        {
+            if (Follow)
+            {
+                if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+                    ClearLineChart();
+                await InvokeAsync(StateHasChanged);
+            }
+        };
+        
+        HealthUpdateTriggered += async (o, args) =>
+        {
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
+            
+            await Task.Run(() =>
+            {
+                if (ConversionDataAssigner.CurrentManager.CpuDataList != null)
+                    lock (ConversionDataAssigner.CurrentManager.CpuDataList)
+                    {
+                        ConversionDataAssigner.CurrentManager.CpuDataList.AddRange(args.Cpu);
+                    }
+
+                if (ConversionDataAssigner.CurrentManager.MemDataList != null)
+                    lock (ConversionDataAssigner.CurrentManager.MemDataList)
+                    {
+                        ConversionDataAssigner.CurrentManager.MemDataList.AddRange(args.Memory);
+                    }
+            });
+            
+            if (Follow)
+            {
+                if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+                {
+                    await Task.Run(ClearLineChart);
+                    await Task.Run(() =>
+                    {
+                        lock (_memDataList) lock (_cpuDataList)
+                        {
+                            CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList());
+                        }
+                    });
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+        };
+    }
+    
+    // **** LineChart methods **** Begin ****
+    private void CreateLineChart(List<HealthData> memDataList, List<HealthData> cpuDataList)
+    {
         // LineChart Memory
-        _lineConfig.Data.Datasets.Clear();
-        _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
+        _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(memDataList.ToList()))
         {
             Label = "Memory usage",
             BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
@@ -90,10 +157,10 @@ else
             PointRadius = 0,
             PointHitRadius = 0
         };
-        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+        
             
         // LineChart CPU
-        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList.ToList()))
         {
             Label = "Cpu usage",
             BorderColor = ColorUtil.ColorHexString(227, 95, 82),
@@ -102,41 +169,13 @@ else
             PointRadius = 0,
             PointHitRadius = 0
         };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
-        
-        StateHasChanged();
-        
-        HealthUpdateTriggered += async (o, args) =>
-        {
-            ConversionDataAssigner._cpuDataList?.AddRange(args.Cpu);
-            ConversionDataAssigner._memDataList?.AddRange(args.Memory);
-            _lineConfig.Data.Datasets.Clear();
-            
-            // LineChart Memory
-            _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(_memDataList))
-            {
-                Label = "Memory usage",
-                BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
-                BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
-                LineTension = 0,
-                PointRadius = 0,
-                PointHitRadius = 0
-            };
-            _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
-            
-            // LineChart CPU
-            _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(_cpuDataList))
-            {
-                Label = "Cpu usage",
-                BorderColor = ColorUtil.ColorHexString(227, 95, 82),
-                BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
-                LineTension = 0,
-                PointRadius = 0,
-                PointHitRadius = 0
-            };
-            _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
-            await InvokeAsync(StateHasChanged);
-        };
+    }
+
+    private void ClearLineChart()
+    {
+        _lineConfig.Data.Datasets.Clear();
     }
     
     // **** LineChart methods **** Begin ****
@@ -145,13 +184,13 @@ else
         string[] separators = new string[] {" "};
         
         _lineConfigDatasetCpu.Clear();
-        foreach (var data in healthDataList)
-            if (data.ReportType == "CPU")
+        foreach (var data in healthDataList.ToList())
+            if (data?.ReportType == "CPU")
                 _lineConfigDatasetCpu.Add(data.NumericValue);
 
         _lineConfig.Data.Labels.Clear();
-        foreach (var data in healthDataList)
-            if (data.ReportType == "CPU")
+        foreach (var data in healthDataList.ToList())
+            if (data?.ReportType == "CPU")
                 _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
         
         return _lineConfigDatasetCpu;
@@ -160,8 +199,8 @@ else
     private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
     {
         _lineConfigDatasetMemory.Clear();
-        foreach (var data in healthDataList)
-            if (data.ReportType == "MEMORY")
+        foreach (var data in healthDataList.ToList())
+            if (data?.ReportType == "MEMORY")
             {
                 long MaxMemory = 21473734656;
                 _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
@@ -277,10 +316,42 @@ else
     
     
     // **** Dropdown menu methods **** Begin ****
-    private void GetSelectedManagerID(int selectedID)
+    private async Task DropDownHandler(int selectedID)
     {
-        SelectedManager = selectedID;
+        SelectedManagerId = selectedID;
+        
+        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
+        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+        
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
+        await InvokeAsync(StateHasChanged);
+    }
+    
+    private async Task OnCheckboxClick()
+    {
+        if (Follow)
+        {
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+        }
+        else
+        {
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
+        }
+        
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
+        await InvokeAsync(StateHasChanged);
     }
     // **** Dropdown menu methods **** End ****
-    
 }
