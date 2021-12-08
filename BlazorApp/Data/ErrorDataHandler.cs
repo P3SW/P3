@@ -21,7 +21,7 @@ namespace BlazorApp.Data
                                  "[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                  "FROM [dbo].[LOGGING] " +
                                  "INNER JOIN [dbo].[LOGGING_CONTEXT] " +
-                                 "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " + 
+                                 "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID AND LOGGING.EXECUTION_ID = LOGGING_CONTEXT.EXECUTION_ID) " + 
                                  $"WHERE CREATED > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  $"AND [LOGGING_CONTEXT].[EXECUTION_ID] = '{_executionId}'"+
                                  "ORDER BY CREATED");
