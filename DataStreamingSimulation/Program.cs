@@ -1,11 +1,6 @@
 using System;
-using System.Globalization;
-using System.IO;
-using System.Threading.Channels;
-using System.Threading.Tasks;
-using Microsoft.Data.SqlClient;
 
-
+/* Runs the data streaming simulation at a 1000ms interval */
 namespace DataStreamingSimulation
 {
     class Program
