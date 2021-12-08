@@ -26,6 +26,7 @@
     <_ContentIncludedByDefault Remove="wwwroot\css\bootstrap\bootstrap.min.css.map" />
   </ItemGroup>
     <ItemGroup>
+      <ProjectReference Include="..\ExecuteSQLScript\ExecuteSQLScript.csproj" />
       <ProjectReference Include="..\SQLDatabaseRead\SQLDatabaseRead.csproj" />
     </ItemGroup>
 
