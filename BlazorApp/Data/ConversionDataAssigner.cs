@@ -4,6 +4,7 @@ using System.Data;
 using System.Threading.Tasks;
 using BlazorApp.Data;
 using BlazorApp.Pages;
+using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
@@ -26,6 +27,7 @@ namespace BlazorApp.Data
         //The program will wait for data if the table is empty
         public static void Start(string setupFile)
         {
+            SQLScriptExecuter.Execute("../ExecuteSQLScript/TRUNCATE_TABLE.sql");
             _connectionString = ConfigReader.ReadSetupFile(setupFile);
             _managerQueue = 0;
             _managerId = 1;
