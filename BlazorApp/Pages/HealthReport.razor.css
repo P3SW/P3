@@ -120,11 +120,15 @@
 
 .chart-header{
     display: grid;
-    grid-template-columns: 30fr 70fr;
+    grid-template-columns: 30fr 40fr 30fr;
 }
 
 .oblong {
     height: 0.3em;
     width: 1em;
     border-radius: 0.25em;
+}
+
+.input[type=checkbox]:checked + label {
+    background-color: #0F2147;
 }
