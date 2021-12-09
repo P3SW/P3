@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
 using BlazorApp.Pages;
-using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
@@ -13,7 +12,7 @@ namespace BlazorApp.Data
     public static class ConversionDataAssigner
     {
 
-        public static List<ManagerStatusHandler> FinishedManagers { get; private set; } = new List<ManagerStatusHandler>();
+        public static List<ManagerStatusHandler> FinishedManagers { get; set; } = new List<ManagerStatusHandler>();
         public static ManagerStatusHandler CurrentManager;
 
         private static SqlConnection _connection;
@@ -26,7 +25,6 @@ namespace BlazorApp.Data
         //The program will wait for data if the table is empty
         public static void Start(string setupFile)
         {
-            SQLScriptExecuter.Execute("../ExecuteSQLScript/TRUNCATE_TABLE.sql");
             _connectionString = ConfigReader.ReadSetupFile(setupFile);
             _managerQueue = 0;
             _managerId = 1;
@@ -111,7 +109,6 @@ namespace BlazorApp.Data
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("READING MANAGER");
                         _managerQueue++;
                     }
                     reader.Close();
@@ -220,10 +217,10 @@ namespace BlazorApp.Data
                               $"Efficiency score: {CurrentManager.EfficiencyScore}");
         }
         
-        public static async Task<List<LogData>> GetErrorLogList(string type)
+        public static async Task<List<LogData>> GetLogList(string type)
         {
             List<LogData> list = new List<LogData>();
-
+            
             if (FinishedManagers.Count > 0)
             {
                 foreach (var finishedManager in FinishedManagers)
@@ -234,6 +231,7 @@ namespace BlazorApp.Data
                         list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
                 }
             }
+
             if (CurrentManager == null)
             {
                 Console.WriteLine(CurrentManager);

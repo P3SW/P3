@@ -5,12 +5,12 @@ using BlazorApp.Pages;
 using Bunit;
 using Xunit;
 using Radzen.Blazor;
-using Xunit.Abstractions;
 
 namespace P3ConversionDashboard.Tests
 {
     public class UnitTestComponents : TestContext
     {
+        //test data for LogDataTableTest
         private List<LogData> testLogData = new()
         {
             new LogData(new DateTime(1995, 1, 1,1,2,4), 
@@ -32,16 +32,9 @@ namespace P3ConversionDashboard.Tests
         };
         
         List<string> testGrades = new() { "INFO", "WARN", "ERROR", "FATAL" };
-        RadzenDataGrid<LogData> dataGridRef = null;
-        
-        private readonly ITestOutputHelper _testOutputHelper;
+        RadzenDataGrid<LogData>? dataGridRef = null;
 
-        public UnitTestComponents(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-        
-        
+        //tests if the error div renders in Errors.razor
         [Fact]
         public void ErrorDivHasRenderedTest()
         {
@@ -58,6 +51,7 @@ namespace P3ConversionDashboard.Tests
             Assert.Contains(expected2, renderedMarkup);
         }
 
+        //tests if the LogDataTable shows the LogData given.
         [Fact]
         public void LogDataTableTest()
         {
@@ -94,6 +88,7 @@ namespace P3ConversionDashboard.Tests
             }
         }
         
+        //tests if the LogDataList can sort between the different types of logs.
         [Fact]
         public void SortingTabsTest()
         {
@@ -138,6 +133,14 @@ namespace P3ConversionDashboard.Tests
                             Assert.DoesNotContain(testString, renderedCut);
                 }
             }
+        }
+        
+        //tests if the ConfigReader.cs reads the config file correct
+        [Fact]
+        public void ConfigReaderTest()
+        {
+            Assert.Equal("Server=localhost,1337;Database=ANS_DB_P3_TEST;Trust Server Certificate = true; User Id=sa;Password=Test123;Trusted_Connection=False",
+                ConfigReader.ReadSetupFile("../../../ConfigReaderTestSetup.txt") );
         }
     }
 }

@@ -1,19 +1,20 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.Threading.Tasks;
 using BlazorApp.Data;
 using DataStreamingSimulation;
+using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.DataStreamingTest
 {
     [Collection("Sequential")]
     public class DataStreamingIntegrationTest
     {
         private DatabaseStreamer testDatabaseStreamer;
 
+        //the number of rows for each streamed table
         private Dictionary<string, int> numberOfRows = new Dictionary<string, int>()
         {
             {"LOGGING", 2213}, {"MANAGERS", 118}, {"LOGGING_CONTEXT", 124}, 
@@ -21,33 +22,50 @@ namespace P3ConversionDashboard.Tests
             {"AFSTEMNING", 159}
         };
 
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public DataStreamingIntegrationTest(ITestOutputHelper testOutputHelper)
+        //the tables that are streamed in the test which have timestamps
+        private List<List<string>> streamsWithTimestamp = new List<List<string>>()
         {
-            _testOutputHelper = testOutputHelper;
-            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/setupDataStreaming.txt", 
-                "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
-        }
+            new List<string>() {"AFSTEMNING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"LOGGING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"MANAGER_TRACKING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"HEALTH_REPORT", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
+            new List<string>() {"ENGINE_PROPERTIES", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"}
+        };
 
-        [Theory] 
-        [InlineData("AFSTEMNING", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("LOGGING", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("MANAGER_TRACKING", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("HEALTH_REPORT", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        [InlineData("ENGINE_PROPERTIES", "2021-10-28 15:07:56.987" , "2021-10-28 15:28:02.323")]
-        public void TestStreamWithoutTimeStamp(string table, string startTime, string nextTime)
+        //the tables that are streamed in the test which dont have timestamps
+        private List<string> streamsWithoutTimestamp = new List<string>() { "MANAGERS", "LOGGING_CONTEXT" };
+
+        //tests if the database streamer, streams the correct amount of data
+        [Fact]
+        public async void DatabaseStreamTest()
+        {
+            //drops database if it exitsts
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/DROP_ANS_DB_P3_TEST.sql"));
+            
+            //creates new database
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            
+            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/DataStreamingSetup.txt", 
+                "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
+            
+            foreach (string stream in streamsWithoutTimestamp)
+            {
+                TestStreamWithoutTimeStamp(stream);
+            }
+
+            foreach (List<string> stream in streamsWithTimestamp)
+            {
+                TestStreamWithTimeStamp(stream[0], stream[1], stream[2]);
+            }
+        }
+        
+        public void TestStreamWithTimeStamp(string table, string startTime, string nextTime)
         {
             testDatabaseStreamer.StreamTable(table,Convert.ToDateTime(startTime),Convert.ToDateTime(nextTime));
             
             TestStream(table);
         }
-
         
-        
-        [Theory]
-        [InlineData("MANAGERS")]
-        [InlineData("LOGGING_CONTEXT")]
         public void TestStreamWithoutTimeStamp(string table)
         {
             testDatabaseStreamer.StreamTableOneTime(table);
@@ -55,15 +73,18 @@ namespace P3ConversionDashboard.Tests
             TestStream(table);
         }
 
+        //runs the stream
         public void TestStream(string table)
         {
-            int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/setupQueryTestData.txt");
+            int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/QueryStreamedDataSetup.txt");
             
             System.Threading.Thread.Sleep(1000);
 
+            //checks if it has streamed the correct amount of rows
             Assert.Equal(numberOfRows[table], rows);
         }
         
+        //queries the data streamed
         private int QueryTestData(string queryString, string setupFile)
         {
             string connectionString = ConfigReader.ReadSetupFile(setupFile);
@@ -82,7 +103,6 @@ namespace P3ConversionDashboard.Tests
                     reader.Close();
                 }
             }
-
             return rows;
         }
     }
