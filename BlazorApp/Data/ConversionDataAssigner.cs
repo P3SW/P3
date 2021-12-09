@@ -222,13 +222,6 @@ namespace BlazorApp.Data
         
         public static async Task<List<LogData>> GetErrorLogList(string type)
         {
-            if (CurrentManager == null)
-            {
-                Console.WriteLine(CurrentManager);
-                Console.WriteLine("Sending new list");
-                return new List<LogData>();
-            }
-
             List<LogData> list = new List<LogData>();
 
             if (FinishedManagers.Count > 0)
@@ -240,14 +233,19 @@ namespace BlazorApp.Data
                     else 
                         list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
                 }
-                
             }
-            
-            if (type == "error") 
-                list.AddRange(CurrentManager.ErrorHandler.LogDataList);
-            else 
-                list.AddRange(CurrentManager.ReconciliationHandler.LogDataList);
-            
+            if (CurrentManager == null)
+            {
+                Console.WriteLine(CurrentManager);
+                Console.WriteLine("Sending new list");
+            }
+            else
+            {
+                list.AddRange(type == "error"
+                    ? CurrentManager.ErrorHandler.LogDataList
+                    : CurrentManager.ReconciliationHandler.LogDataList);
+            }
+
             return await Task.FromResult(list);
         }
         
