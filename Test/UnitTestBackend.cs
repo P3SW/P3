@@ -18,7 +18,7 @@ namespace P3ConversionDashboard.Tests
         public void ConfigReaderTest()
         {
             Assert.Equal("Server=localhost,1337;Database=ANS_DB_P3_TEST;Trust Server Certificate = true; User Id=sa;Password=Test123;Trusted_Connection=False",
-                ConfigReader.ReadSetupFile("../../../testSetup.txt") );
+                ConfigReader.ReadSetupFile("../../../ConfigReaderTestSetup.txt") );
         }
     }
 }

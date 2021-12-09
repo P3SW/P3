@@ -26,13 +26,12 @@ namespace P3ConversionDashboard.Tests.BlazorBackendTest
         [Fact]
         public async void BlazorBackendTest()
         {
-            System.Threading.Thread.Sleep(1000);
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
-            ConversionDataAssigner.Start("../../../BlazorBackendTest/setupBlazorBackend.txt");
+            ConversionDataAssigner.Start("../../../BlazorBackendTest/BlazorBackendSetup.txt");
 
-            testDatabaseStreamer = new DatabaseStreamer("../../../BlazorBackendTest/setupDataStreamingBlazorTest.txt", 
+            testDatabaseStreamer = new DatabaseStreamer("../../../BlazorBackendTest/DataStreamingSetup.txt", 
                 "2021-10-28 15:07:10.347","2021-10-28 15:09:50.533");
             
             testDatabaseStreamer.Stream(100);

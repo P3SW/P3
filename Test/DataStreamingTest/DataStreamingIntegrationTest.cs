@@ -46,7 +46,7 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/DROP_ANS_DB_P3_TEST.sql"));
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
-            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/setupDataStreaming.txt", 
+            testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/DataStreamingSetup.txt", 
                 "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
 
             foreach (string stream in streamsWithoutTimestamp)
@@ -76,7 +76,7 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
 
         public void TestStream(string table)
         {
-            int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/setupQueryTestData.txt");
+            int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/QueryStreamedDataSetup.txt");
             
             System.Threading.Thread.Sleep(1000);
 

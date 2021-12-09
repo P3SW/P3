@@ -165,8 +165,8 @@ else
     {                                                                                                                      
         ConfigurePieConfig();                                                                                              
                                                                                                                            
-        _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("error"));
-        _reconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList("reconciliations"));
+        _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("error"));
+        _reconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("reconciliations"));
         
         // **** ArgumentNullException fix at page reload ****
         // PieChart Errors

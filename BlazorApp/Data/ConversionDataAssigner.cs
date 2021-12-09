@@ -14,7 +14,7 @@ namespace BlazorApp.Data
     public static class ConversionDataAssigner
     {
 
-        public static List<ManagerStatusHandler> FinishedManagers { get; private set; } = new List<ManagerStatusHandler>();
+        public static List<ManagerStatusHandler> FinishedManagers { get; set; } = new List<ManagerStatusHandler>();
         public static ManagerStatusHandler _currentManager;
 
         private static SqlConnection _connection;
@@ -63,7 +63,6 @@ namespace BlazorApp.Data
                             while (reader.Read())
                             {
                                 _managerQueue++;
-                                Console.WriteLine("READING MANAGER");
                             }
                             reader.Close();
                             ManagerTrackingListener();
@@ -115,7 +114,6 @@ namespace BlazorApp.Data
                 {
                     while (reader.Read())
                     {
-                        Console.WriteLine("READING MANAGER");
                         _managerQueue++;
                     }
                     reader.Close();
@@ -224,17 +222,10 @@ namespace BlazorApp.Data
                               $"Efficiency score: {_currentManager.EfficiencyScore}");
         }
         
-        public static async Task<List<LogData>> GetErrorLogList(string type)
+        public static async Task<List<LogData>> GetLogList(string type)
         {
-            if (_currentManager == null)
-            {
-                Console.WriteLine(_currentManager);
-                Console.WriteLine("Sending new list");
-                return new List<LogData>();
-            }
-
             List<LogData> list = new List<LogData>();
-
+            
             if (FinishedManagers.Count > 0)
             {
                 foreach (var finishedManager in FinishedManagers)
@@ -247,10 +238,17 @@ namespace BlazorApp.Data
                 
             }
             
-            if (type == "error") 
-                list.AddRange(_currentManager.ErrorHandler.LogDataList);
-            else 
-                list.AddRange(_currentManager.ReconciliationHandler.LogDataList);
+            if (_currentManager == null)
+            {
+                Console.WriteLine(_currentManager);
+                Console.WriteLine("Sending new list");
+            }
+            else
+            {
+                list.AddRange(type == "error"
+                    ? _currentManager.ErrorHandler.LogDataList
+                    : _currentManager.ReconciliationHandler.LogDataList);
+            }
             
             return await Task.FromResult(list);
         }

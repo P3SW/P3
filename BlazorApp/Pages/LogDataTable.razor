@@ -17,7 +17,7 @@
     {
         if (LogDataList == null)
         {
-            LogDataList = await Task.Run(() => ConversionDataAssigner.GetErrorLogList(Type));
+            LogDataList = await Task.Run(() => ConversionDataAssigner.GetLogList(Type));
             StateHasChanged(); 
         }
 
