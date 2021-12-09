@@ -1,33 +1,29 @@
 using System;
-using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using BlazorApp.Data;
 using DataStreamingSimulation;
-using Microsoft.Data.SqlClient;
+using ExecuteSQLScript;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.BlazorBackendTest
 {
     [Collection("Sequential")]
     public class BlazorBackendIntegrationTest
     {
 
         private DatabaseStreamer testDatabaseStreamer;
-        
-        private readonly ITestOutputHelper _testOutputHelper;
 
-        public BlazorBackendIntegrationTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
+        //tests if the blazor-backend can query data from a conversion
         [Fact]
-        public void BlazorBackendTest()
+        public async void BlazorBackendTest()
         {
-            ConversionDataAssigner.Start("../../../BlazorBackendTest/setupBlazorBackend.txt");
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            
+            ConversionDataAssigner.Start("../../../BlazorBackendTest/BlazorBackendSetup.txt");
 
-            testDatabaseStreamer = new DatabaseStreamer("../../../BlazorBackendTest/setupDataStreamingBlazorTest.txt", 
+            testDatabaseStreamer = new DatabaseStreamer("../../../BlazorBackendTest/DataStreamingSetup.txt", 
                 "2021-10-28 15:07:10.347","2021-10-28 15:09:50.533");
             
             testDatabaseStreamer.Stream(100);
@@ -36,9 +32,11 @@ namespace P3ConversionDashboard.Tests
             
             System.Threading.Thread.Sleep((int) ts.TotalMilliseconds / 10 + 1000);
 
+            //assert
             CheckData();
         }
 
+        // checks if the blazor-backend has queried the correct data
         public void CheckData()
         {
             for (int i = 0; i < BlazorBackendCheckData.testManagers.Count; i++)
@@ -63,12 +61,6 @@ namespace P3ConversionDashboard.Tests
                 }
                 
                 //checks Error
-                foreach (LogData data in manager.ErrorHandler.LogDataList)
-                {
-                    _testOutputHelper.WriteLine(data.Description);
-                }
-                _testOutputHelper.WriteLine(manager.ErrorHandler.LogDataList.Count.ToString());
-                _testOutputHelper.WriteLine("");
                 Assert.Contains(testManager.Error.Description, manager.ErrorHandler.LogDataList.Select(data => data.Description));
                 Assert.Contains(testManager.Error.Grade, manager.ErrorHandler.LogDataList.Select(data => data.Grade));
                 Assert.Contains(testManager.Error.Timestamp, manager.ErrorHandler.LogDataList.Select(data => data.Timestamp));
@@ -77,13 +69,11 @@ namespace P3ConversionDashboard.Tests
                 //checks Reconciliations
                 if (testManager.Reconciliation != null)
                 {
-                    _testOutputHelper.WriteLine(manager.ReconciliationHandler.LogDataList.Select(data => data.Description).Count().ToString());
                     Assert.Contains(testManager.Reconciliation.Description, manager.ReconciliationHandler.LogDataList.Select(data => data.Description));
                     Assert.Contains(testManager.Reconciliation.Grade, manager.ReconciliationHandler.LogDataList.Select(data => data.Grade));
                     Assert.Contains(testManager.Reconciliation.Timestamp, manager.ReconciliationHandler.LogDataList.Select(data => data.Timestamp));
                     Assert.Contains(testManager.Reconciliation.ManagerName, manager.ReconciliationHandler.LogDataList.Select(data => data.ManagerName));
                 }
-
             }
         }
     }

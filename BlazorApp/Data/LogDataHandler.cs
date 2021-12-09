@@ -34,5 +34,10 @@ namespace BlazorApp.Data
             
             TriggerUpdate(newLogDataList);
         }
+        
+        public void AddLogData(DateTime timestamp, string description, string managerName, string grade)
+        {
+            LogDataList.Add(new LogData(timestamp, description, managerName, grade));
+        }
     }
 }
