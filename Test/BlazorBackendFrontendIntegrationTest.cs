@@ -21,7 +21,8 @@ namespace P3ConversionDashboard.Tests
             //creates a new database
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
-            await Task.Run(() => AssignTestData()); //assigns data to the backend
+            //assigns data to the backend
+            await Task.Run(() => AssignTestData()); 
             
             // inject javascript in blazor, radzen tables uses it
             JSInterop.Mode = JSRuntimeMode.Loose;
@@ -32,7 +33,7 @@ namespace P3ConversionDashboard.Tests
             string renderedErrorMarkup = errorComponent.Markup;
             string renderedReconMarkup = reconComponent.Markup;
 
-            //Asserts for the data in the components(frontend)
+            //asserts for the data in the components(frontend)
             foreach (ManagerStatusHandler manager in ConversionDataAssigner.FinishedManagers)
             {
                 foreach (LogData error in manager.ErrorHandler.LogDataList)
