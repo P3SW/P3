@@ -30,7 +30,7 @@ namespace SQLDatabaseRead
         {
             run = false;
             _dependency.OnChange -= SqlDependencyChange;
-            AddQueryToObject(_dataHandlerObject.GetNewestDataQueryString());
+            AddQueryToObject(DataHandlerObject.GetNewestDataQueryString());
         }
 
         //Method responsible for listening for changes in the tables.

@@ -87,7 +87,7 @@ namespace BlazorApp.Data
         public void CalculateEfficiencyScore()
         {
             double averageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
-            Cpu = Convert.ToInt32(AvgCpu);
+            Cpu = Convert.ToInt32(averageCpu);
 
             double result;
             if (RunTime == 0)
@@ -96,7 +96,7 @@ namespace BlazorApp.Data
             }
             else
             {
-                result = ((double) (RowsRead + RowsWritten) / RunTime * AvgCpu)*10;
+                result = ((double) (RowsRead + RowsWritten) / RunTime * (averageCpu));
             }
 
             EfficiencyScore = Convert.ToInt32(result);
