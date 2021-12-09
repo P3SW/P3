@@ -24,24 +24,5 @@ namespace DataStreamingSimulation
                 }
             }
         }
-        
-        public Int32 GetMaxRowsInDb(string[] tables, string connectionString)
-        {
-            using (SqlConnection connection = new SqlConnection(connectionString))
-            {
-                connection.Open();
-                List<int> tableRowNum = new List<int>();
-
-                foreach (var table in tables)
-                {
-                    SqlCommand cmd = new SqlCommand($"SELECT COUNT(*) FROM {table}", connection);
-                    Int32 count = (Int32)cmd.ExecuteScalar();
-                    tableRowNum.Add(count);
-                }
-                
-                connection.Close();
-                return tableRowNum.Max();
-            }
-        }
     }
 }
