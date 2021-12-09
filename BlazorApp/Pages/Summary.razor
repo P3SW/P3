@@ -44,7 +44,7 @@
     <div class="manager-queue-container">
         <div class="queue-text">
             <span class="queue-finished-text">Finished: <b>@ConversionDataAssigner.FinishedManagers.Count</b></span>
-            <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner._managerQueue</b></span>
+            <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner.ManagerQueue</b></span>
         </div>
         <div class="manager-queue-circle">
             @if (Managers != null)
@@ -150,8 +150,6 @@
     private int[] _hoveredManagerRecons;
     private double _mousePositionX;
     private double _mousePositionY;
-    ManagerStatusHandler _currentManager;
-    private int[] _managerQueueCounter;
     private int _managersCount = 0;
     
     protected override async Task OnInitializedAsync()
@@ -169,7 +167,6 @@
         ReconUpdateTriggered += async (_, args) =>
         {
             _reconDataStorageList.AddRange(args.ReconDataList);
-            
             await InvokeAsync(StateHasChanged);
         };
         
@@ -224,7 +221,10 @@
 
     private void ClearPieChart()
     {
-        _pieConfigErrors.Data.Datasets.Clear();
+        lock (_pieConfigErrors)
+        {
+            _pieConfigErrors.Data.Datasets.Clear();
+        }
     }
     
     // **** PieChart methods **** Begin ****
@@ -411,7 +411,7 @@
         /* Adds 1 to the counter */
         private static void RuntimeCounter(Object source)
         {
-            if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner.CurrentManager == null)
+            if (ConversionDataAssigner.ManagerQueue == 0 && ConversionDataAssigner.CurrentManager == null)
             {
                 _runtimeTimer.Dispose();
             }

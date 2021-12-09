@@ -24,8 +24,8 @@ namespace DataStreamingSimulation
 
                 string queryString = $"INSERT INTO {row["BaseTableName"]} VALUES (" + paramString + ");";
 
-                Console.WriteLine("---- queryString: ---- ");
-                Console.WriteLine(queryString);
+                //Console.WriteLine("---- queryString: ---- ");
+                //Console.WriteLine(queryString);
                 
                 using (SqlCommand command = new SqlCommand(queryString, connection))
                 {
