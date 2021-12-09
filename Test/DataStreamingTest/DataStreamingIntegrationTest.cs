@@ -14,6 +14,7 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
     {
         private DatabaseStreamer testDatabaseStreamer;
 
+        //the number of rows for each streamed table
         private Dictionary<string, int> numberOfRows = new Dictionary<string, int>()
         {
             {"LOGGING", 2213}, {"MANAGERS", 118}, {"LOGGING_CONTEXT", 124}, 
@@ -21,6 +22,7 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
             {"AFSTEMNING", 159}
         };
 
+        //the tables that are streamed in the test which have timestamps
         private List<List<string>> streamsWithTimestamp = new List<List<string>>()
         {
             new List<string>() {"AFSTEMNING", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"},
@@ -30,18 +32,22 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
             new List<string>() {"ENGINE_PROPERTIES", "2021-10-28 15:07:56.987", "2021-10-28 15:28:02.323"}
         };
 
+        //the tables that are streamed in the test which dont have timestamps
         private List<string> streamsWithoutTimestamp = new List<string>() { "MANAGERS", "LOGGING_CONTEXT" };
 
         //tests if the database streamer, streams the correct amount of data
         [Fact]
         public async void DatabaseStreamTest()
         {
+            //drops database if it exitsts
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/DROP_ANS_DB_P3_TEST.sql"));
+            
+            //creates new database
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
             testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/DataStreamingSetup.txt", 
                 "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
-
+            
             foreach (string stream in streamsWithoutTimestamp)
             {
                 TestStreamWithoutTimeStamp(stream);
@@ -67,15 +73,18 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
             TestStream(table);
         }
 
+        //runs the stream
         public void TestStream(string table)
         {
             int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/QueryStreamedDataSetup.txt");
             
             System.Threading.Thread.Sleep(1000);
 
+            //checks if it has streamed the correct amount of rows
             Assert.Equal(numberOfRows[table], rows);
         }
         
+        //queries the data streamed
         private int QueryTestData(string queryString, string setupFile)
         {
             string connectionString = ConfigReader.ReadSetupFile(setupFile);

@@ -13,7 +13,7 @@ namespace P3ConversionDashboard.Tests.SQLDependencyListenerTest
     [Collection("Sequential")]
     public class SQLDependencyListenenerIntegrationTest
     {
-
+        //test health data
         private List<HealthData> cpu = new List<HealthData>()
         {
             new HealthData("CPU", 5, DateTime.Parse("2021-10-28 15:07:24.683")),
@@ -23,6 +23,7 @@ namespace P3ConversionDashboard.Tests.SQLDependencyListenerTest
             new HealthData("CPU", 14, DateTime.Parse("2021-10-28 15:09:34.173"))
         };
 
+        //test health data
         private List<HealthData> memory = new List<HealthData>()
         {
             new HealthData("MEMORY", 6601781248, DateTime.Parse("2021-10-28 15:07:24.700")),
@@ -32,10 +33,14 @@ namespace P3ConversionDashboard.Tests.SQLDependencyListenerTest
             new HealthData("MEMORY", 6563631104, DateTime.Parse("2021-10-28 15:09:34.187"))
         };
 
+        //tests the SQLDependencyListener.cs to check if it works as it should
         [Fact]
         public async void SQLDependencyTest()
         {
+            //drops database if it exists
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerTest/DROP_ANS_DB_P3_TEST.sql"));
+            
+            //creates a new database
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
             HealthDataHandler testHealthHandler = new HealthDataHandler(DateTime.Parse("2021-10-28 15:07:23.277"));
