@@ -73,95 +73,91 @@
                                             <div class="circle background-lightred"></div><li>Error: @_hoveredManagerErrors[1]</li>
                                             <div class="circle background-yellow"></div><li>Warning: @_hoveredManagerErrors[2]</li>
                                             <div class="circle background-green"></div><li>Info: @_hoveredManagerErrors[3]</li>
-                                        </ul>                                                                          
-                                    </div>                                                                             
-                                    <div class="hoverbox-recons">                                                      
-                                        <div>Reconciliations</div>                                                     
-                                        <ul class="error-reconciliation-formatting">                                   
+                                        </ul>
+                                    </div> 
+                                    <div class="hoverbox-recons">
+                                        <div>Reconciliations</div> 
+                                        <ul class="error-reconciliation-formatting">
                                             <div class="circle background-red"></div><li>Mismatch: @_hoveredManagerRecons[0]</li>
                                             <div class="circle background-lightred"></div><li>Failed: @_hoveredManagerRecons[1]</li>
                                             <div class="circle background-yellow"></div><li>Disabled: @_hoveredManagerRecons[2]</li>
                                             <div class="circle background-green"></div><li>OK: @_hoveredManagerRecons[3]</li>
-                                        </ul>                                                                          
-                                    </div>                                                                             
-                                </div>                                                                                 
-                            </div>                                                                                     
-                        }                                                                                              
-                    </div>                                                                                             
-                }                                                                                                      
-            }                                                                                                          
-        </div>                                                                                                         
-    </div>                                                                                                             
-    @* Total manager info *@                                                                                           
-    @if (_pieConfigDatasetErrors != null && _pieConfigDatasetReconciliations != null)                                  
-    {                                                                                                                  
-        <div class="Total_errors_and_reconciliations_container">                                                       
-            <div class="info_total_errors">                                                                            
-                Total Errors: @_pieConfigDatasetErrors.Sum()                                                           
-                <ul class="error-reconciliation-formatting">                                                           
-                    <div class="circle background-red"></div><li>Fatal: @_pieConfigDatasetErrors[0]</li>               
-                    <div class="circle background-lightred"></div><li>Error: @_pieConfigDatasetErrors[1]</li>          
-                    <div class="circle background-yellow"></div><li>Warning: @_pieConfigDatasetErrors[2]</li>          
-                    <div class="circle background-green"></div><li>Info: @_pieConfigDatasetErrors[3]</li>              
-                </ul>                                                                                                  
-            </div>                                                                                                     
-            <div class="PieConfigTotalErrors">                                                                         
-                <Chart Config="_pieConfigErrors" Height="50" Width="50"></Chart>                                       
-            </div>                                                                                                     
-                                                                                                                       
-            <div class="info_total_reconciliations">                                                                   
-                Total Reconciliations: @_pieConfigDatasetReconciliations.Sum()                                         
-                <ul class="error-reconciliation-formatting">                                                           
-                    <div class="circle background-red"></div><li>Mismatch: @_pieConfigDatasetReconciliations[0]</li>   
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                }
+            }
+        </div>
+    </div> 
+    @* Total manager info *@
+    @if (_pieConfigDatasetErrors != null && _pieConfigDatasetReconciliations != null)
+    {
+        <div class="Total_errors_and_reconciliations_container">
+            <div class="info_total_errors">
+                Total Errors: @_pieConfigDatasetErrors.Sum()
+                <ul class="error-reconciliation-formatting">
+                    <div class="circle background-red"></div><li>Fatal: @_pieConfigDatasetErrors[0]</li> 
+                    <div class="circle background-lightred"></div><li>Error: @_pieConfigDatasetErrors[1]</li>
+                    <div class="circle background-yellow"></div><li>Warning: @_pieConfigDatasetErrors[2]</li>
+                    <div class="circle background-green"></div><li>Info: @_pieConfigDatasetErrors[3]</li>
+                </ul>
+            </div>
+            <div class="PieConfigTotalErrors">
+                <Chart Config="_pieConfigErrors" Height="50" Width="50"></Chart>
+            </div>
+            <div class="info_total_reconciliations"> 
+                Total Reconciliations: @_pieConfigDatasetReconciliations.Sum()
+                <ul class="error-reconciliation-formatting">
+                    <div class="circle background-red"></div><li>Mismatch: @_pieConfigDatasetReconciliations[0]</li>
                     <div class="circle background-lightred"></div><li>Failed: @_pieConfigDatasetReconciliations[1]</li>
                     <div class="circle background-yellow"></div><li>Disabled: @_pieConfigDatasetReconciliations[2]</li>
-                    <div class="circle background-green"></div><li>OK: @_pieConfigDatasetReconciliations[3]</li>       
-                </ul>                                                                                                  
-            </div>                                                                                                     
-            <div class="pieConfigTotalReconciliations">                                                                
-                <Chart Config="_pieConfigReconciliations" Height="50" Width="50"></Chart>                              
-            </div>                                                                                                     
-        </div>                                                                                                         
-    }                                                                                                                  
-    @* Efficiency score table summary *@                                                                               
-    <div class="efficiency-container">                                                                                 
-        <div>Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div>            
-        <div>Total read:    <b>@TotalRows(Managers, "read")</b></div>                          
-        <div>Total written: <b>@TotalRows(Managers, "written")</b></div>  
+                    <div class="circle background-green"></div><li>OK: @_pieConfigDatasetReconciliations[3]</li>
+                </ul>
+            </div>
+            <div class="pieConfigTotalReconciliations">
+                <Chart Config="_pieConfigReconciliations" Height="50" Width="50"></Chart>
+            </div>
+        </div>
+    }
+    @* Efficiency score table summary *@
+    <div class="efficiency-container">
+        <div>Median efficiency score: <b>@MedianEfficiencyScore(Managers)</b></div>
+        <div>Total read:    <b>@TotalRows(Managers, "read")</b></div>
+        <div>Total written: <b>@TotalRows(Managers, "written")</b></div>
         <div style="text-align: center"><b>The five worst scoring managers</b></div>
-        <div class="summary_efficiency_table">                                                                                                          
+        <div class="summary_efficiency_table">
             <SummaryEfficiencyTable SortedData="@SortByEfficiency(Managers).Take(5).ToList()"></SummaryEfficiencyTable>
-        </div>                                                                                                         
-    </div>                                                                                                             
-</div>                                                                                                                 
-                                                                                                                     
-                                                                                                                           
-@code{                                                                                                                     
-    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }                                                   
-                                                                                                                           
-    private PieConfig _pieConfigErrors;                                                                                    
-    private PieConfig _pieConfigReconciliations;                                                                           
-    private PieDataset<int> _pieConfigDatasetErrors;                                                                       
-    private PieDataset<int> _pieConfigDatasetReconciliations;                                                              
-                                                                                                                           
-    private List<LogData> _errorDataStorageList;                                                                           
-    private List<LogData> _reconDataStorageList;                                                                           
-                                                                                                                           
-    private int _hoveredManager;                                                                                           
-    private int[] _hoveredManagerErrors;                                                                                   
-    private int[] _hoveredManagerRecons;                                                                                   
-    private double _mousePositionX;                                                                                        
-    private double _mousePositionY;                                                                                        
-                                                                                                                           
-    ManagerStatusHandler _currentManager;                                                                                  
-    private int[] _managerQueueCounter;                                                                                    
-    private int _managersCount = 0;                                                                                        
-                                                                                                                           
-    protected override async Task OnInitializedAsync()                                                                     
-    {                          
-        
-        ConfigurePieConfig();                                                                                              
-                                                                                                                           
+        </div>
+    </div>
+</div>
+
+@code{
+    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
+
+    private PieConfig _pieConfigErrors;
+    private PieConfig _pieConfigReconciliations;
+    private PieDataset<int> _pieConfigDatasetErrors;
+    private PieDataset<int> _pieConfigDatasetReconciliations;
+
+    private List<LogData> _errorDataStorageList;
+    private List<LogData> _reconDataStorageList;
+
+    private int _hoveredManager;
+    private int[] _hoveredManagerErrors;
+    private int[] _hoveredManagerRecons;
+    private double _mousePositionX;
+    private double _mousePositionY;
+    ManagerStatusHandler _currentManager;
+    private int[] _managerQueueCounter;
+    private int _managersCount = 0;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ConfigurePieConfig();
+         
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("error"));
         _reconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("reconciliations"));
         
