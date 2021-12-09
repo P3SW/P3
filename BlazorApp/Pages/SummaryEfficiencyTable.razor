@@ -17,7 +17,7 @@ else
                     FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
                     LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
         <Columns>
-            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="ManagerName" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="Name" Filterable="false"
                                   Title="MANAGER" Frozen="false" Width="400px" Sortable="false">
                 <Template Context="data">
                     <div style="color: white; display: block; width: 200px; max-width: 200px; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@data.Name">
@@ -33,7 +33,7 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="TimeFinished" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="EndTime" Filterable="false"
                                   Title="ENDTIME" Frozen="false" Width="300px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EndTime">
@@ -57,7 +57,7 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="TimeRan" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="RunTime" Filterable="false"
                                   Title="rUnTIme" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RunTime">
@@ -73,7 +73,7 @@ else
                     </div>
                 </Template>
             </RadzenDataGridColumn>
-            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="AvgMemory" Filterable="false"
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="AvgMemoryPercent" Filterable="false"
                                   Title="Memory" Frozen="false" Width="100px" Sortable="false">
                 <Template Context="data">
                     <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgMemory">
@@ -104,6 +104,6 @@ else
     //When rendering the cells, change the background color.
     void CellRender(DataGridCellRenderEventArgs<ManagerStatusHandler> dataGridCellRenderEventArgs)
     {
-        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: #384561;");
+        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: rgba(83, 96, 122, 0.27);");
     }
 }

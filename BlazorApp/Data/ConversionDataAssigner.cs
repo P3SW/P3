@@ -2,9 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Threading.Tasks;
-using BlazorApp.Data;
 using BlazorApp.Pages;
-using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
@@ -15,16 +13,13 @@ namespace BlazorApp.Data
     {
 
         public static List<ManagerStatusHandler> FinishedManagers { get; set; } = new List<ManagerStatusHandler>();
-        public static ManagerStatusHandler _currentManager;
+        public static ManagerStatusHandler CurrentManager;
 
         private static SqlConnection _connection;
         private static string _connectionString;
         public static int _managerQueue = 0;
         private static int _managerId;
         private static int _executionId;
-        
-        public static List<HealthData> _cpuDataList = new ();
-        public static List<HealthData> _memDataList = new ();
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
@@ -33,7 +28,7 @@ namespace BlazorApp.Data
             _connectionString = ConfigReader.ReadSetupFile(setupFile);
             _managerQueue = 0;
             _managerId = 1;
-            _currentManager = null;
+            CurrentManager = null;
             _executionId = 1;
             
             Console.WriteLine("Engine started");
@@ -176,17 +171,17 @@ namespace BlazorApp.Data
                 {
                     if (reader.HasRows)
                     {
-                        if (_currentManager != null) //Checks if a manager is running
+                        if (CurrentManager != null) //Checks if a manager is running
                         {
                             Console.WriteLine("Finishing manager");
-                            _currentManager.FinishManager();
-                            FinishedManagers.Add(_currentManager);
+                            CurrentManager.FinishManager();
+                            FinishedManagers.Add(CurrentManager);
                             PrintFinishedManager();
                         }
 
                         if (_managerQueue == 0) //If the last manager has run the method will stop
                         {
-                            _currentManager = null;
+                            CurrentManager = null;
                             return;
                         }
                     }
@@ -194,7 +189,7 @@ namespace BlazorApp.Data
                     if (reader.Read())
                     {
                         Console.WriteLine("Starting new manager");
-                        _currentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1], _executionId);
+                        CurrentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1], _executionId);
                         Console.WriteLine("New manager name is " + reader[0]);
                         _managerId++;
                         _managerQueue--;
@@ -203,23 +198,23 @@ namespace BlazorApp.Data
                     reader.Close();
                 }
             }
-            _currentManager.WatchManager();
+            CurrentManager.WatchManager();
             ManagerTrackingListener();
         }
 
         private static void PrintFinishedManager()
         {
-            Console.WriteLine($"Name: {_currentManager.Name}\n" +
-                              $"Status: {_currentManager.Status}\n" +
-                              $"Runtime: {_currentManager.RunTime}\n" +
-                              $"Reconciliations: {_currentManager.ReconciliationHandler.LogDataList.Count}\n" +
-                              $"Errors: {_currentManager.ErrorHandler.LogDataList.Count}\n" +
-                              $"Rows read: {_currentManager.RowsRead}\n" +
-                              $"Rows written: {_currentManager.RowsWritten}\n" +
-                              $"Average CPU: {_currentManager.Cpu}\n" +
-                              $"Memory logs: {_currentManager.Health.Memory.Count}\n" +
-                              $"CPU logs: {_currentManager.Health.Cpu.Count}\n" +
-                              $"Efficiency score: {_currentManager.EfficiencyScore}");
+            Console.WriteLine($"Name: {CurrentManager.Name}\n" +
+                              $"Status: {CurrentManager.Status}\n" +
+                              $"Runtime: {CurrentManager.RunTime}\n" +
+                              $"Reconciliations: {CurrentManager.ReconciliationHandler.LogDataList.Count}\n" +
+                              $"Errors: {CurrentManager.ErrorHandler.LogDataList.Count}\n" +
+                              $"Rows read: {CurrentManager.RowsRead}\n" +
+                              $"Rows written: {CurrentManager.RowsWritten}\n" +
+                              $"Average CPU: {CurrentManager.Cpu}\n" +
+                              $"Memory logs: {CurrentManager.Health.Memory.Count}\n" +
+                              $"CPU logs: {CurrentManager.Health.Cpu.Count}\n" +
+                              $"Efficiency score: {CurrentManager.EfficiencyScore}");
         }
         
         public static async Task<List<LogData>> GetLogList(string type)
@@ -235,21 +230,20 @@ namespace BlazorApp.Data
                     else 
                         list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
                 }
-                
             }
-            
-            if (_currentManager == null)
+
+            if (CurrentManager == null)
             {
-                Console.WriteLine(_currentManager);
+                Console.WriteLine(CurrentManager);
                 Console.WriteLine("Sending new list");
             }
             else
             {
                 list.AddRange(type == "error"
-                    ? _currentManager.ErrorHandler.LogDataList
-                    : _currentManager.ReconciliationHandler.LogDataList);
+                    ? CurrentManager.ErrorHandler.LogDataList
+                    : CurrentManager.ReconciliationHandler.LogDataList);
             }
-            
+
             return await Task.FromResult(list);
         }
         

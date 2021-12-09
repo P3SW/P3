@@ -1,25 +1,26 @@
 @page "/"
-@using ChartJs.Blazor.LineChart
-@using ChartJs.Blazor.PieChart
 @using BlazorApp.Data
-@using System.Globalization
 
 <link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
 
-@if (ConversionDataAssigner._currentManager == null)
+@if (ConversionDataAssigner.CurrentManager == null && ConversionDataAssigner.FinishedManagers.Count < 1)
 {
     <p>Waiting for a manager to start ....</p>
 }
 else
 {
     <div class="overview_container">
-        <Summary Managers="_managers"></Summary>
-            <div class="Overview-right">
+        <div class="summary-container">
+            <Summary Managers="_managers"></Summary>
+        </div>
+        <div class="Overview-right">
+            <div class="health-report-table-container">
                 <HealthReport Managers="_managers"></HealthReport>
-                <div class="efficiency-table-container">
-                    <EfficiencyTable Managers="_managers"></EfficiencyTable>
-                </div>
             </div>
+            <div class="efficiency-table-container">
+                <EfficiencyTable Managers="_managers"></EfficiencyTable>
+            </div>
+        </div>
     </div>
 }
 

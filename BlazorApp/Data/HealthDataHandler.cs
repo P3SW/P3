@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using BlazorApp.DataStreaming.Events;
+using BlazorApp.Data.Events;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 
