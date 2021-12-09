@@ -25,16 +25,13 @@ namespace BlazorApp.Data
         //Inserts data from the reader into temporary list and adds these to the full list of data.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
-            newLogDataList = new List<LogData>();
+            LogDataList = new List<LogData>();
             while (reader.Read())
             {
-                newLogDataList.Add(new LogData(reader));
+                LogDataList.Add(new LogData(reader));
             }
 
-            LastRowTimeStamp = newLogDataList[newLogDataList.Count - 1].Timestamp;
-            LogDataList.AddRange(newLogDataList);
-            
-            TriggerUpdate(newLogDataList);
+            TriggerUpdate(LogDataList);
         }
     }
 }

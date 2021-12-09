@@ -14,7 +14,8 @@ namespace BlazorApp.DataStreaming.Events
         public string GetNewestDataQueryString()
         {
             return string.Format("SELECT [AFSTEMTDATO],[DESCRIPTION],[AFSTEMRESULTAT],[MANAGER]" +
-                                 $"FROM [dbo].[AFSTEMNING] WHERE AFSTEMTDATO > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
+                                 $"FROM [dbo].[AFSTEMNING] " +
+                                 $"WHERE [MANAGER] = '{ConversionDataAssigner.CurrentManager.Name}'" +
                                  "ORDER BY AFSTEMTDATO");
         }
     }

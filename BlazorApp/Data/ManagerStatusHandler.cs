@@ -54,9 +54,7 @@ namespace BlazorApp.Data
         {
             OverviewTriggerUpdate();
             
-            Console.WriteLine($"Manager {Name} started");
             Console.WriteLine($"Manager {Name} started with execution_id " + ExecutionID);
-            Console.WriteLine("MANAGER START TIME IS: " + StartTime);
 
             _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,
                 GetSelectStringsForTableStreamer("health"), Health);
@@ -171,6 +169,17 @@ namespace BlazorApp.Data
                 default:
                     throw new ArgumentException();
             }
+        }
+
+        public string GetManagerNameWithoutRnd()
+        {
+            if (Name.Contains(','))
+            {
+                string[] name = Name.Split(",");
+                return name[0];
+            }
+
+            return Name;
         }
     }
 }

@@ -180,7 +180,6 @@ namespace BlazorApp.Data
                             Console.WriteLine("Finishing manager");
                             CurrentManager.FinishManager();
                             FinishedManagers.Add(CurrentManager);
-                            PrintFinishedManager();
                         }
 
                         if (_managerQueue == 0) //If the last manager has run the method will stop
@@ -192,9 +191,7 @@ namespace BlazorApp.Data
                     
                     if (reader.Read())
                     {
-                        Console.WriteLine("Starting new manager");
                         CurrentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1], _executionId);
-                        Console.WriteLine("New manager name is " + reader[0]);
                         _managerId++;
                         _managerQueue--;
                         Summary.Runtime.CurrentManagerResetTimer();
