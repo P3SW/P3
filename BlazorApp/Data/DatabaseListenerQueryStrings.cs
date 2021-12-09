@@ -1,4 +1,3 @@
-
 namespace BlazorApp.Data
 {
     //Class containing constant sql strings. These are used for sql dependencies.

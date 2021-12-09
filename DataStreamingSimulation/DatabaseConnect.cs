@@ -53,11 +53,5 @@ namespace DataStreamingSimulation
             if (transferData) return connectionString[1];
             return connectionString[0];
         }
-        
-        public void PrintConnection(SqlConnection connection)
-        {
-            Console.WriteLine("State: {0}", connection.State);
-            Console.WriteLine("ConnectionString: {0}", connection.ConnectionString);
-        }
     }
 }
