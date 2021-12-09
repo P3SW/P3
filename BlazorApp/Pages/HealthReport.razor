@@ -183,30 +183,48 @@ else
     // **** LineChart methods **** Begin ****
     private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
+        DateTime newestEntry = default;
         string[] separators = new string[] {" "};
         
         _lineConfigDatasetCpu.Clear();
         foreach (var data in healthDataList.ToList())
-            if (data?.ReportType == "CPU")
+        {
+            if (data?.ReportType == "CPU" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
                 _lineConfigDatasetCpu.Add(data.NumericValue);
+            }
+        }
 
+        newestEntry = default;
         _lineConfig.Data.Labels.Clear();
         foreach (var data in healthDataList.ToList())
-            if (data?.ReportType == "CPU")
+        {
+            if (data?.ReportType == "CPU" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
                 _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            }
+        }
+        
         
         return _lineConfigDatasetCpu;
     }
     
     private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
     {
+        DateTime newestEntry = default;
         _lineConfigDatasetMemory.Clear();
         foreach (var data in healthDataList.ToList())
-            if (data?.ReportType == "MEMORY")
+        {
+            if (data?.ReportType == "MEMORY" && (newestEntry == default || data.LogTime > newestEntry))
             {
+                newestEntry = data.LogTime;
                 long MaxMemory = 21473734656;
                 _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
             }
+        }
+            
 
         return _lineConfigDatasetMemory;
     }
@@ -356,4 +374,5 @@ else
         await InvokeAsync(StateHasChanged);
     }
     // **** Dropdown menu methods **** End ****
+    
 }

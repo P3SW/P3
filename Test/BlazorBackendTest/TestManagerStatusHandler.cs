@@ -1,9 +1,8 @@
-using System.Collections.Generic;
 using BlazorApp.Data;
-using Radzen;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.BlazorBackendTest
 {
+    //a data class that is used for the test
     public class TestManagerStatusHandler
     {
         public string managerName;
@@ -12,7 +11,4 @@ namespace P3ConversionDashboard.Tests
         public LogData Error;
         public LogData Reconciliation;
     }
-    
-    
-    
 }

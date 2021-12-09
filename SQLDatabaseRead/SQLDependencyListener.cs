@@ -13,12 +13,12 @@ namespace SQLDatabaseRead
         private SqlDependency _dependency;
         private string _queryString;
         public static SqlConnection Connection { get; set; }
-        private IDataHandler _dataHandlerObject;
+        public IDataHandler DataHandlerObject { get;}
         private bool run;
         public SQLDependencyListener(string queryString, string currentDataQueryString, IDataHandler dataHandlerObject)
         {
             _queryString = queryString;
-            _dataHandlerObject = dataHandlerObject;
+            DataHandlerObject = dataHandlerObject;
             run = true;
 
             //Queries the database for data currently in the database
@@ -71,7 +71,7 @@ namespace SQLDatabaseRead
             {
                 //Console.WriteLine("QUERY STRING LOOKS LIKE THIS: " + _dataObject.GetChangesQueryString());
                 //To minimise network traffic, a separate list containing only the changes is made and send to the client
-                AddQueryToObject(_dataHandlerObject.GetNewestDataQueryString());
+                AddQueryToObject(DataHandlerObject.GetNewestDataQueryString());
             }
             StartListening();
         }
@@ -84,7 +84,7 @@ namespace SQLDatabaseRead
                 {
                     if (reader.HasRows)
                     {
-                        _dataHandlerObject.AddDataFromSqlReader(reader);
+                        DataHandlerObject.AddDataFromSqlReader(reader);
                     }
                     reader.Close();
                 }
