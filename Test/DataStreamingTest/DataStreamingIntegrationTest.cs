@@ -6,7 +6,6 @@ using DataStreamingSimulation;
 using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace P3ConversionDashboard.Tests.DataStreamingTest
 {
@@ -33,13 +32,7 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
 
         private List<string> streamsWithoutTimestamp = new List<string>() { "MANAGERS", "LOGGING_CONTEXT" };
 
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public DataStreamingIntegrationTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
+        //tests if the database streamer, streams the correct amount of data
         [Fact]
         public async void DatabaseStreamTest()
         {

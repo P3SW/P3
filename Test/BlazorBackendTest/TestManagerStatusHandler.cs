@@ -10,7 +10,4 @@ namespace P3ConversionDashboard.Tests.BlazorBackendTest
         public LogData Error;
         public LogData Reconciliation;
     }
-    
-    
-    
 }

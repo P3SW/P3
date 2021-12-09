@@ -6,30 +6,20 @@ using BlazorApp.Data;
 using BlazorApp.Pages;
 using Bunit;
 using ExecuteSQLScript;
-using Microsoft.CodeAnalysis.CSharp;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace P3ConversionDashboard.Tests
 {
     public class BlazorBackendFrontendIntegrationTest : TestContext
     {
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public BlazorBackendFrontendIntegrationTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
-
         [Fact]
         public async void TestBlazorBackendFrontend()
         {
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
             await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
-            await Task.Run(() => AssignTestData());
+            await Task.Run(() => AssignTestData()); //assigns data to the backend
             
-            JSInterop.Mode = JSRuntimeMode.Loose; // because of radzen
+            JSInterop.Mode = JSRuntimeMode.Loose;
             
             var errorComponent = RenderComponent<Errors>();
             var reconComponent = RenderComponent<Reconciliations>();
@@ -38,6 +28,7 @@ namespace P3ConversionDashboard.Tests
             string renderedErrorMarkup = errorComponent.Markup;
             string renderedReconMarkup = reconComponent.Markup;
 
+            //Asserts for the data in the components(frontend)
             foreach (ManagerStatusHandler manager in ConversionDataAssigner.FinishedManagers)
             {
                 foreach (LogData error in manager.ErrorHandler.LogDataList)
@@ -60,10 +51,7 @@ namespace P3ConversionDashboard.Tests
             ConversionDataAssigner.FinishedManagers = new List<ManagerStatusHandler>();
         }
         
-        
-        
-        
-
+        //Assigns data to the ConversionDataAssigner(backend)
         public void AssignTestData()
         {
             ConversionDataAssigner.FinishedManagers = new List<ManagerStatusHandler>()
@@ -102,9 +90,9 @@ namespace P3ConversionDashboard.Tests
             }
         }
         
-        public  string GenerateRandomString(int length = 10)
+        public  string GenerateRandomString(int length)
         {
-            const string chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+            const string chars = "abcdefghijklmnopqrstuvwxyz0123456789";
  
             var random       = new Random();
             var randomString = new string(Enumerable.Repeat(chars, length).Select(s => s[random.Next(s.Length)]).ToArray());

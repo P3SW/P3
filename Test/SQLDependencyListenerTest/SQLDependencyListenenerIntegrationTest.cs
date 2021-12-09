@@ -7,12 +7,11 @@ using ExecuteSQLScript;
 using Microsoft.Data.SqlClient;
 using SQLDatabaseRead;
 using Xunit;
-using Xunit.Abstractions;
 
-namespace P3ConversionDashboard.Tests.SQLDependencyListenerIntegrationTest
+namespace P3ConversionDashboard.Tests.SQLDependencyListenerTest
 {
     [Collection("Sequential")]
-    public class SQLDependencyListenenerTest
+    public class SQLDependencyListenenerIntegrationTest
     {
 
         private List<HealthData> cpu = new List<HealthData>()
@@ -33,27 +32,18 @@ namespace P3ConversionDashboard.Tests.SQLDependencyListenerIntegrationTest
             new HealthData("MEMORY", 6563631104, DateTime.Parse("2021-10-28 15:09:34.187"))
         };
 
-
-
-        private readonly ITestOutputHelper _testOutputHelper;
-
-        public SQLDependencyListenenerTest(ITestOutputHelper testOutputHelper)
-        {
-            _testOutputHelper = testOutputHelper;
-        }
-
         [Fact]
         public async void SQLDependencyTest()
         {
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerIntegrationTest/DROP_ANS_DB_P3_TEST.sql"));
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerIntegrationTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
             HealthDataHandler testHealthHandler = new HealthDataHandler(DateTime.Parse("2021-10-28 15:07:23.277"));
             
-            SQLDependencyListener.Connection = new SqlConnection(ConfigReader.ReadSetupFile("../../../SQLDependencyListenerIntegrationTest/SQLDependencyListenerSetup.txt"));
+            SQLDependencyListener.Connection = new SqlConnection(ConfigReader.ReadSetupFile("../../../SQLDependencyListenerTest/SQLDependencyListenerSetup.txt"));
             SQLDependencyListener.Connection.Open();
             
-            DatabaseStreamer testDatabaseStreamer = new DatabaseStreamer("../../../SQLDependencyListenerIntegrationTest/DataStreamingSetup.txt", 
+            DatabaseStreamer testDatabaseStreamer = new DatabaseStreamer("../../../SQLDependencyListenerTest/DataStreamingSetup.txt", 
                 "2021-10-28 15:07:23.277", "2021-10-28 15:10:06.043");
             testDatabaseStreamer.Stream(100);
             
@@ -74,7 +64,8 @@ namespace P3ConversionDashboard.Tests.SQLDependencyListenerIntegrationTest
             //assert
             CheckSQLDependencyListener(testHealthHandler);
         }
-
+        
+        //checks that the data queried by the SQLDependencyListener is the correct data
         public void CheckSQLDependencyListener(HealthDataHandler healthDataHandler)
         {
             Assert.NotEmpty(healthDataHandler.Cpu);
