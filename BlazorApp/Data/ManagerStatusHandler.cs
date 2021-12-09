@@ -98,7 +98,7 @@ namespace BlazorApp.Data
             }
             else
             {
-                result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
+                result = ((double) (RowsRead + RowsWritten) / RunTime * AvgCpu)*10;
             }
 
             EfficiencyScore = Convert.ToInt32(result);
