@@ -4,6 +4,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using BlazorApp.Data;
+using ExecuteSQLScript;
 
 
 namespace BlazorApp
@@ -51,7 +52,7 @@ namespace BlazorApp
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
-
+            SQLScriptExecuter.Execute("../ExecuteSQLScript/TRUNCATE_TABLE.sql");
             ConversionDataAssigner.Start("setup.txt");
         }
     }

@@ -1,22 +1,19 @@
 using System;
 using System.Collections.Generic;
 using BlazorApp.Data;
-using Xunit;
 
-namespace P3ConversionDashboard.Tests
+namespace P3ConversionDashboard.Tests.BlazorBackendTest
 {
     public static class BlazorBackendCheckData
     {
+        //test data for BlazorBackendIntegrationTest.cs
         public static List<TestManagerStatusHandler> testManagers = new List<TestManagerStatusHandler>()
         {
             new TestManagerStatusHandler()
             {
                 managerName = "dk.aes.ans.konvertering.managers.conversionUser.AnsConversionUserManager,rnd_2032045042",
-                CPU =  new HealthData("CPU", 5,DateTime.Parse("2021-10-28 15:07:24.683")),
-                Memory = new HealthData("MEMORY", 6601781248, DateTime.Parse("2021-10-28 15:07:24.700")),
                 Error = new LogData(DateTime.Parse("2021-10-28 15:07:25.763"), "Executing pre-run scripts",
                     "DK.AES.ANS.KONVERTERING.MANAGERS.CONVERSIONUSER.ANSCONVERSIONUSERMANAGER","INFO"),
-                //No reconciliations logged by this manager
             },
             new TestManagerStatusHandler()
             {
@@ -25,7 +22,6 @@ namespace P3ConversionDashboard.Tests
                 Memory = new HealthData("MEMORY", 6552645632, DateTime.Parse("2021-10-28 15:07:56.987")),
                 Error = new LogData(DateTime.Parse("2021-10-28 15:07:50.517"), "Toggling foreign keys for Injury succeeded.",
                     "DK.AES.ANS.KONVERTERING.MANAGERS.INIT.ANSINITMANAGER","INFO"),
-                //No reconciliations logged by this manager
             },
             new TestManagerStatusHandler()
             {
@@ -40,8 +36,6 @@ namespace P3ConversionDashboard.Tests
             new TestManagerStatusHandler()
             {
                 managerName = "dk.aes.ans.konvertering.managers.actor.departments.DepartmentManager",
-                //No CPU logged by this manager
-                //No Memory logged by this manager
                 Error = new LogData(DateTime.Parse("2021-10-28 15:09:11.627"), "Set nologging on tables: ACTOR, KONV_ACTOR",
                     "DK.AES.ANS.KONVERTERING.MANAGERS.ACTOR.DEPARTMENTS.DEPARTMENTMANAGER","INFO"),
                 Reconciliation = new LogData(DateTime.Parse("2021-10-28 15:09:19.913"), "Mindst en række i ANS_KONV_BLOK22.dbo.[KONV_ACTOR]",
@@ -60,11 +54,8 @@ namespace P3ConversionDashboard.Tests
             new TestManagerStatusHandler()
             {
                 managerName = "dk.aes.ans.konvertering.managers.parts.Konv.PartFSFTOpsaetningManager",
-                //No CPU logged by this manager
-                //No Memory logged by this manager
                 Error = new LogData(DateTime.Parse("2021-10-28 15:09:40.270"), "Will clean AUDIT_LOGINFO where MGRNAME is 'dk.aes.ans.konvertering.managers.parts.Konv.PartFSFTOpsaetningManager'",
                     "DK.AES.ANS.KONVERTERING.MANAGERS.PARTS.KONV.PARTFSFTOPSAETNINGMANAGER", "INFO"),
-                //No reconciliations logged by this manager
             },
             
         };

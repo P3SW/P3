@@ -56,5 +56,17 @@ namespace BlazorApp.Data
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
         }
+
+        public void AddHealthData(string reportType, long numericValue, DateTime logtime)
+        {
+            if (reportType == "CPU")
+            {
+                Cpu.Add(new HealthData(reportType, numericValue, logtime));
+            }
+            else
+            {
+                Memory.Add(new HealthData(reportType, numericValue, logtime));
+            }
+        }
     }
 }
