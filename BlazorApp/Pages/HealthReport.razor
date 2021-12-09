@@ -16,7 +16,7 @@ else
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManagerId)-@Utility.ShortenManagerName(Managers[SelectedManagerId].Name)</b>
+                <b class="selected-manager-name" title="@SelectedManagerWriter("Title")">@SelectedManagerWriter("Dropdown")</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
@@ -27,7 +27,7 @@ else
                         {
                             continue;
                         }
-                        else if (j == 0)
+                        if (j == 0)
                         {
                             j++;
                             <div class="dropdown-content-first" 
@@ -90,7 +90,7 @@ else
         _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
         
         // **** Show LineChart at page reload ****
-        if ((_memDataList != null && _memDataList?.Count != 0) && (_cpuDataList != null && _cpuDataList?.Count != 0))
+        if (_memDataList != null && _memDataList?.Count != 0 && _cpuDataList != null && _cpuDataList?.Count != 0)
         {
             await Task.Run(ClearLineChart);
             await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
@@ -100,6 +100,7 @@ else
 
         UpdateOverviewTriggered += async (o,args) =>
         {
+            SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
             if (Follow)
             {
                 if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
@@ -112,7 +113,7 @@ else
         {
             _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
             _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
-            
+
             await Task.Run(() =>
             {
                 if (ConversionDataAssigner.CurrentManager.CpuDataList != null)
@@ -130,6 +131,7 @@ else
             
             if (Follow)
             {
+                SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
                 if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
                 {
                     await Task.Run(ClearLineChart);
@@ -351,13 +353,33 @@ else
         
         await InvokeAsync(StateHasChanged);
     }
+
+    private string SelectedManagerWriter(string type)
+    {
+        if (ConversionDataAssigner.CurrentManager != null)
+        {
+            if (type.Equals("Title"))
+            {
+                return Follow ? ConversionDataAssigner.CurrentManager.Name : Managers[SelectedManagerId].Name;
+            }
+            if (Follow)
+            {
+                return ConversionDataAssigner.CurrentManager.Id + "-" + @Utility.ShortenManagerName(ConversionDataAssigner.CurrentManager.Name);
+            }
+        }
+        else if(type.Equals("Title"))
+        {
+            return Managers[SelectedManagerId].Name;
+        }
+        return SelectedManagerId + "-" + Utility.ShortenManagerName(Managers[SelectedManagerId].Name);
+    }
     
     private async Task OnCheckboxClick()
     {
         if (Follow)
         {
-            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
-            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId == 0 ? 0 : SelectedManagerId -= 1]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId == 0 ? 0 : SelectedManagerId -= 1]?.MemDataList);
         }
         else
         {
@@ -365,7 +387,7 @@ else
             _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
         }
         
-        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        if (_memDataList != null && _cpuDataList != null && _memDataList?.Count != 0 && _cpuDataList?.Count != 0)
         {
             await Task.Run(ClearLineChart);
             await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
