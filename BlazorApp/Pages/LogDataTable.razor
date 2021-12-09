@@ -228,26 +228,12 @@
                 await InvokeAsync(DataGridRef.Reload);
                 await InvokeAsync(StateHasChanged);
             };
-        
-            ErrorUpdateReset += async (_, _) =>
-            {
-                LogDataList = null;
-                await InvokeAsync(DataGridRef.Reload);
-                await InvokeAsync(StateHasChanged);
-            };
         }
         else
         {
             ReconUpdateTriggered += async (_, args) =>
             {
                 LogDataList.AddRange(args.ReconDataList);
-                await InvokeAsync(DataGridRef.Reload);
-                await InvokeAsync(StateHasChanged);
-            };
-        
-            ReconUpdateReset += async (_, _) =>
-            {
-                LogDataList = null;
                 await InvokeAsync(DataGridRef.Reload);
                 await InvokeAsync(StateHasChanged);
             };

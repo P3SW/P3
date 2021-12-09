@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Linq;
-using BlazorApp.Data;
 
 namespace BlazorApp
 {
@@ -41,6 +40,7 @@ namespace BlazorApp
                 return hours + ':' + minutes + ':' + seconds;
         }
 
+        /* Converts available memory to memory used out of max memory */
         public static int CalculateMemoryUsage(long memoryAvailable, long maxMemory)
         {
             return Convert.ToInt32(((double)(maxMemory - memoryAvailable) / (maxMemory)) * 100);
