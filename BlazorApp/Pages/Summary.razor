@@ -153,14 +153,11 @@
     ManagerStatusHandler _currentManager;
     private int[] _managerQueueCounter;
     private int _managersCount = 0;
-                                                                                                                           
+    
     protected override async Task OnInitializedAsync()
     {
-        
         ConfigurePieConfig();
-        
-        ConfigurePieConfig();                                                                                              
-                                                                                                                           
+         
         _errorDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("error"));
         _reconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("reconciliations"));
         
