@@ -34,7 +34,14 @@ namespace BlazorApp.Data
         // Used in ManagerStatusHandler
         public int Cpu { get; set; }
         public static SqlConnection Connection { get; set; }
-        
+        public HealthDataHandler Health { get; set; }
+        public ReconciliationDataHandler ReconciliationHandler { get; set; }
+        public ErrorDataHandler ErrorHandler { get; set; }
+        public string Name { get; private set; }
+        public int Id { get; private set; }
+        private DateTime StartTime { get; set; }
+        private int ExecutionID { get; set; }
+
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
             Health = new HealthDataHandler(startTime);
@@ -45,25 +52,12 @@ namespace BlazorApp.Data
             StartTime = startTime;
             ExecutionID = executionId;
         }
-        
-        public HealthDataHandler Health { get; set; }
-        public ReconciliationDataHandler ReconciliationHandler { get; set; }
-        public ErrorDataHandler ErrorHandler { get; set; }
-        public string Name { get; private set; }
-        public int Id { get; private set; }
-        private DateTime StartTime { get; set; }
-        private int ExecutionID { get; set; }
-        
-        
+
         //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {
             OverviewTriggerUpdate();
             
-            Console.WriteLine($"Manager {Name} started");
-            Console.WriteLine($"Manager {Name} started with execution_id " + ExecutionID);
-            Console.WriteLine("MANAGER START TIME IS: " + StartTime);
-
             _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,
                 GetSelectStringsForTableStreamer("health"), Health);
             _errorStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ErrorSelect,
@@ -79,11 +73,9 @@ namespace BlazorApp.Data
         //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
         public void FinishManager()
         {
-            Console.WriteLine("Stopping the data from listening");
             _healthStreamer.StopListening();
             _errorStreamer.StopListening();
             _reconciliationStreamer.StopListening();
-            Console.WriteLine("Listening stopped");
             
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
@@ -95,7 +87,7 @@ namespace BlazorApp.Data
         public void CalculateEfficiencyScore()
         {
             double averageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
-            Cpu = Convert.ToInt32(AvgCpu);
+            Cpu = Convert.ToInt32(averageCpu);
 
             double result;
             if (RunTime == 0)
@@ -104,13 +96,14 @@ namespace BlazorApp.Data
             }
             else
             {
-                result = ((double) (RowsRead + RowsWritten) / RunTime * AvgCpu)*10;
+                result = ((double) (RowsRead + RowsWritten) / RunTime * (averageCpu));
             }
 
             EfficiencyScore = Convert.ToInt32(result);
             AvgCpu = Convert.ToInt64(averageCpu);
         }
         
+        //Method used to calculate the average memory usage of a manager
         public void CalculateAverageMemoryUsed()
         {
             AvgMemory = Health.Memory.Count > 0 ? Convert.ToInt64(Health.Memory.Average(data => data.NumericValue)) : MaxMemory;
@@ -136,7 +129,8 @@ namespace BlazorApp.Data
                     reader.Close();
                 }
             }
-
+            
+            //The method will retry the query up to 5 times if it fails.
             if (RunTime == 0 && _mtRetryCount < 5)
             {
                 _mtRetryCount++;
@@ -145,7 +139,7 @@ namespace BlazorApp.Data
             }
         }
 
-        //Queries data from the MANAGER_TRACKING table
+        //Returns a query string for the MANAGER_TRACKING table
         private string GetManagerTrackingQueryString()
         {
             return string.Format($"SELECT [STATUS], [RUNTIME], [PERFORMANCECOUNTROWSREAD], [PERFORMANCECOUNTROWSWRITTEN], [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
@@ -166,7 +160,7 @@ namespace BlazorApp.Data
                                          "[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          "FROM [dbo].[LOGGING] " +
                                          "INNER JOIN [dbo].[LOGGING_CONTEXT] " +
-                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
+                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID AND LOGGING.EXECUTION_ID = LOGGING_CONTEXT.EXECUTION_ID) " +
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
                                          $"AND [LOGGING_CONTEXT].[EXECUTION_ID] = '{ExecutionID}' "+
                                          "ORDER BY CREATED");
@@ -177,6 +171,18 @@ namespace BlazorApp.Data
                 default:
                     throw new ArgumentException();
             }
+        }
+        
+        //Method used to strip away the RND part found in some manager names.
+        public string GetManagerNameWithoutRnd()
+        {
+            if (Name.Contains(','))
+            {
+                string[] name = Name.Split(",");
+                return name[0];
+            }
+
+            return Name;
         }
     }
 }
