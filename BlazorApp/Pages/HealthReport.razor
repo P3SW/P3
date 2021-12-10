@@ -100,9 +100,9 @@ else
 
         UpdateOverviewTriggered += async (o,args) =>
         {
-            SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
-            if (Follow)
+            if (Follow && ConversionDataAssigner.CurrentManager != null)
             {
+                SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
                 if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
                     ClearLineChart();
                 await InvokeAsync(StateHasChanged);
@@ -129,7 +129,7 @@ else
                     }
             });
             
-            if (Follow)
+            if (Follow && ConversionDataAssigner.CurrentManager != null)
             {
                 SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
                 if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
@@ -376,10 +376,12 @@ else
     
     private async Task OnCheckboxClick()
     {
+        if (ConversionDataAssigner.CurrentManager == null) return;
         if (Follow)
         {
-            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId == 0 ? 0 : SelectedManagerId -= 1]?.CpuDataList);
-            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId == 0 ? 0 : SelectedManagerId -= 1]?.MemDataList);
+            if(SelectedManagerId > ConversionDataAssigner.FinishedManagers.Count - 1) SelectedManagerId -= 1;
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
         }
         else
         {
