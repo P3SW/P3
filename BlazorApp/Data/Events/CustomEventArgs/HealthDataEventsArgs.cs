@@ -8,6 +8,5 @@ namespace BlazorApp.DataStreaming.Events.CustomEventArgs
     {
         public List<HealthData> Cpu { get; set; }
         public List<HealthData> Memory { get; set; }
-        public string ReportType { get; set; }
     }
 }

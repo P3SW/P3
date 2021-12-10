@@ -10,9 +10,9 @@ namespace BlazorApp.Data
     {
         public List<HealthData> Cpu { get; private set; }
         public List<HealthData> Memory { get; private set; }
-        public List<HealthData> NewCpu { get; private set; }
-        public List<HealthData> NewMemory { get; private set; }
-        public static DateTime LastRowTimeStamp { get; private set; }
+        private List<HealthData> NewCpu { get; set; }
+        private List<HealthData> NewMemory { get; set; }
+        private static DateTime LastRowTimeStamp { get; set; }
         
 
         public HealthDataHandler(DateTime managerStartTime)
