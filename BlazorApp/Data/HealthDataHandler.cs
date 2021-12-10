@@ -10,9 +10,9 @@ namespace BlazorApp.Data
     {
         public List<HealthData> Cpu { get; private set; }
         public List<HealthData> Memory { get; private set; }
-        public List<HealthData> NewCpu { get; private set; }
-        public List<HealthData> NewMemory { get; private set; }
-        public static DateTime LastRowTimeStamp { get; private set; }
+        private List<HealthData> NewCpu { get; set; }
+        private List<HealthData> NewMemory { get; set; }
+        private static DateTime LastRowTimeStamp { get; set; }
         
 
         public HealthDataHandler(DateTime managerStartTime)
@@ -56,7 +56,8 @@ namespace BlazorApp.Data
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
         }
-
+        
+        //Method used to create new healthdata objects from values.
         public void AddHealthData(string reportType, long numericValue, DateTime logtime)
         {
             if (reportType == "CPU")

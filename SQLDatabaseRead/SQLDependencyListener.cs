@@ -30,6 +30,7 @@ namespace SQLDatabaseRead
         {
             run = false;
             _dependency.OnChange -= SqlDependencyChange;
+            AddQueryToObject(DataHandlerObject.GetNewestDataQueryString());
         }
 
         //Method responsible for listening for changes in the tables.
@@ -68,8 +69,6 @@ namespace SQLDatabaseRead
             }
             else
             {
-                //Console.WriteLine("QUERY STRING LOOKS LIKE THIS: " + _dataObject.GetChangesQueryString());
-                //To minimise network traffic, a separate list containing only the changes is made and send to the client
                 AddQueryToObject(DataHandlerObject.GetNewestDataQueryString());
             }
             StartListening();

@@ -16,14 +16,14 @@ else
     <div class="cpu_usage">
         <div class="chart-header">
             <div class="dropdown">
-                <b class="selected-manager-name" title="">@(SelectedManagerId)-@Utility.ShortenManagerName(Managers[SelectedManagerId].Name)</b>
+                <b class="selected-manager-name" title="">@(_selectedManagerId)-@Utility.ShortenManagerName(Managers[_selectedManagerId].Name)</b>
                 <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
                 <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
                 <div class="dropdown-content">
                     @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
                         int managerID = i;
-                        if (i == SelectedManagerId)
+                        if (i == _selectedManagerId)
                         {
                             continue;
                         }
@@ -76,15 +76,13 @@ else
     private LineDataset<long> _lineConfigDatasetCpu;
     private LineDataset<long> _lineConfigDatasetMemory;
     private LineConfig _lineConfig;
-    private int SelectedManagerId { get; set; }
-    private ManagerStatusHandler SelectedManager { get; set; }
-    
+    private int _selectedManagerId;
     private bool Follow { get; set; } = true;
     
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
-        SelectedManagerId = 0;
+        _selectedManagerId = 0;
         
         _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
         _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
@@ -160,7 +158,6 @@ else
             PointHitRadius = 0
         };
         
-            
         // LineChart CPU
         _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList.ToList()))
         {
@@ -177,36 +174,56 @@ else
 
     private void ClearLineChart()
     {
-        _lineConfig.Data.Datasets.Clear();
+        lock (_lineConfig)
+        {
+            _lineConfig.Data.Datasets.Clear();
+        }
     }
     
-    // **** LineChart methods **** Begin ****
     private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
+        DateTime newestEntry = default;
         string[] separators = new string[] {" "};
         
         _lineConfigDatasetCpu.Clear();
         foreach (var data in healthDataList.ToList())
-            if (data?.ReportType == "CPU")
+        {
+            if (data?.ReportType == "CPU" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
                 _lineConfigDatasetCpu.Add(data.NumericValue);
+            }
+        }
 
+        newestEntry = default;
         _lineConfig.Data.Labels.Clear();
         foreach (var data in healthDataList.ToList())
-            if (data?.ReportType == "CPU")
+        {
+            if (data?.ReportType == "CPU" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
                 _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            }
+        }
+        
         
         return _lineConfigDatasetCpu;
     }
     
     private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
     {
+        DateTime newestEntry = default;
         _lineConfigDatasetMemory.Clear();
         foreach (var data in healthDataList.ToList())
-            if (data?.ReportType == "MEMORY")
+        {
+            if (data?.ReportType == "MEMORY" && (newestEntry == default || data.LogTime > newestEntry))
             {
+                newestEntry = data.LogTime;
                 long MaxMemory = 21473734656;
                 _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
             }
+        }
+            
 
         return _lineConfigDatasetMemory;
     }
@@ -320,10 +337,10 @@ else
     // **** Dropdown menu methods **** Begin ****
     private async Task DropDownHandler(int selectedID)
     {
-        SelectedManagerId = selectedID;
+        _selectedManagerId = selectedID;
         
-        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
-        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.CpuDataList);
+        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.MemDataList);
         
         if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
         {
@@ -338,8 +355,8 @@ else
     {
         if (Follow)
         {
-            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
-            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.MemDataList);
         }
         else
         {

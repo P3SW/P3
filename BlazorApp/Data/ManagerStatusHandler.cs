@@ -11,32 +11,36 @@ namespace BlazorApp.Data
 {
     public class ManagerStatusHandler : EventBase
     {
-        private int ExecutionID;
-        public string Name { get; private set; }
-        public int Id { get; private set; }
-        public string Status { get; private set; }
-        public DateTime StartTime { get; private set; }
-        public DateTime EndTime { get; private set; }
-        public int RunTime { get; private set; }
-        public HealthDataHandler Health { get; set; }
-        public ErrorDataHandler ErrorHandler { get; set; }
-        public ReconciliationDataHandler ReconciliationHandler { get; set; }
-        public int RowsRead { get; private set; }
-        public int RowsWritten { get; private set; }
-        public int Cpu { get; set; }
-        public int EfficiencyScore { get; private set; }
-        public static SqlConnection Connection { get; set; }
+        private const long MaxMemory = 21473734656; /* Approx 20gb */
         private SQLDependencyListener _healthStreamer;
         private SQLDependencyListener _errorStreamer;
         private SQLDependencyListener _reconciliationStreamer;
         private int _mtRetryCount;
+        
         public long AvgCpu;
         public long AvgMemory;
-        public int AvgMemoryPercent { get; private set; }
-        private const long MaxMemory = 21473734656; /* Approx 20gb */
-
         public readonly List<HealthData> CpuDataList = new ();
         public readonly List<HealthData> MemDataList = new ();
+        
+        // Used in pages
+        public string Status { get; private set; }
+        public DateTime EndTime { get; private set; }
+        public int RunTime { get; private set; }
+        public int RowsRead { get; private set; }
+        public int RowsWritten { get; private set; }
+        public int EfficiencyScore { get; private set; }
+        public int AvgMemoryPercent { get; private set; }
+        
+        // Used in ManagerStatusHandler
+        public int Cpu { get; set; }
+        public static SqlConnection Connection { get; set; }
+        public HealthDataHandler Health { get; set; }
+        public ReconciliationDataHandler ReconciliationHandler { get; set; }
+        public ErrorDataHandler ErrorHandler { get; set; }
+        public string Name { get; private set; }
+        public int Id { get; private set; }
+        private DateTime StartTime { get; set; }
+        private int ExecutionID { get; set; }
 
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
@@ -54,10 +58,6 @@ namespace BlazorApp.Data
         {
             OverviewTriggerUpdate();
             
-            Console.WriteLine($"Manager {Name} started");
-            Console.WriteLine($"Manager {Name} started with execution_id " + ExecutionID);
-            Console.WriteLine("MANAGER START TIME IS: " + StartTime);
-
             _healthStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.HealthSelect,
                 GetSelectStringsForTableStreamer("health"), Health);
             _errorStreamer = new SQLDependencyListener(DatabaseListenerQueryStrings.ErrorSelect,
@@ -73,11 +73,9 @@ namespace BlazorApp.Data
         //Stops the tablestreamers, queries relevant data and calculates the EffiencyScore(TM)
         public void FinishManager()
         {
-            Console.WriteLine("Stopping the data from listening");
             _healthStreamer.StopListening();
             _errorStreamer.StopListening();
             _reconciliationStreamer.StopListening();
-            Console.WriteLine("Listening stopped");
             
             AssignManagerTrackingData();
             CalculateEfficiencyScore();
@@ -89,7 +87,7 @@ namespace BlazorApp.Data
         public void CalculateEfficiencyScore()
         {
             double averageCpu = Health.Cpu.Count > 0 ?  Health.Cpu.Average(data => data.NumericValue) : 0;
-            Cpu = Convert.ToInt32(AvgCpu);
+            Cpu = Convert.ToInt32(averageCpu);
 
             double result;
             if (RunTime == 0)
@@ -98,13 +96,14 @@ namespace BlazorApp.Data
             }
             else
             {
-                result = ((double) (RowsRead + RowsWritten) / RunTime * (1+AvgCpu))*10;
+                result = ((double) (RowsRead + RowsWritten) / RunTime * (averageCpu));
             }
 
             EfficiencyScore = Convert.ToInt32(result);
             AvgCpu = Convert.ToInt64(averageCpu);
         }
         
+        //Method used to calculate the average memory usage of a manager
         public void CalculateAverageMemoryUsed()
         {
             AvgMemory = Health.Memory.Count > 0 ? Convert.ToInt64(Health.Memory.Average(data => data.NumericValue)) : MaxMemory;
@@ -130,7 +129,8 @@ namespace BlazorApp.Data
                     reader.Close();
                 }
             }
-
+            
+            //The method will retry the query up to 5 times if it fails.
             if (RunTime == 0 && _mtRetryCount < 5)
             {
                 _mtRetryCount++;
@@ -139,7 +139,7 @@ namespace BlazorApp.Data
             }
         }
 
-        //Queries data from the MANAGER_TRACKING table
+        //Returns a query string for the MANAGER_TRACKING table
         private string GetManagerTrackingQueryString()
         {
             return string.Format($"SELECT [STATUS], [RUNTIME], [PERFORMANCECOUNTROWSREAD], [PERFORMANCECOUNTROWSWRITTEN], [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
@@ -160,7 +160,7 @@ namespace BlazorApp.Data
                                          "[dbo].[LOGGING_CONTEXT].[CONTEXT] " +
                                          "FROM [dbo].[LOGGING] " +
                                          "INNER JOIN [dbo].[LOGGING_CONTEXT] " +
-                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID) " +
+                                         "ON (LOGGING.CONTEXT_ID = LOGGING_CONTEXT.CONTEXT_ID AND LOGGING.EXECUTION_ID = LOGGING_CONTEXT.EXECUTION_ID) " +
                                          $"WHERE CREATED > '{StartTime.ToString("yyyy-MM-dd HH:mm:ss.fff")}' " +
                                          $"AND [LOGGING_CONTEXT].[EXECUTION_ID] = '{ExecutionID}' "+
                                          "ORDER BY CREATED");
@@ -171,6 +171,18 @@ namespace BlazorApp.Data
                 default:
                     throw new ArgumentException();
             }
+        }
+        
+        //Method used to strip away the RND part found in some manager names.
+        public string GetManagerNameWithoutRnd()
+        {
+            if (Name.Contains(','))
+            {
+                string[] name = Name.Split(",");
+                return name[0];
+            }
+
+            return Name;
         }
     }
 }
