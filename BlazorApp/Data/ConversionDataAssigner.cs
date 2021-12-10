@@ -11,22 +11,21 @@ namespace BlazorApp.Data
 {
     public static class ConversionDataAssigner
     {
-
-        public static List<ManagerStatusHandler> FinishedManagers { get; set; } = new List<ManagerStatusHandler>();
-        public static ManagerStatusHandler CurrentManager;
-
         private static SqlConnection _connection;
         private static string _connectionString;
-        public static int _managerQueue = 0;
         private static int _managerId;
         private static int _executionId;
+        
+        public static List<ManagerStatusHandler> FinishedManagers { get; set; } = new List<ManagerStatusHandler>();
+        public static ManagerStatusHandler CurrentManager;
+        public static int ManagerQueue = 0;
         
         //Method starting the tracking of the tables in the DB. This is done by querying rows from the Managers table. 
         //The program will wait for data if the table is empty
         public static void Start(string setupFile)
         {
             _connectionString = ConfigReader.ReadSetupFile(setupFile);
-            _managerQueue = 0;
+            ManagerQueue = 0;
             _managerId = 1;
             CurrentManager = null;
             _executionId = 1;
@@ -60,7 +59,7 @@ namespace BlazorApp.Data
                             Summary.Runtime.StartTimer(); //Starts the timer for conversion runtime on summary
                             while (reader.Read())
                             {
-                                _managerQueue++;
+                                ManagerQueue++;
                             }
                             reader.Close();
                             ManagerTrackingListener();
@@ -111,7 +110,7 @@ namespace BlazorApp.Data
                 {
                     while (reader.Read())
                     {
-                        _managerQueue++;
+                        ManagerQueue++;
                     }
                     reader.Close();
                 }
@@ -181,7 +180,7 @@ namespace BlazorApp.Data
                             FinishedManagers.Add(CurrentManager);
                         }
 
-                        if (_managerQueue == 0) //If the last manager has run the method will stop
+                        if (ManagerQueue == 0) //If the last manager has run the method will stop
                         {
                             CurrentManager = null;
                             return;
@@ -192,7 +191,7 @@ namespace BlazorApp.Data
                     {
                         CurrentManager = new ManagerStatusHandler((string)reader[0], _managerId, (DateTime)reader[1], _executionId);
                         _managerId++;
-                        _managerQueue--;
+                        ManagerQueue--;
                         Summary.Runtime.CurrentManagerResetTimer();
                     }
                     reader.Close();

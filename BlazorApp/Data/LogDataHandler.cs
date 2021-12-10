@@ -9,11 +9,10 @@ namespace BlazorApp.Data
     public abstract class LogDataHandler : EventBase
     {
         public List<LogData> LogDataList { get; private set; }
-        public List<LogData> newLogDataList { get; private set; }
-        public DateTime LastRowTimeStamp { get; private set; }
+        protected DateTime LastRowTimeStamp { get; private set; }
         private Action<List<LogData>> TriggerUpdate { get; set; }
-        
-        public LogDataHandler(DateTime managerStartTime, Action<List<LogData>> triggerUpdate)
+
+        protected LogDataHandler(DateTime managerStartTime, Action<List<LogData>> triggerUpdate)
         {
             LogDataList = new List<LogData>();
             LastRowTimeStamp = managerStartTime;
