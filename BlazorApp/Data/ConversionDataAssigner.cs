@@ -39,8 +39,11 @@ namespace BlazorApp.Data
             {
                 conn.Open();
                 
+                //Stops the SqlDependency before starting it to ensure it starts with the correct connection.
                 SqlDependency.Stop(_connectionString);
                 SqlDependency.Start(_connectionString);
+                
+                
                 ManagerStatusHandler.Connection = new SqlConnection(_connectionString);
                 SQLDependencyListener.Connection = new SqlConnection(_connectionString);
                 
@@ -85,10 +88,9 @@ namespace BlazorApp.Data
                 command.CommandText = DatabaseListenerQueryStrings.ManagersSelect;
                     
                 SqlDependency dependency = new SqlDependency(command);
-                dependency.OnChange +=  ContinueSetup;
+                dependency.OnChange += ContinueSetup;
                     
                 SQLDependencyListener.CloseReader(command);
-
             }            
         }
         
@@ -117,6 +119,25 @@ namespace BlazorApp.Data
             ManagerTrackingListener();
         }
 
+        //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
+        private static void ManagerTrackingListener()
+        {
+            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
+            {
+                
+                command.CommandType = CommandType.Text;
+                command.CommandText = DatabaseListenerQueryStrings.ManagerStartTimesSelect;
+                    
+                SqlDependency dependency = new SqlDependency(command);
+                dependency.OnChange += GetExecutionID;
+                dependency.OnChange += ManagerStartTracking;
+                Console.WriteLine("Manager start dependency created");
+                
+                SQLDependencyListener.CloseReader(command);
+            }
+        }
+        
+        //Eventhandler used to query ExecutionID for a manager
         private static void GetExecutionID(object sender, SqlNotificationEventArgs eventArgs)
         {
             if (eventArgs.Info == SqlNotificationInfo.Invalid)
@@ -137,25 +158,7 @@ namespace BlazorApp.Data
                 }
             }
         }
-
-        //Listens for updates in the MANAGER_TRACKING table using a SqlDependency. The eventhandler stops the current manager from listening 
-        private static void ManagerTrackingListener()
-        {
-            using (SqlCommand command = new SqlCommand(DatabaseListenerQueryStrings.ManagerStartTimesSelect, _connection))
-            {
-                
-                command.CommandType = CommandType.Text;
-                command.CommandText = DatabaseListenerQueryStrings.ManagerStartTimesSelect;
-                    
-                SqlDependency dependency = new SqlDependency(command);
-                dependency.OnChange += GetExecutionID;
-                dependency.OnChange += ManagerStartTracking;
-                Console.WriteLine("Manager start dependency created");
-                
-                SQLDependencyListener.CloseReader(command);
-            }
-        }
-
+        
         //Method handling the event. Calls the next manager and creates a new SqlDependency to track the table again
         private static void ManagerStartTracking(object sender, SqlNotificationEventArgs eventArgs)
         {
@@ -199,24 +202,12 @@ namespace BlazorApp.Data
             ManagerTrackingListener();
         }
 
-        private static void PrintFinishedManager()
-        {
-            Console.WriteLine($"Name: {CurrentManager.Name}\n" +
-                              $"Status: {CurrentManager.Status}\n" +
-                              $"Runtime: {CurrentManager.RunTime}\n" +
-                              $"Reconciliations: {CurrentManager.ReconciliationHandler.LogDataList.Count}\n" +
-                              $"Errors: {CurrentManager.ErrorHandler.LogDataList.Count}\n" +
-                              $"Rows read: {CurrentManager.RowsRead}\n" +
-                              $"Rows written: {CurrentManager.RowsWritten}\n" +
-                              $"Average CPU: {CurrentManager.Cpu}\n" +
-                              $"Memory logs: {CurrentManager.Health.Memory.Count}\n" +
-                              $"CPU logs: {CurrentManager.Health.Cpu.Count}\n" +
-                              $"Efficiency score: {CurrentManager.EfficiencyScore}");
-        }
         
+        //Async method used by the frontend to get the error and reconciliation logs
         public static async Task<List<LogData>> GetLogList(string type)
         {
             List<LogData> list = new List<LogData>();
+            
             
             if (FinishedManagers.Count > 0)
             {
@@ -228,21 +219,15 @@ namespace BlazorApp.Data
                         list.AddRange(finishedManager.ReconciliationHandler.LogDataList);
                 }
             }
-
-            if (CurrentManager == null)
-            {
-                Console.WriteLine(CurrentManager);
-                Console.WriteLine("Sending new list");
-            }
-            else
+            
+            
+            if (CurrentManager != null)
             {
                 list.AddRange(type == "error"
                     ? CurrentManager.ErrorHandler.LogDataList
                     : CurrentManager.ReconciliationHandler.LogDataList);
             }
-
             return await Task.FromResult(list);
         }
-        
     }
 }

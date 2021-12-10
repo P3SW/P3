@@ -37,7 +37,7 @@ namespace BlazorApp.Data
 
         public readonly List<HealthData> CpuDataList = new ();
         public readonly List<HealthData> MemDataList = new ();
-
+        
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
             Health = new HealthDataHandler(startTime);
@@ -103,6 +103,7 @@ namespace BlazorApp.Data
             AvgCpu = Convert.ToInt64(averageCpu);
         }
         
+        //Method used to calculate the average memory usage of a manager
         public void CalculateAverageMemoryUsed()
         {
             AvgMemory = Health.Memory.Count > 0 ? Convert.ToInt64(Health.Memory.Average(data => data.NumericValue)) : MaxMemory;
@@ -128,7 +129,8 @@ namespace BlazorApp.Data
                     reader.Close();
                 }
             }
-
+            
+            //The method will retry the query up to 5 times if it fails.
             if (RunTime == 0 && _mtRetryCount < 5)
             {
                 _mtRetryCount++;
@@ -137,7 +139,7 @@ namespace BlazorApp.Data
             }
         }
 
-        //Queries data from the MANAGER_TRACKING table
+        //Returns a query string for the MANAGER_TRACKING table
         private string GetManagerTrackingQueryString()
         {
             return string.Format($"SELECT [STATUS], [RUNTIME], [PERFORMANCECOUNTROWSREAD], [PERFORMANCECOUNTROWSWRITTEN], [ENDTIME] FROM dbo.MANAGER_TRACKING WHERE MGR = '{Name}'");
@@ -170,7 +172,8 @@ namespace BlazorApp.Data
                     throw new ArgumentException();
             }
         }
-
+        
+        //Method used to strip away the RND part found in some manager names.
         public string GetManagerNameWithoutRnd()
         {
             if (Name.Contains(','))

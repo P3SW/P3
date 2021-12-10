@@ -20,7 +20,7 @@ namespace BlazorApp.Data
             TriggerUpdate = triggerUpdate;
         }
         
-        //Inserts data from the reader into temporary list and adds these to the full list of data.
+        //Inserts data from the reader into a list.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
             LogDataList = new List<LogData>();
@@ -32,6 +32,7 @@ namespace BlazorApp.Data
             TriggerUpdate(LogDataList);
         }
         
+        //Inserts data into a list using passed values
         public void AddLogData(DateTime timestamp, string description, string managerName, string grade)
         {
             LogDataList.Add(new LogData(timestamp, description, managerName, grade));
