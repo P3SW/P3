@@ -23,7 +23,7 @@ else
                     @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
                     {
                         int managerID = i;
-                        if (i == SelectedManagerId)
+                        if (i == _selectedManagerId)
                         {
                             continue;
                         }
@@ -76,15 +76,13 @@ else
     private LineDataset<long> _lineConfigDatasetCpu;
     private LineDataset<long> _lineConfigDatasetMemory;
     private LineConfig _lineConfig;
-    private int SelectedManagerId { get; set; }
-    private ManagerStatusHandler SelectedManager { get; set; }
-    
+    private int _selectedManagerId;
     private bool Follow { get; set; } = true;
     
     protected override async Task OnInitializedAsync()
     {
         ConfigureLineConfig();
-        SelectedManagerId = 0;
+        _selectedManagerId = 0;
         
         _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
         _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
@@ -102,7 +100,7 @@ else
         {
             if (Follow && ConversionDataAssigner.CurrentManager != null)
             {
-                SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
+                _selectedManagerId = ConversionDataAssigner.CurrentManager.Id;
                 if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
                     ClearLineChart();
                 await InvokeAsync(StateHasChanged);
@@ -131,7 +129,7 @@ else
             
             if (Follow && ConversionDataAssigner.CurrentManager != null)
             {
-                SelectedManagerId = ConversionDataAssigner.CurrentManager.Id;
+                _selectedManagerId = ConversionDataAssigner.CurrentManager.Id;
                 if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
                 {
                     await Task.Run(ClearLineChart);
@@ -162,7 +160,6 @@ else
             PointHitRadius = 0
         };
         
-            
         // LineChart CPU
         _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList.ToList()))
         {
@@ -179,10 +176,12 @@ else
 
     private void ClearLineChart()
     {
-        _lineConfig.Data.Datasets.Clear();
+        lock (_lineConfig)
+        {
+            _lineConfig.Data.Datasets.Clear();
+        }
     }
     
-    // **** LineChart methods **** Begin ****
     private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
         DateTime newestEntry = default;
@@ -340,10 +339,10 @@ else
     // **** Dropdown menu methods **** Begin ****
     private async Task DropDownHandler(int selectedID)
     {
-        SelectedManagerId = selectedID;
+        _selectedManagerId = selectedID;
         
-        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
-        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.CpuDataList);
+        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.MemDataList);
         
         if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
         {
@@ -360,7 +359,7 @@ else
         {
             if (type.Equals("Title"))
             {
-                return Follow ? ConversionDataAssigner.CurrentManager.Name : Managers[SelectedManagerId].Name;
+                return Follow ? ConversionDataAssigner.CurrentManager.Name : Managers[_selectedManagerId].Name;
             }
             if (Follow)
             {
@@ -369,9 +368,9 @@ else
         }
         else if(type.Equals("Title"))
         {
-            return Managers[SelectedManagerId].Name;
+            return Managers[_selectedManagerId].Name;
         }
-        return SelectedManagerId + "-" + Utility.ShortenManagerName(Managers[SelectedManagerId].Name);
+        return _selectedManagerId + "-" + Utility.ShortenManagerName(Managers[_selectedManagerId].Name);
     }
     
     private async Task OnCheckboxClick()
@@ -379,9 +378,9 @@ else
         if (ConversionDataAssigner.CurrentManager == null) return;
         if (Follow)
         {
-            if(SelectedManagerId > ConversionDataAssigner.FinishedManagers.Count - 1) SelectedManagerId -= 1;
-            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.CpuDataList);
-            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[SelectedManagerId]?.MemDataList);
+            if(_selectedManagerId > ConversionDataAssigner.FinishedManagers.Count - 1) _selectedManagerId -= 1;
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.MemDataList);
         }
         else
         {

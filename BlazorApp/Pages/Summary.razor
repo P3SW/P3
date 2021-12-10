@@ -44,7 +44,7 @@
     <div class="manager-queue-container">
         <div class="queue-text">
             <span class="queue-finished-text">Finished: <b>@ConversionDataAssigner.FinishedManagers.Count</b></span>
-            <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner._managerQueue</b></span>
+            <span class="queue-inqueue-text">In queue: <b>@ConversionDataAssigner.ManagerQueue</b></span>
         </div>
         <div class="manager-queue-circle">
             @if (Managers != null)
@@ -150,8 +150,6 @@
     private int[] _hoveredManagerRecons;
     private double _mousePositionX;
     private double _mousePositionY;
-    ManagerStatusHandler _currentManager;
-    private int[] _managerQueueCounter;
     private int _managersCount = 0;
     
     protected override async Task OnInitializedAsync()
@@ -162,8 +160,35 @@
         _reconDataStorageList = await Task.Run(() => ConversionDataAssigner.GetLogList("reconciliations"));
         
         // **** ArgumentNullException fix at page reload ****
-        // PieChart Errors
-        _pieConfigErrors.Data.Datasets.Clear();
+        ClearPieChart();
+        CreatePieChart();
+        StateHasChanged();
+        
+        ReconUpdateTriggered += async (_, args) =>
+        {
+            _reconDataStorageList.AddRange(args.ReconDataList);
+            await InvokeAsync(StateHasChanged);
+        };
+        
+        ErrorUpdateTriggered += async (_, args) =>
+        {
+            _errorDataStorageList.AddRange(args.NewLogDataList);
+            await InvokeAsync(StateHasChanged);
+        };
+        
+        UpdateOverviewTriggered += async (_, _) =>
+        {
+            _managersCount++;
+            _pieConfigReconciliations.Data.Datasets.RemoveAt(0);
+            _pieConfigErrors.Data.Datasets.RemoveAt(0);
+            CreatePieChart();
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+    
+    // **** PieChart methods **** Begin ****
+    private void CreatePieChart()
+    {
         _pieConfigDatasetErrors = new PieDataset<int>(TotalErrorsSeverityCounter(Managers))
         {
             BackgroundColor = new[] // Color for the pies 
@@ -179,7 +204,6 @@
         _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
          
         // PieChart Reconciliations
-        _pieConfigReconciliations.Data.Datasets.Clear();
         _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
         {
             BackgroundColor = new[] // Color for the pies
@@ -193,62 +217,14 @@
             BorderWidth = 0
         };
         _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
-        
-        StateHasChanged();
-        
-        ReconUpdateTriggered += async (_, args) =>
-        {
-            _reconDataStorageList.AddRange(args.ReconDataList);
-            
-            await InvokeAsync(StateHasChanged);
-        };
-        
-        ErrorUpdateTriggered += async (_, args) =>
-        {
-            _errorDataStorageList.AddRange(args.NewLogDataList);
-            await InvokeAsync(StateHasChanged);
-        };
-        
-        UpdateOverviewTriggered += async (_, _) =>
-        {
-            _managersCount++;
-            _pieConfigReconciliations.Data.Datasets.RemoveAt(0);
-            _pieConfigErrors.Data.Datasets.RemoveAt(0);
-            
-            // PieChart Errors
-            _pieConfigDatasetErrors = new PieDataset<int>(TotalErrorsSeverityCounter(Managers))
-            {
-                BackgroundColor = new[] // Color for the pies 
-                {
-                    ColorUtil.ColorHexString(255, 23, 0), //Fatal Error
-                    ColorUtil.ColorHexString(227, 95, 82), //Error
-                    ColorUtil.ColorHexString(221, 155, 43), //Warning
-                    ColorUtil.ColorHexString(92, 188, 169) //Info
-                },
-                BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-                BorderWidth = 0
-            };
-            
+    }
 
-
-            // PieChart Reconciliations
-            _pieConfigDatasetReconciliations = new PieDataset<int>(TotalReconTypeCounter(Managers))
-            {
-                BackgroundColor = new[] // Color for the pies
-                {
-                    ColorUtil.ColorHexString(255, 23, 0), //Mismatch
-                    ColorUtil.ColorHexString(227, 95, 82), //Failed
-                    ColorUtil.ColorHexString(221, 155, 43), //Disabled
-                    ColorUtil.ColorHexString(92, 188, 169) //OK
-                },
-                BorderColor = ColorUtil.ColorHexString(0, 0, 0),
-                BorderWidth = 0
-            };
-            _pieConfigErrors.Data.Datasets.Add(_pieConfigDatasetErrors);
-            _pieConfigReconciliations.Data.Datasets.Add(_pieConfigDatasetReconciliations);
-            
-            await InvokeAsync(StateHasChanged);
-        };
+    private void ClearPieChart()
+    {
+        lock (_pieConfigErrors)
+        {
+            _pieConfigErrors.Data.Datasets.Clear();
+        }
     }
     
     // **** PieChart methods **** Begin ****
@@ -435,7 +411,7 @@
         /* Adds 1 to the counter */
         private static void RuntimeCounter(Object source)
         {
-            if (ConversionDataAssigner._managerQueue == 0 && ConversionDataAssigner.CurrentManager == null)
+            if (ConversionDataAssigner.ManagerQueue == 0 && ConversionDataAssigner.CurrentManager == null)
             {
                 _runtimeTimer.Dispose();
             }
@@ -553,4 +529,3 @@
     
     
 }
-
