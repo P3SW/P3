@@ -30,8 +30,6 @@ namespace BlazorApp.Data
             CurrentManager = null;
             _executionId = 1;
             
-            Console.WriteLine("Engine started");
-
             SqlConnection conn = new SqlConnection(_connectionString);
             
             try
@@ -130,7 +128,6 @@ namespace BlazorApp.Data
                 SqlDependency dependency = new SqlDependency(command);
                 dependency.OnChange += GetExecutionID;
                 dependency.OnChange += ManagerStartTracking;
-                Console.WriteLine("Manager start dependency created");
                 
                 SQLDependencyListener.CloseReader(command);
             }
@@ -175,7 +172,6 @@ namespace BlazorApp.Data
                     {
                         if (CurrentManager != null) //Checks if a manager is running
                         {
-                            Console.WriteLine("Finishing manager");
                             CurrentManager.FinishManager();
                             FinishedManagers.Add(CurrentManager);
                         }
