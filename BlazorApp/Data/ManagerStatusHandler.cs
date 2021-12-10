@@ -11,33 +11,30 @@ namespace BlazorApp.Data
 {
     public class ManagerStatusHandler : EventBase
     {
-        private int ExecutionID;
-        public string Name { get; private set; }
-        public int Id { get; private set; }
-        public string Status { get; private set; }
-        public DateTime StartTime { get; private set; }
-        public DateTime EndTime { get; private set; }
-        public int RunTime { get; private set; }
-        public HealthDataHandler Health { get; set; }
-        public ErrorDataHandler ErrorHandler { get; set; }
-        public ReconciliationDataHandler ReconciliationHandler { get; set; }
-        public int RowsRead { get; private set; }
-        public int RowsWritten { get; private set; }
-        public int Cpu { get; set; }
-        public int EfficiencyScore { get; private set; }
-        public static SqlConnection Connection { get; set; }
+        private const long MaxMemory = 21473734656; /* Approx 20gb */
         private SQLDependencyListener _healthStreamer;
         private SQLDependencyListener _errorStreamer;
         private SQLDependencyListener _reconciliationStreamer;
         private int _mtRetryCount;
+        
         public long AvgCpu;
         public long AvgMemory;
-        public int AvgMemoryPercent { get; private set; }
-        private const long MaxMemory = 21473734656; /* Approx 20gb */
-
         public readonly List<HealthData> CpuDataList = new ();
         public readonly List<HealthData> MemDataList = new ();
-
+        
+        // Used in pages
+        public string Status { get; private set; }
+        public DateTime EndTime { get; private set; }
+        public int RunTime { get; private set; }
+        public int RowsRead { get; private set; }
+        public int RowsWritten { get; private set; }
+        public int EfficiencyScore { get; private set; }
+        public int AvgMemoryPercent { get; private set; }
+        
+        // Used in ManagerStatusHandler
+        public int Cpu { get; set; }
+        public static SqlConnection Connection { get; set; }
+        
         public ManagerStatusHandler(string name, int id, DateTime startTime, int executionId)
         {
             Health = new HealthDataHandler(startTime);
@@ -48,7 +45,16 @@ namespace BlazorApp.Data
             StartTime = startTime;
             ExecutionID = executionId;
         }
-
+        
+        public HealthDataHandler Health { get; set; }
+        public ReconciliationDataHandler ReconciliationHandler { get; set; }
+        public ErrorDataHandler ErrorHandler { get; set; }
+        public string Name { get; private set; }
+        public int Id { get; private set; }
+        private DateTime StartTime { get; set; }
+        private int ExecutionID { get; set; }
+        
+        
         //Starts the tablestreamers and assigns the start time of the manager
         public void WatchManager()
         {

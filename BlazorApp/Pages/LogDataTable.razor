@@ -208,8 +208,6 @@
     [Parameter] public string Type { get; set; }
     [Parameter] public List<string> Grades { get; set; }
     [Parameter] public string GradeName { get; set; }
-    public static event EventHandler ErrorUpdateReset;
-    public static event EventHandler ReconUpdateReset;
     
     protected override async Task OnInitializedAsync()
     {

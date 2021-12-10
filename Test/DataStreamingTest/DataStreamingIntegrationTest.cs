@@ -76,7 +76,7 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
         //runs the stream
         public void TestStream(string table)
         {
-            int rows = QueryTestData(testDatabaseStreamer._queryString, "../../../DataStreamingTest/QueryStreamedDataSetup.txt");
+            int rows = QueryTestData(testDatabaseStreamer.QueryString, "../../../DataStreamingTest/QueryStreamedDataSetup.txt");
             
             System.Threading.Thread.Sleep(1000);
 

@@ -6,59 +6,59 @@ namespace DataStreamingSimulation
     {
         const int INCREASE_IN_SEC = 1;
         const bool CONSOLE_PRINT = false;
-        string[] tablesToStream = {"AFSTEMNING", "LOGGING", "MANAGER_TRACKING", "HEALTH_REPORT", "ENGINE_PROPERTIES"};
-        private string[] tablesToStreamOneTime = {"MANAGERS","LOGGING_CONTEXT"};
-        private DateTime currentStreamTime;
-        private DateTime stopTime;
-        private DateTime nextTime;
-        private DatabaseConnect sqlConnection;
-        public string setupFile;
-        private QuerySetup querySetup;
-        public static string FilePath;
-        public string _queryString;
+        private readonly string[] _tablesToStream = {"AFSTEMNING", "LOGGING", "MANAGER_TRACKING", "HEALTH_REPORT", "ENGINE_PROPERTIES"};
+        private readonly string[] _tablesToStreamOneTime = {"MANAGERS","LOGGING_CONTEXT"};
         
         public DatabaseStreamer(string fileName, string streamStartDate, string streamStopDate)
         {
-            currentStreamTime = DateTime.Parse(streamStartDate);
+            _currentStreamTime = DateTime.Parse(streamStartDate);
             stopTime = DateTime.Parse(streamStopDate);
-            nextTime = currentStreamTime.AddSeconds(INCREASE_IN_SEC);
-            sqlConnection = new DatabaseConnect();
+            _nextTime = _currentStreamTime.AddSeconds(INCREASE_IN_SEC);
+            _sqlConnection = new DatabaseConnect();
             FilePath = fileName;
-            setupFile = sqlConnection.ReadSetupFile(fileName);
-            querySetup = new QuerySetup();
-            _queryString = "";
+            _setupFile = _sqlConnection.ReadSetupFile(fileName);
+            _querySetup = new QuerySetup();
+            QueryString = "";
         }
+        
+        private DateTime _currentStreamTime;
+        private DateTime stopTime;
+        private DateTime _nextTime;
+        private readonly DatabaseConnect _sqlConnection;
+        public static string FilePath;
+        private readonly string _setupFile;
+        private readonly QuerySetup _querySetup;
+        public string QueryString;
 
         public void StreamTableOneTime(string table)
         {
-            _queryString = querySetup.MakeOneTimeQueryString(table);
-            SqlConnect(_queryString);
+            QueryString = _querySetup.MakeOneTimeQueryString(table);
+            SqlConnect(QueryString);
         }
 
         public void StreamTable(string table, DateTime currentStreamTime, DateTime nextTime)
         {
-            _queryString = new QuerySetup().MakeQueryString(table, currentStreamTime, nextTime);
-            SqlConnect(_queryString);
+            QueryString = new QuerySetup().MakeQueryString(table, currentStreamTime, nextTime);
+            SqlConnect(QueryString);
         }
 
         private void SqlConnect(string queryString)
         {
-            sqlConnection.SqlConnect(queryString, setupFile, CONSOLE_PRINT);
+            _sqlConnection.SqlConnect(queryString, _setupFile, CONSOLE_PRINT);
         }
-        
         
         public void Stream(int sleepInMiliSecs)
         {
-            foreach (string table in tablesToStreamOneTime)
+            foreach (string table in _tablesToStreamOneTime)
                 StreamTableOneTime(table);
 
-            while (currentStreamTime < stopTime)
+            while (_currentStreamTime < stopTime)
             {
-                for (int i = 0; i < tablesToStream.Length; i++)
-                    StreamTable(tablesToStream[i], currentStreamTime,nextTime);
+                for (int i = 0; i < _tablesToStream.Length; i++)
+                    StreamTable(_tablesToStream[i], _currentStreamTime,_nextTime);
                 
-                currentStreamTime = nextTime;
-                nextTime = currentStreamTime.AddSeconds(INCREASE_IN_SEC);
+                _currentStreamTime = _nextTime;
+                _nextTime = _currentStreamTime.AddSeconds(INCREASE_IN_SEC);
                 System.Threading.Thread.Sleep(INCREASE_IN_SEC * sleepInMiliSecs); // How frequently it inserts into ANS_DB_P3
             }
         }
