@@ -9,7 +9,6 @@ namespace BlazorApp.Data
     public abstract class LogDataHandler : EventBase
     {
         public List<LogData> LogDataList { get; private set; }
-        private List<LogData> NewLogDataList { get; set; }
         protected DateTime LastRowTimeStamp { get; private set; }
         private Action<List<LogData>> TriggerUpdate { get; set; }
 
@@ -20,21 +19,19 @@ namespace BlazorApp.Data
             TriggerUpdate = triggerUpdate;
         }
         
-        //Inserts data from the reader into temporary list and adds these to the full list of data.
+        //Inserts data from the reader into a list.
         public void AddDataFromSqlReader(SqlDataReader reader)
         {
-            NewLogDataList = new List<LogData>();
+            LogDataList = new List<LogData>();
             while (reader.Read())
             {
-                NewLogDataList.Add(new LogData(reader));
+                LogDataList.Add(new LogData(reader));
             }
 
-            LastRowTimeStamp = NewLogDataList[NewLogDataList.Count - 1].Timestamp;
-            LogDataList.AddRange(NewLogDataList);
-            
-            TriggerUpdate(NewLogDataList);
+            TriggerUpdate(LogDataList);
         }
         
+        //Inserts data into a list using passed values
         public void AddLogData(DateTime timestamp, string description, string managerName, string grade)
         {
             LogDataList.Add(new LogData(timestamp, description, managerName, grade));

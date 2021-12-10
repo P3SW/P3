@@ -11,7 +11,7 @@ namespace DataStreamingSimulation
             {
                 DatabaseStreamer streamer = new DatabaseStreamer("../../../setup.txt", "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
                 streamer.Stream(1000);
-            }
+            }   
             catch (Exception e)
             {
                 Console.WriteLine(e);

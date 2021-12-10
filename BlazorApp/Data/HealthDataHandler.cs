@@ -56,7 +56,8 @@ namespace BlazorApp.Data
                                  $"AND LOG_TIME > '{LastRowTimeStamp.ToString("yyyy-MM-dd HH:mm:ss.fff")}'" +
                                  "ORDER BY LOG_TIME");
         }
-
+        
+        //Method used to create new healthdata objects from values.
         public void AddHealthData(string reportType, long numericValue, DateTime logtime)
         {
             if (reportType == "CPU")
