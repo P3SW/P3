@@ -8,7 +8,7 @@ using Radzen.Blazor;
 
 namespace P3ConversionDashboard.Tests
 {
-    public class UnitTestComponents : TestContext
+    public class UnitTest : TestContext
     {
         //test data for LogDataTableTest
         private List<LogData> testLogData = new()
