@@ -49,7 +49,7 @@
         <div class="manager-queue-circle">
             @if (Managers != null)
             {
-                @foreach (ManagerStatusHandler manager in Managers)
+                @foreach (ManagerStatusHandler manager in Managers.ToList())
                 {
                     <div class="manager-circle @ManagerCircleColour(manager)" @onmousemove="@((e) => GetHoveredManager(manager.Id, e, manager))">
                         @if (manager.Status == "RUNNING")
@@ -474,46 +474,48 @@
     private string CurrentManagerDataWriter(string dataType)
     {
         string result = "";
+
+        ManagerStatusHandler currentManager = ConversionDataAssigner.CurrentManager;
         
         if (CurrentManagerChecker())
         {
             switch (dataType)
             {
                 case "name":
-                    result = Utility.ShortenManagerName(ConversionDataAssigner.CurrentManager.Name);
+                    result = Utility.ShortenManagerName(currentManager.Name);
                     break;
                 case "runtime":
                     result = Utility.FormatTime(Runtime.CurrentManagerRuntimeCounter * 1000);
                     break;
                 case "totalErrors":
-                    result = ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count().ToString();
+                    result = currentManager.ErrorHandler.LogDataList.Count().ToString();
                     break;
                 case "FATAL":
-                    result = ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "FATAL").ToString();
+                    result = currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "FATAL").ToString();
                     break;
                 case "ERROR":
-                    result = ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "ERROR").ToString();
+                    result = currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "ERROR").ToString();
                     break;
                 case "WARNING":
-                    result = ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "WARN").ToString();
+                    result = currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "WARN").ToString();
                     break;
                 case "INFO":
-                    result = ConversionDataAssigner.CurrentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "INFO").ToString();
+                    result = currentManager.ErrorHandler.LogDataList.Count(data => data.Grade == "INFO").ToString();
                     break;
                 case "totalRecons":
-                    result = ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count().ToString();
+                    result = currentManager.ReconciliationHandler.LogDataList.Count().ToString();
                     break;
                 case "MISMATCH":
-                    result = ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "MISMATCH").ToString();
+                    result = currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "MISMATCH").ToString();
                     break;
                 case "FAILED":
-                    result = ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "FAILED").ToString();
+                    result = currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "FAILED").ToString();
                     break;
                 case "DISABLED":
-                    result = ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "DISABLED").ToString();
+                    result = currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "DISABLED").ToString();
                     break;
                 case "OK":
-                    result = ConversionDataAssigner.CurrentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "OK").ToString();
+                    result = currentManager.ReconciliationHandler.LogDataList.Count(data => data.Grade == "OK").ToString();
                     break;
             }
         }
