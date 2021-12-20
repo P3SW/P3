@@ -148,6 +148,7 @@ else
     [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
     RadzenDataGrid<ManagerStatusHandler> _efficiencyDataGrid;
     
+    // Event for updating the efficiency table when a manager is finished
     protected override async Task OnInitializedAsync()
     {
         StateHasChanged();

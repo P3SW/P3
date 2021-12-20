@@ -471,10 +471,10 @@
         return Convert.ToInt32(median);
     }
 
+    // Method for writing data for the current manager, if there is one
     private string CurrentManagerDataWriter(string dataType)
     {
         string result = "";
-
         ManagerStatusHandler currentManager = ConversionDataAssigner.CurrentManager;
         
         if (CurrentManagerChecker())
@@ -519,7 +519,6 @@
                     break;
             }
         }
-        
         return result;
     }
     
@@ -528,6 +527,4 @@
     {
         return ConversionDataAssigner.CurrentManager != null;
     }
-    
-    
 }
