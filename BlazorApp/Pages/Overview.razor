@@ -27,6 +27,7 @@ else
 @code{
     private List<ManagerStatusHandler> _managers = new ();
     
+    // Initialises overview and updates when new data is inserted
     protected override async Task OnInitializedAsync()
     {
         _managers = await Task.Run(() => ConversionDataAssigner.FinishedManagers);

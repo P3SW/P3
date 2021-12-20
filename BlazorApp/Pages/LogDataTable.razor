@@ -209,6 +209,7 @@
     [Parameter] public List<string> Grades { get; set; }
     [Parameter] public string GradeName { get; set; }
     
+    // Event for updating either error page or reconciliation page when new data is queried
     protected override async Task OnInitializedAsync()
     {
         

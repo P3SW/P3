@@ -146,7 +146,7 @@ else
         };
     }
     
-    // **** LineChart methods **** Begin ****
+    // Creates a list of data to present for the line chart
     private void CreateLineChart(List<HealthData> memDataList, List<HealthData> cpuDataList)
     {
         // LineChart Memory
@@ -174,14 +174,16 @@ else
         _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
     }
 
+    // Clears the list of data for the line chart
     private void ClearLineChart()
     {
-        lock (_lineConfig)
+        lock (_lineConfig) // lock ensures it gets cleared
         {
             _lineConfig.Data.Datasets.Clear();
         }
     }
     
+    // Inputs CPU data to a list
     private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
     {
         DateTime newestEntry = default;
@@ -207,11 +209,10 @@ else
                 _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
             }
         }
-        
-        
         return _lineConfigDatasetCpu;
     }
     
+    // Inputs memory data to a list
     private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
     {
         DateTime newestEntry = default;
@@ -221,15 +222,14 @@ else
             if (data?.ReportType == "MEMORY" && (newestEntry == default || data.LogTime > newestEntry))
             {
                 newestEntry = data.LogTime;
-                long MaxMemory = 21473734656;
+                long MaxMemory = 21473734656; // Hardcoded memory: should be queried from the database
                 _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
             }
         }
-            
-
         return _lineConfigDatasetMemory;
     }
     
+    // Styling for the line chart
     private void ConfigureLineConfig()
     {
         _lineConfig = new LineConfig();
@@ -266,7 +266,6 @@ else
                         ScaleLabel = new ScaleLabel
                         {
                             Display = true,
-                            //LabelString = "Time",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
                         },
@@ -288,7 +287,6 @@ else
                         ScaleLabel = new ScaleLabel
                         {
                             Display = true,
-                            //LabelString = "Usage %",
                             FontColor = "#FFFFFF",
                             FontSize = 15,
     
@@ -299,8 +297,8 @@ else
                             Padding = 10,
                             FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
                             BeginAtZero = true,
-                            StepSize = 10,
-                            Max = 100,
+                            StepSize = 10, // Limits the y-axis entries to 10
+                            Max = 100, // Maximum numerical value is limited too 100 to represent '100%'
                         },
                         GridLines = new GridLines
                         {
@@ -333,10 +331,8 @@ else
         };
 
     }
-    // **** LineChart methods **** END ****
-    
-    
-    // **** Dropdown menu methods **** Begin ****
+
+    // Changes data when changing manager in the dropdown menu
     private async Task DropDownHandler(int selectedID)
     {
         _selectedManagerId = selectedID;
@@ -353,6 +349,7 @@ else
         await InvokeAsync(StateHasChanged);
     }
 
+    // Checks if there is a manager and shows it depending on if its tracking or not
     private string SelectedManagerWriter(string type)
     {
         if (ConversionDataAssigner.CurrentManager != null)
@@ -373,6 +370,7 @@ else
         return _selectedManagerId + "-" + Utility.ShortenManagerName(Managers[_selectedManagerId].Name);
     }
     
+    // Handles position of managers in the dropdown box
     private async Task OnCheckboxClick()
     {
         if (ConversionDataAssigner.CurrentManager == null) return;
@@ -393,9 +391,6 @@ else
             await Task.Run(ClearLineChart);
             await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
         }
-        
         await InvokeAsync(StateHasChanged);
     }
-    // **** Dropdown menu methods **** End ****
-    
 }

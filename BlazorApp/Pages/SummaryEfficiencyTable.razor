@@ -94,6 +94,7 @@ else
     {
         StateHasChanged();
         
+        // Updates the table when new data is inserted
         UpdateOverviewTriggered += async (o, args) =>
         {
             await InvokeAsync(_summaryEfficiencyDataGrid.Reload);
