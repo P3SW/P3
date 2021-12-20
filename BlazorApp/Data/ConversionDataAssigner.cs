@@ -26,7 +26,7 @@ namespace BlazorApp.Data
         {
             _connectionString = ConfigReader.ReadSetupFile(setupFile);
             ManagerQueue = 0;
-            _managerId = 1;
+            _managerId = 0;
             CurrentManager = null;
             _executionId = 1;
             

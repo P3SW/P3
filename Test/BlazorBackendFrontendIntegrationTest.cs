@@ -15,12 +15,6 @@ namespace P3ConversionDashboard.Tests
         [Fact]
         public async void TestBlazorBackendFrontend()
         {
-            //drops database if it exists
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
-            
-            //creates a new database
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
-            
             //assigns data to the backend
             await Task.Run(() => AssignTestData()); 
             
