@@ -1,0 +1,396 @@
+﻿@using ChartJs.Blazor.PieChart
+@using BlazorApp.Data
+@using System.Globalization
+@using ChartJs.Blazor.LineChart
+@using BlazorApp
+@using Microsoft.VisualBasic
+
+<link href='https://fonts.googleapis.com/css?family=Roboto Slab' rel='stylesheet'>
+
+@if (Managers == null || Managers.Count == 0)
+{
+    <p>Waiting for a manager to finish ....</p>
+}
+else 
+{
+    <div class="cpu_usage">
+        <div class="chart-header">
+            <div class="dropdown">
+                <b class="selected-manager-name" title="@SelectedManagerWriter("Title")">@SelectedManagerWriter("Dropdown")</b>
+                <img src="Icons/dropdown-arrow.svg" alt="dropdown-arrow" class="dropdown-arrow"/>
+                <img src="Icons/dropup-arrow.svg" alt="dropup-arrow" class="dropup-arrow"/>
+                <div class="dropdown-content">
+                    @for (int i = 0, j = 0; i < Managers.Count; i++) //id does not do anything as of right now, but might be useful later on
+                    {
+                        int managerID = i;
+                        if (i == _selectedManagerId)
+                        {
+                            continue;
+                        }
+                        if (j == 0)
+                        {
+                            j++;
+                            <div class="dropdown-content-first" 
+                                 title="@Managers[managerID].Name" 
+                                 id="@managerID"
+                                 @onclick="@(() => DropDownHandler(managerID))">
+                                @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                            </div>
+                            continue;
+                        }
+                        <div title="@Managers[managerID].Name"
+                             id="@managerID"
+                             @onclick="@(() => DropDownHandler(managerID))">
+                            @(managerID)-@Utility.ShortenManagerName(Managers[managerID].Name)
+                        </div>
+                    }
+                </div>
+            </div>
+            <div class="chart-title">
+                Memory/CPU
+            </div>
+            <div class="checkbox-container">
+                <label class="container">Track current manager
+                    <input type="checkbox" id="follow_current_manager" @bind="@Follow" @onclick="OnCheckboxClick">
+                    <span class="checkmark"></span>
+                </label>
+            </div>
+        </div>
+        <div style="position: relative; width: 90%; left: 5%">
+            <Chart Config="_lineConfig"></Chart>
+        </div>
+        <div class="info-labels">
+            <div class="oblong background-lightred"></div>
+            <div class="cpu_text">CPU Load (%)</div>
+            <div class="oblong background-green"></div>
+            <div class="memory_text">Memory Used (%)</div>
+        </div>
+    </div>
+}
+
+@code{
+    [Parameter] public List<ManagerStatusHandler> Managers { get; set; }
+
+    private List<HealthData> _cpuDataList;
+    private List<HealthData> _memDataList;
+    private LineDataset<long> _lineConfigDatasetCpu;
+    private LineDataset<long> _lineConfigDatasetMemory;
+    private LineConfig _lineConfig;
+    private int _selectedManagerId;
+    private bool Follow { get; set; } = true;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        ConfigureLineConfig();
+        _selectedManagerId = 0;
+        
+        _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+        _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
+        
+        // **** Show LineChart at page reload ****
+        if (_memDataList != null && _memDataList?.Count != 0 && _cpuDataList != null && _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
+        StateHasChanged();
+
+        UpdateOverviewTriggered += async (o,args) =>
+        {
+            if (Follow && ConversionDataAssigner.CurrentManager != null)
+            {
+                _selectedManagerId = ConversionDataAssigner.CurrentManager.Id;
+                if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+                    ClearLineChart();
+                await InvokeAsync(StateHasChanged);
+            }
+        };
+        
+        HealthUpdateTriggered += async (o, args) =>
+        {
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
+
+            await Task.Run(() =>
+            {
+                if (ConversionDataAssigner.CurrentManager.CpuDataList != null)
+                    lock (ConversionDataAssigner.CurrentManager.CpuDataList)
+                    {
+                        ConversionDataAssigner.CurrentManager.CpuDataList.AddRange(args.Cpu);
+                    }
+
+                if (ConversionDataAssigner.CurrentManager.MemDataList != null)
+                    lock (ConversionDataAssigner.CurrentManager.MemDataList)
+                    {
+                        ConversionDataAssigner.CurrentManager.MemDataList.AddRange(args.Memory);
+                    }
+            });
+            
+            if (Follow && ConversionDataAssigner.CurrentManager != null)
+            {
+                _selectedManagerId = ConversionDataAssigner.CurrentManager.Id;
+                if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+                {
+                    await Task.Run(ClearLineChart);
+                    await Task.Run(() =>
+                    {
+                        lock (_memDataList) lock (_cpuDataList)
+                        {
+                            CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList());
+                        }
+                    });
+                }
+                await InvokeAsync(StateHasChanged);
+            }
+        };
+    }
+    
+    // Creates a list of data to present for the line chart
+    private void CreateLineChart(List<HealthData> memDataList, List<HealthData> cpuDataList)
+    {
+        // LineChart Memory
+        _lineConfigDatasetMemory = new LineDataset<long>(LineDataInputYaxisMem(memDataList.ToList()))
+        {
+            Label = "Memory usage",
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+            LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0
+        };
+        
+        // LineChart CPU
+        _lineConfigDatasetCpu = new LineDataset<long>(LineDataInputYaxisCpu(cpuDataList.ToList()))
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0
+        };
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetMemory);
+        _lineConfig.Data.Datasets.Add(_lineConfigDatasetCpu);
+    }
+
+    // Clears the list of data for the line chart
+    private void ClearLineChart()
+    {
+        lock (_lineConfig) // lock ensures it gets cleared
+        {
+            _lineConfig.Data.Datasets.Clear();
+        }
+    }
+    
+    // Inputs CPU data to a list
+    private LineDataset<long> LineDataInputYaxisCpu(List<HealthData> healthDataList)
+    {
+        DateTime newestEntry = default;
+        string[] separators = new string[] {" "};
+        
+        _lineConfigDatasetCpu.Clear();
+        foreach (var data in healthDataList.ToList())
+        {
+            if (data?.ReportType == "CPU" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
+                _lineConfigDatasetCpu.Add(data.NumericValue);
+            }
+        }
+
+        newestEntry = default;
+        _lineConfig.Data.Labels.Clear();
+        foreach (var data in healthDataList.ToList())
+        {
+            if (data?.ReportType == "CPU" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
+                _lineConfig.Data.Labels.Add((data.LogTime.ToString().Split(separators, 2, StringSplitOptions.RemoveEmptyEntries))[1]);
+            }
+        }
+        return _lineConfigDatasetCpu;
+    }
+    
+    // Inputs memory data to a list
+    private LineDataset<long> LineDataInputYaxisMem(List<HealthData> healthDataList)
+    {
+        DateTime newestEntry = default;
+        _lineConfigDatasetMemory.Clear();
+        foreach (var data in healthDataList.ToList())
+        {
+            if (data?.ReportType == "MEMORY" && (newestEntry == default || data.LogTime > newestEntry))
+            {
+                newestEntry = data.LogTime;
+                long MaxMemory = 21473734656; // Hardcoded memory: should be queried from the database
+                _lineConfigDatasetMemory.Add(Utility.CalculateMemoryUsage(data.NumericValue, MaxMemory));
+            }
+        }
+        return _lineConfigDatasetMemory;
+    }
+    
+    // Styling for the line chart
+    private void ConfigureLineConfig()
+    {
+        _lineConfig = new LineConfig();
+        
+        _lineConfig.Options = new LineOptions
+        {
+            Responsive = true,
+            Title = new OptionsTitle
+            {
+                Display = false,
+                Text = "Cpu & Memory usage",
+                FontColor = "#FFFFFF"
+            },
+            Legend = new Legend
+            {
+                Position = Position.Bottom,
+                Display = false,
+            },
+            Hover = new Hover
+            {
+                Mode = InteractionMode.Nearest,
+                Intersect = true
+            },
+            Animation = new Animation()
+            {
+                Duration = 0,
+            },
+            Scales = new Scales
+            {
+                XAxes = new List<CartesianAxis> //scale for the x-axis
+                {
+                    new CategoryAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            Display = true,
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+                        },
+                        Ticks = new CategoryTicks
+                        {
+                            FontColor = "#FFFFFF",
+                            FontSize = 13,
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142, 142, 142),
+                        }
+                    },
+                },
+                YAxes = new List<CartesianAxis> //Scale for the y-axis
+                {
+                    new LinearCartesianAxis
+                    {
+                        ScaleLabel = new ScaleLabel
+                        {
+                            Display = true,
+                            FontColor = "#FFFFFF",
+                            FontSize = 15,
+    
+                        },
+                        Ticks = new LinearCartesianTicks
+                        {
+                            FontSize = 13,
+                            Padding = 10,
+                            FontColor = "#FFFFFF", //Colour for ticks, values on y-axis
+                            BeginAtZero = true,
+                            StepSize = 10, // Limits the y-axis entries to 10
+                            Max = 100, // Maximum numerical value is limited too 100 to represent '100%'
+                        },
+                        GridLines = new GridLines
+                        {
+                            Color = ColorUtil.ColorHexString(142, 142, 142),
+                            DrawBorder = false, //Removes the border in the y-axis
+                        },
+                    }
+                }
+            }
+        };
+        
+        _lineConfigDatasetCpu = new LineDataset<long>
+        {
+            Label = "Cpu usage",
+            BorderColor = ColorUtil.ColorHexString(227, 95, 82),
+            BackgroundColor = ColorUtil.ColorString(0, 0, 0, 0.0),
+            LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
+        };
+
+        _lineConfigDatasetMemory = new LineDataset<long> //Needs data From health data memory class, like the data above
+        {
+            Label = "Memory usage",
+            BorderColor = ColorUtil.ColorString(92, 188, 169, 1),
+            BackgroundColor = ColorUtil.ColorString(92, 188, 169, 0.3),
+            LineTension = 0,
+            PointRadius = 0,
+            PointHitRadius = 0,
+        };
+
+    }
+
+    // Changes data when changing manager in the dropdown menu
+    private async Task DropDownHandler(int selectedID)
+    {
+        _selectedManagerId = selectedID;
+        
+        _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.CpuDataList);
+        _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.MemDataList);
+        
+        if (_memDataList != null || _cpuDataList != null || _memDataList?.Count != 0 || _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        
+        await InvokeAsync(StateHasChanged);
+    }
+
+    // Checks if there is a manager and shows it depending on if its tracking or not
+    private string SelectedManagerWriter(string type)
+    {
+        if (ConversionDataAssigner.CurrentManager != null)
+        {
+            if (type.Equals("Title"))
+            {
+                return Follow ? ConversionDataAssigner.CurrentManager.Name : Managers[_selectedManagerId].Name;
+            }
+            if (Follow)
+            {
+                return ConversionDataAssigner.CurrentManager.Id + "-" + @Utility.ShortenManagerName(ConversionDataAssigner.CurrentManager.Name);
+            }
+        }
+        else if(type.Equals("Title"))
+        {
+            return Managers[_selectedManagerId].Name;
+        }
+        return _selectedManagerId + "-" + Utility.ShortenManagerName(Managers[_selectedManagerId].Name);
+    }
+    
+    // Handles position of managers in the dropdown box
+    private async Task OnCheckboxClick()
+    {
+        if (ConversionDataAssigner.CurrentManager == null) return;
+        if (Follow)
+        {
+            if(_selectedManagerId > ConversionDataAssigner.FinishedManagers.Count - 1) _selectedManagerId -= 1;
+            _cpuDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.CpuDataList);
+            _memDataList = await Task.Run( () => ConversionDataAssigner.FinishedManagers[_selectedManagerId]?.MemDataList);
+        }
+        else
+        {
+            _cpuDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.CpuDataList);
+            _memDataList = await Task.Run(() => ConversionDataAssigner.CurrentManager?.MemDataList);
+        }
+        
+        if (_memDataList != null && _cpuDataList != null && _memDataList?.Count != 0 && _cpuDataList?.Count != 0)
+        {
+            await Task.Run(ClearLineChart);
+            await Task.Run(() => CreateLineChart(_memDataList.ToList(), _cpuDataList.ToList()));
+        }
+        await InvokeAsync(StateHasChanged);
+    }
+}

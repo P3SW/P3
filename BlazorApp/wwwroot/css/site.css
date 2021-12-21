@@ -1,0 +1,107 @@
+@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+
+html, body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    margin: 0;
+}
+
+a, .btn-link {
+    color: #0366d6;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.content {
+    padding-top: 1.1rem;
+}
+
+.valid.modified:not([type=checkbox]) {
+    outline: 1px solid #26b050;
+}
+
+.invalid {
+    outline: 1px solid red;
+}
+
+.validation-message {
+    color: red;
+}
+
+#blazor-error-ui {
+    background: lightyellow;
+    bottom: 0;
+    box-shadow: 0 -1px 2px rgba(0, 0, 0, 0.2);
+    display: none;
+    left: 0;
+    padding: 0.6rem 1.25rem 0.7rem 1.25rem;
+    position: fixed;
+    width: 100%;
+    z-index: 1000;
+}
+
+    #blazor-error-ui .dismiss {
+        cursor: pointer;
+        position: absolute;
+        right: 0.75rem;
+        top: 0.5rem;
+    }
+
+.log-table-formatting {
+    margin: 1%;
+    align-items: center;
+}
+    
+/* Scrollbar CSS */ 
+    /* width */
+    ::-webkit-scrollbar {
+        width: 0.75rem !important;
+        height: 0.75rem !important;
+        background-color: #384561 !important;
+    }
+    
+    /* Track */
+    ::-webkit-scrollbar-track {
+        background: #8c8c8c !important;
+        border-radius: 10px !important;
+    }
+    
+    /* Handle */
+    ::-webkit-scrollbar-thumb {
+        background: #384561 !important;
+        border-radius: 10px !important;
+        border: 1px solid rgba(140, 140, 140, 1) !important;
+    }
+    
+    /* Handle on hover */
+    ::-webkit-scrollbar-thumb:hover {
+        background: #0F2147 !important;
+    }
+
+/* Colours */
+.background-green {
+    background-color: rgba(92, 188, 169, 1) !important;
+}
+
+.background-yellow {
+    background-color: rgba(221, 155, 43, 1) !important;
+}
+
+.background-lightred {
+    background-color: rgba(227, 95, 82, 1) !important;
+}
+
+.background-red {
+    background-color: rgba(255, 23, 0, 1) !important;
+}
+
+.background-running {
+    background-color: #0F2147;
+}
+
+.background-queued {
+    background-color: #384561;
+}

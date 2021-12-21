@@ -1,0 +1,269 @@
+﻿.summary_container{
+    background-color: #384561;
+    padding: 0;
+    display: grid;
+    grid-template-rows: 8fr 8fr 17fr 2fr 13fr 20fr 33fr;
+    max-height: 100vh;
+    height: 100%;
+    overflow-y: auto;
+}
+
+.summary_container > div{
+    margin-left: 0.5rem;
+    margin-right: 0.5rem;
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+    color: #FFFFFF;
+    text-align: center;
+    font-size: 2rem;
+    border-bottom: 2px solid #8E8E8E;
+}
+
+.mind-the-gap{
+    font-size: 0 !important;
+}
+
+/* Summary header */
+.summary_caption_container{
+    font-size: 2rem;
+    color: #FFFFFF;
+    line-height: 2rem;
+}
+
+.conversion-runtime {
+    font-size: 0.75em;
+}
+
+/* Current manager */
+.Current_manager_info_container {
+    border-bottom: 0 !important;
+
+}
+
+.Current_manager_info_container > div{
+    text-align: left;
+    font-size: 0.6em;
+}
+
+.Current_manager_container{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    background: rgba(83, 96, 122, 0.27);
+    border-bottom: 0 !important;
+}
+
+.Current_manager_container > div{
+    margin: 0.5rem;
+    text-align: left;
+    white-space: nowrap;
+    font-size: 0.7em;
+}
+
+.Current_manager_errors {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.error-reconciliation-formatting {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+.Current_manager_reconciliations {
+    margin-top: 0 !important;
+    margin-bottom: 0 !important;
+}
+
+/* Total errors and reconciliations */
+.Total_errors_and_reconciliations_container{
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.5fr 1fr;
+}
+
+.Total_errors_and_reconciliations_container > div{
+    margin: 0.5rem;
+    text-align: left;
+    font-size: 0.7em;
+}
+
+.Total_read_written_container{
+    border: none !important;
+    margin: 0 !important;
+}
+
+.efficiency{
+    background-color: #384561;
+}
+
+.efficiency-container{
+    border-bottom: none !important;
+}
+
+.efficiency-container > div{
+    font-size: 0.6em;
+    text-align: left;
+}
+
+.PieConfigTotalErrors {
+    position: relative;
+    background-color: rgba(15, 33, 71, 0.2);
+    border-radius: 50%;
+    width: 80%;
+    aspect-ratio: 1;
+    align-self: center;
+    padding: 0.3rem;
+}
+
+.pieConfigTotalReconciliations {
+    position: relative;
+    background-color: rgba(15, 33, 71, 0.2);
+    border-radius: 50%;
+    width: 80%;
+    aspect-ratio: 1;
+    align-self: center;
+    padding: 0.3rem;
+}
+
+.error-reconciliation-formatting {
+    list-style: none;
+    display: grid;
+    align-items: center;
+    row-gap: 0.5em;
+    grid-template-rows: 1fr 1fr 1fr 1fr;
+    grid-template-columns: 0.8em 1fr;
+    font-size: 0.8em;
+}
+
+.dropdown {
+    position: relative;
+    left: 5%;
+    height: 1.1em;
+    background-color: #4B5772;
+    font-family: inherit;
+    font-size: 0.5em;
+    color: #e3e3e3;
+    padding: 0.3em;
+    cursor: pointer;
+    border: 1px solid #384561;
+    border-bottom: 1px solid #8E8E8E;
+    align-self: center;
+}
+
+
+/* Shapes */
+.circle {
+    height: 0.5em;
+    width: 0.5em;
+    border-radius: 100%;
+}
+
+/* Manager queue */
+.manager-queue-container > div {
+    font-size: 0.6em;
+    margin: 0.5rem 0;
+}
+
+.manager-queue-container{
+    display: grid;
+    grid-template-rows: 0.6em 1fr;
+    height: 100%;
+}
+
+.manager-circle {
+    height: 60px;
+    width: 60px;
+    border-radius: 50%;
+    display: inline-block;
+    margin: 0.3rem;
+}
+
+.manager-queue-circle {
+    display: block;
+    background: rgba(83, 96, 122, 0.27);
+    overflow-x: scroll;
+    white-space: nowrap;
+    text-align: left;
+}
+
+.hovered-manager{
+    display: none;
+    position: absolute;
+    height: 12rem;
+    width: 20rem;
+    text-align: left;
+    font-size: 0.8em;
+    background-color: #0F2147;
+    z-index: 2;
+    top: 100%;
+    box-shadow: 0 0 0.1rem black;
+}
+
+.manager-circle:hover > .hovered-manager{
+    display: grid;
+    grid-template-rows: 2fr 3fr;
+}
+
+.queue-finished-text {
+    float: left;
+}
+
+.queue-inqueue-text {
+    float: right;
+}
+
+.hoverbox-errors-recons{
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    border-top: 2px solid #8E8E8E;
+    margin-left: 0.5em;
+    margin-right: 0.5em;
+    font-size: 1em;
+}
+
+.hoverbox-info{
+    padding-left: 0.5em;
+    max-width: 19rem;
+}
+
+.hoverbox-info > div {
+    display: block;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+}
+
+.hoverbox-errors-recons  ul{
+    margin: 0 !important;
+    padding: 0 !important;
+    font-size: 0.9em;
+}
+
+.hoverbox-recons{
+    padding-left: 2em;
+}
+
+.hoverbox-arrow{
+    display: none;
+    height: 1rem;
+    filter: drop-shadow(0 0 0.1rem black);
+    pointer-events: none;
+}
+
+.manager-circle:hover > .hoverbox-arrow{
+    display: block;
+}
+
+.current-manager-loader{
+    display: block;
+    height: 80%;
+    width: 80%;
+    position: relative;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.summary_efficiency_table > div{
+    text-align: left;
+    font-size: 0.6em;
+}

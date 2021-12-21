@@ -1,0 +1,110 @@
+﻿@using BlazorApp.Data
+@using System.Reflection.Metadata
+@using System.Net.Sockets
+@using Radzen.Blazor
+@using Radzen.Blazor.Rendering
+
+
+@if (SortedData == null)
+{
+    <p>Loading ....</p>
+}
+else
+{
+    <div class="efficiency-table-styling">
+    <RadzenDataGrid @ref="_summaryEfficiencyDataGrid" AllowFiltering="false" AllowColumnResize="true" FilterMode="FilterMode.Advanced" PageSize="999999"
+                    AllowPaging="false" AllowSorting="true" Data="@SortedData" TItem="ManagerStatusHandler"
+                    FilterCaseSensitivity="FilterCaseSensitivity.CaseInsensitive"
+                    LogicalFilterOperator="LogicalFilterOperator.Or" CellRender="@CellRender">
+        <Columns>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="Name" Filterable="false"
+                                  Title="MANAGER" Frozen="false" Width="400px" Sortable="false">
+                <Template Context="data">
+                    <div style="color: white; display: block; width: 200px; max-width: 200px; overflow-x: hidden; text-overflow: ellipsis; white-space: nowrap;" title="@data.Name">
+                        <span style="color: #FFFFFF; ">@Utility.ShortenManagerName(data.Name)</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="EfficiencyScore" Filterable="false"
+                                  Title="SCORE" Frozen="false" Width="100px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 60px; max-width: 60px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EfficiencyScore">
+                        <span style="color: #FFFFFF;">@data.EfficiencyScore</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="EndTime" Filterable="false"
+                                  Title="ENDTIME" Frozen="false" Width="300px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 150px; max-width: 150px; text-overflow: ellipsis; white-space: nowrap;" title="@data.EndTime">
+                        <span style="color: #FFFFFF;">@data.EndTime</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="RowsRead" Filterable="false"
+                                  Title="Read" Frozen="false" Width="100px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsRead">
+                        <span style="color: #FFFFFF;">@data.RowsRead</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="RowsWritten" Filterable="false"
+                                  Title="Written" Frozen="false" Width="100px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 75px; max-width: 75px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RowsWritten">
+                        <span style="color: #FFFFFF;">@data.RowsWritten</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="RunTime" Filterable="false"
+                                  Title="rUnTIme" Frozen="false" Width="100px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.RunTime">
+                        <span style="color: #FFFFFF; text-align: right;">@Utility.FormatTime(data.RunTime)</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="AvgCpu" Filterable="false"
+                                  Title="CPU" Frozen="false" Width="100px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgCpu">
+                        <span style="color: #FFFFFF; text-align: right">@data.AvgCpu%</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+            <RadzenDataGridColumn TItem="ManagerStatusHandler" Property="AvgMemoryPercent" Filterable="false"
+                                  Title="Memory" Frozen="false" Width="100px" Sortable="false">
+                <Template Context="data">
+                    <div style="display: grid; width: 50px; max-width: 50px; text-overflow: ellipsis; white-space: nowrap;" title="@data.AvgMemory">
+                        <span style="color: #FFFFFF; text-align: right">@data.AvgMemoryPercent%</span>
+                    </div>
+                </Template>
+            </RadzenDataGridColumn>
+        </Columns>
+    </RadzenDataGrid>
+    </div>
+}
+
+@code {
+    [Parameter] public List<ManagerStatusHandler> SortedData { get; set; }
+    RadzenDataGrid<ManagerStatusHandler> _summaryEfficiencyDataGrid;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        StateHasChanged();
+        
+        // Updates the table when new data is inserted
+        UpdateOverviewTriggered += async (o, args) =>
+        {
+            await InvokeAsync(_summaryEfficiencyDataGrid.Reload);
+            await InvokeAsync(StateHasChanged);
+        };
+    }
+
+    //When rendering the cells, change the background color.
+    void CellRender(DataGridCellRenderEventArgs<ManagerStatusHandler> dataGridCellRenderEventArgs)
+    {
+        dataGridCellRenderEventArgs.Attributes.Add("style", $"background-color: rgba(83, 96, 122, 0.27);");
+    }
+}
