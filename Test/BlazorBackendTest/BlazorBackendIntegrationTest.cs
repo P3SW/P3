@@ -18,8 +18,8 @@ namespace P3ConversionDashboard.Tests.BlazorBackendTest
         [Fact]
         public async void BlazorBackendTest()
         {
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.ExecuteMultipleLines("../../../BlazorBackendTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.ExecuteMultipleLines("../../../BlazorBackendTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
             ConversionDataAssigner.Start("../../../BlazorBackendTest/BlazorBackendSetup.txt");
 

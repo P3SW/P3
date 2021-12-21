@@ -38,10 +38,10 @@ namespace P3ConversionDashboard.Tests.SQLDependencyListenerTest
         public async void SQLDependencyTest()
         {
             //drops database if it exists
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.ExecuteMultipleLines("../../../SQLDependencyListenerTest/DROP_ANS_DB_P3_TEST.sql"));
             
             //creates a new database
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../SQLDependencyListenerTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.ExecuteMultipleLines("../../../SQLDependencyListenerTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
             HealthDataHandler testHealthHandler = new HealthDataHandler(DateTime.Parse("2021-10-28 15:07:23.277"));
             

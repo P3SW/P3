@@ -52,7 +52,7 @@ namespace BlazorApp
                 endpoints.MapBlazorHub();
                 endpoints.MapFallbackToPage("/_Host");
             });
-            SQLScriptExecuter.Execute("../ExecuteSQLScript/TRUNCATE_TABLE.sql");
+            SQLScriptExecuter.ExecuteOneLine("../ExecuteSQLScript/TRUNCATE_TABLE.sql");
             ConversionDataAssigner.Start("setup.txt");
         }
     }
