@@ -21,7 +21,7 @@ To access the server, either VSCode, DataGrip, Azure Data Studio etc. can be use
 
 ### Create conversion database
 
-To fill the database with data from a conversion, run the `CUSTOM.sql`script. 
+To fill the database with data from a conversion, run the `Database/CUSTOM.sql`script. 
 
 IMPORTANT: make sure the file path on line 7 and 9 matches with your database's path.
 
@@ -29,17 +29,26 @@ IMPORTANT: make sure the file path on line 7 and 9 matches with your database's 
 
 In order to run the application, data patches have to be made.
 
-1. Run `ManagerTrackingFixer.sln`.
-2. Run `MANAGER_TRACKING_patcher.sql`.
+- Run `ManagerTrackingFixer` project.
 
 ## Running the Application
 
 To run the program, dotnet 5.0 is required, it can be installed [here](https://dotnet.microsoft.com/en-us/download/dotnet/5.0).
 
-**Linux, MacOS and Windows**
+**Using Jetbrains Rider**
 
 1. Open the `P3ConversionDashboard.sln`in JetBrains Rider.
 2. Run the Project run configuration.
+
+**Using Terminal**
+
+1. Open 2 terminal windows in the code directory
+2. In the first terminal window run the following:
+  1. `cd BlazorApp/`
+  2. `dotnet run`
+3. In the second terminal window
+  1. `cd DataStreamingSimulation/`
+  2. `dotnet run` 
 
 ## Running Tests
 
@@ -49,3 +58,4 @@ In order to run tests, your file path to the database should be the same as your
 - `Test/DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql`
 - `Test/SQLDependencyListenerTest/NEW_CREATE_ANS_DB_P3_TEST.sql`
 
+After that you can run the tests, by executing the `Test` project.
