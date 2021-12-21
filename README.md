@@ -21,7 +21,8 @@ To access the server, either VSCode, DataGrip, Azure Data Studio etc. can be use
 
 ### Create conversion database
 
-To fill the database with data from a conversion, run the `Database/CUSTOM.sql`script. 
+1. Create a aes user by running `Database/CREATE_aes_LOGIN.sql`
+2. To fill the database with data from a conversion, run the `Database/CUSTOM.sql`script. 
 
 IMPORTANT: make sure the file path on line 7 and 9 matches with your database's path.
 

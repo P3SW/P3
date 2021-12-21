@@ -1,0 +1,2 @@
+CREATE LOGIN aes WITH PASSWORD = 'Password123'
+GO
