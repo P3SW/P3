@@ -10,7 +10,7 @@ namespace ExecuteSQLScript
     public static class SQLScriptExecuter
     {
         //Executes a SQL script with the given path on the database
-        public static void Execute(string path)
+        public static void ExecuteOneLine(string path)
         {
             FileInfo fi = new FileInfo(path);
 
@@ -31,7 +31,7 @@ namespace ExecuteSQLScript
             }
         }
         
-        public static void CreateDB(string path)
+        public static void ExecuteMultipleLines(string path)
         {
             FileInfo fi = new FileInfo(path);
             Console.WriteLine(fi.FullName);

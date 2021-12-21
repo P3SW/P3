@@ -40,10 +40,10 @@ namespace P3ConversionDashboard.Tests.DataStreamingTest
         public async void DatabaseStreamTest()
         {
             //drops database if it exitsts
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/DROP_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.ExecuteMultipleLines("../../../DataStreamingTest/DROP_ANS_DB_P3_TEST.sql"));
             
             //creates new database
-            await Task.Run(() => SQLScriptExecuter.CreateDB("../../../DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
+            await Task.Run(() => SQLScriptExecuter.ExecuteMultipleLines("../../../DataStreamingTest/NEW_CREATE_ANS_DB_P3_TEST.sql"));
             
             testDatabaseStreamer = new DatabaseStreamer("../../../DataStreamingTest/DataStreamingSetup.txt", 
                 "2021-10-28 15:07:10.347", "2021-10-28 16:58:52.720");
